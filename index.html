@@ -41,9 +41,11 @@
     .iframe-container {
       position: relative;
       width: 100%;
-      padding-bottom: 120%; /* Altura para Google Forms */
+      padding-bottom: 140%; /* Altura responsiva para Google Forms */
       height: 0;
       overflow: hidden;
+      background: #f3f4f6;
+      border-radius: 0.75rem;
     }
     .iframe-container iframe {
       position: absolute;
@@ -92,10 +94,9 @@
       </div>
       
       <!-- Iframe responsivo para Google Forms -->
-      <div class="iframe-container rounded-xl shadow-2xl overflow-hidden border-2 border-gray-200">
-        <!-- ⚠️ REEMPLAZA ESTA URL CON LA DE TU GOOGLE FORM -->
+      <div class="iframe-container shadow-2xl overflow-hidden border-2 border-gray-200">
         <iframe 
-          src="https://docs.google.com/forms/d/e/TU_FORM_ID/viewform?embedded=true"
+          src="https://docs.google.com/forms/d/e/1FAIpQLScYw4bPFaZwzvBSXNoWokc-RnJwYJ0Pk8aVw6zPzfBirKrJkA/viewform?embedded=true"
           title="Formulario de Afiliación UADAV"
           loading="lazy">
           Cargando formulario...
