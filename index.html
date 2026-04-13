@@ -1,1 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedSindical-Digital | UADAV Afiliaciones</title>
+    <script src="https://tailwindcss.com"></script>
+    <link href="https://cloudflare.com" rel="stylesheet">
+    <style>
+        .form-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding-top: 140%; /* Ajuste para que el formulario no se corte en móviles */
+        }
+        .form-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans antialiased">
+
+    <!-- BARRA DE NAVEGACIÓN (Estilo Institucional) -->
+    <nav class="bg-blue-900 text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="bg-white text-blue-900 p-1 rounded font-black text-xl italic">RS</div>
+                <span class="font-bold text-lg tracking-tight text-blue-100 uppercase">RedSindical-Digital</span>
+            </div>
+            <div class="hidden md:flex space-x-8 font-medium">
+                <a href="#inicio" class="hover:text-blue-300 transition">Inicio</a>
+                <a href="#beneficios" class="hover:text-blue-300 transition">Beneficios</a>
+                <a href="#registro" class="bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-500 transition shadow-lg">Afiliarme</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION (Enfoque Duo-Tono) -->
+    <header id="inicio" class="relative bg-blue-900 py-16 md:py-24 overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 text-white mb-12 md:mb-0">
+                    <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+                        Unimos la <span class="text-blue-400 font-serif italic">Trayectoria</span> con la <span class="text-blue-400">Innovación</span>.
+                    </h1>
+                    <p class="text-xl text-blue-100 mb-8 max-w-lg">
+                        UADAV: El sindicato moderno para artistas jóvenes, veteranos y alumnos de todas las disciplinas.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#registro" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-xl shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                            <i class="fas fa-user-plus mr-2"></i> INICIAR REGISTRO
+                        </a>
+                        <a href="#beneficios" class="bg-transparent border-2 border-white/30 hover:bg-white/10 text-white font-bold py-4 px-8 rounded-xl transition duration-300">
+                            Ver Beneficios
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="bg-blue-800/30 p-4 rounded-3xl border border-white/10 backdrop-blur-sm shadow-inner">
+                        <div class="grid grid-cols-2 gap-4 text-center text-white">
+                            <div class="bg-white/5 p-6 rounded-2xl">
+                                <i class="fas fa-shield-alt text-3xl text-blue-400 mb-2"></i>
+                                <p class="text-sm font-bold uppercase tracking-widest">Protección</p>
+                            </div>
+                            <div class="bg-white/5 p-6 rounded-2xl">
+                                <i class="fas fa-video text-3xl text-purple-400 mb-2"></i>
+                                <p class="text-sm font-bold uppercase tracking-widest">Streaming</p>
+                            </div>
+                            <div class="bg-white/5 p-6 rounded-2xl">
+                                <i class="fas fa-briefcase-medical text-3xl text-red-400 mb-2"></i>
+                                <p class="text-sm font-bold uppercase tracking-widest">Salud</p>
+                            </div>
+                            <div class="bg-white/5 p-6 rounded-2xl">
+                                <i class="fas fa-graduation-cap text-3xl text-yellow-400 mb-2"></i>
+                                <p class="text-sm font-bold uppercase tracking-widest">Cursos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Decoración de fondo -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+    </header>
+
+    <!-- SECCIÓN DE REGISTRO (El Formulario Chatbot) -->
+    <section id="registro" class="py-20 bg-slate-100">
+        <div class="container mx-auto px-6">
+            <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
+                <div class="bg-blue-600 p-6 text-white text-center">
+                    <h3 class="text-2xl font-bold italic">Portal de Afiliación Digital</h3>
+                    <p class="text-blue-100 opacity-80">Completa tus datos y un administrador te contactará por WhatsApp</p>
+                </div>
+                
+                <div class="form-container">
+                    <iframe src="https://google.com">Cargando…</iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DE BENEFICIOS (Estilo UTHGRA / ACTORES) -->
+    <section id="beneficios" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black text-gray-900 mb-4 uppercase">¿Por qué elegir UADAV?</h2>
+                <div class="w-24 h-2 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="bg-slate-50 p-10 rounded-2xl border-t-8 border-blue-900 shadow-sm hover:shadow-lg transition">
+                    <i class="fas fa-hand-holding-heart text-4xl text-blue-900 mb-6"></i>
+                    <h4 class="text-xl font-bold mb-4">Salud y Bienestar</h4>
+                    <p class="text-gray-600 leading-relaxed italic">Convenios exclusivos con obras sociales y farmacias para vos y tu familia.</p>
+                </div>
+                <div class="bg-slate-50 p-10 rounded-2xl border-t-8 border-blue-600 shadow-sm hover:shadow-lg transition">
+                    <i class="fas fa-suitcase-rolling text-4xl text-blue-600 mb-6"></i>
+                    <h4 class="text-xl font-bold mb-4">Turismo Social</h4>
+                    <p class="text-gray-600 leading-relaxed italic">Acceso a hoteles y centros recreativos en todo el país con tarifas sindicales.</p>
+                </div>
+                <div class="bg-slate-50 p-10 rounded-2xl border-t-8 border-blue-400 shadow-sm hover:shadow-lg transition">
+                    <i class="fas fa-broadcast-tower text-4xl text-blue-400 mb-6"></i>
+                    <h4 class="text-xl font-bold mb-4">UADAV Stream</h4>
+                    <p class="text-gray-600 leading-relaxed italic">Plataforma propia para que los alumnos y artistas muestren su arte al mundo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (Marca Blanca) -->
+    <footer class="bg-blue-950 text-white py-12 px-6 border-t border-white/5">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <div class="mb-8 md:mb-0">
+                <h2 class="text-2xl font-black italic mb-2 tracking-tighter text-blue-400">RedSindical-Digital</h2>
+                <p class="text-blue-200/50 text-sm tracking-widest">TECNOLOGÍA AL SERVICIO DEL TRABAJADOR</p>
+            </div>
+            <div class="text-blue-200/70 text-sm">
+                <p>© 2026 UADAV | Unión Argentina de Artistas de Variedades</p>
+                <p>Hospedado de forma segura para RedSindical</p>
+            </div>
+            <div class="mt-8 md:mt-0 flex space-x-6 text-2xl">
+                <a href="#" class="hover:text-blue-400 transition"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="hover:text-blue-400 transition"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="hover:text-blue-400 transition"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
 
