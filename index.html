@@ -6,20 +6,17 @@
   <title>UADAV - Unión Argentina de Artistas de Variedades</title>
   <meta name="description" content="Afiliate a UADAV y accedé a beneficios exclusivos para artistas y alumnos."/>
   
-  <!-- Tailwind CSS (CDN para desarrollo) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   
-  <!-- Configuración de colores duotono (personalizable para marca blanca) -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            primary: '#8B0000',    /* Rojo UADAV - CAMBIAR PARA OTROS SINDICATOS */
-            secondary: '#FFD700',  /* Dorado - CAMBIAR PARA OTROS SINDICATOS */
+            primary: '#8B0000',
+            secondary: '#FFD700',
             dark: '#1a1a1a',
             light: '#f8f9fa'
           }
@@ -29,7 +26,6 @@
   </script>
   
   <style>
-    /* Efectos duotono */
     .duotone-gradient {
       background: linear-gradient(135deg, #8B0000 0%, #1a1a1a 100%);
     }
@@ -41,7 +37,7 @@
     .iframe-container {
       position: relative;
       width: 100%;
-      padding-bottom: 140%; /* Altura responsiva para Google Forms */
+      padding-bottom: 140%;
       height: 0;
       overflow: hidden;
       background: #f3f4f6;
@@ -55,145 +51,237 @@
       height: 100%;
       border: 0;
     }
+    /* Animación de engranajes */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .gear-spin {
+      animation: spin 8s linear infinite;
+    }
+    .gear-spin-reverse {
+      animation: spin 8s linear infinite reverse;
+    }
   </style>
 </head>
 <body class="font-sans text-dark bg-light">
 
-  <!-- ========== HERO SECTION ========== -->
-  <header class="duotone-gradient text-white py-20 px-4">
-    <div class="max-w-6xl mx-auto text-center">
-      <!-- Logo -->
-      <div class="mb-6">
-        <img src="assets/img/logo.svg" alt="Logo UADAV" class="h-20 mx-auto" onerror="this.src='https://via.placeholder.com/200x80?text=UADAV'"/>
-      </div>
-      
-      <h1 class="text-4xl md:text-6xl font-bold mb-4">
-        Unión Argentina de <span class="text-secondary">Artistas de Variedades</span>
-      </h1>
-      <p class="text-xl md:text-2xl mb-8 opacity-90">
-        Protegemos tu arte, impulsamos tu carrera 🎭✨
-      </p>
-      
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="#registro" class="bg-secondary text-dark font-bold py-3 px-8 rounded-full hover:bg-yellow-400 transition shadow-lg">
-          <i class="fas fa-user-plus mr-2"></i>Afiliate Ahora
-        </a>
-        <a href="#beneficios" class="border-2 border-white py-3 px-8 rounded-full hover:bg-white hover:text-primary transition">
-          <i class="fas fa-gift mr-2"></i>Ver Beneficios
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <!-- ========== SECCIÓN DE REGISTRO (Google Forms) ========== -->
-  <section id="registro" class="py-16 px-4 bg-white">
-    <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-10">
-        <h2 class="text-3xl font-bold text-primary mb-2">📝 Registro de Afiliación</h2>
-        <p class="text-gray-600">Completá el formulario en menos de 3 minutos. ¡Es gratis!</p>
-      </div>
-      
-      <!-- Iframe responsivo para Google Forms -->
-      <div class="iframe-container shadow-2xl overflow-hidden border-2 border-gray-200">
-        <iframe 
-          src="https://docs.google.com/forms/d/e/1FAIpQLScYw4bPFaZwzvBSXNoWokc-RnJwYJ0Pk8aVw6zPzfBirKrJkA/viewform?embedded=true"
-          title="Formulario de Afiliación UADAV"
-          loading="lazy">
-          Cargando formulario...
-        </iframe>
-      </div>
-      
-      <p class="text-center text-sm text-gray-500 mt-4">
-        <i class="fas fa-lock mr-1"></i> Tus datos están protegidos. Solo los administradores de UADAV tendrán acceso.
-      </p>
-    </div>
-  </section>
-
-  <!-- ========== BENEFICIOS ========== -->
-  <section id="beneficios" class="py-16 px-4 duotone-gradient text-white">
-    <div class="max-w-6xl mx-auto">
-      <h2 class="text-3xl font-bold text-center mb-12">🎁 Beneficios Exclusivos</h2>
-      
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Beneficio 1 -->
-        <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
-          <div class="text-4xl mb-4">🎟️</div>
-          <h3 class="text-xl font-bold mb-2">Descuentos en Eventos</h3>
-          <p class="opacity-90">Acceso preferencial y tarifas reducidas en teatros, festivales y espacios culturales aliados.</p>
-        </div>
-        
-        <!-- Beneficio 2 -->
-        <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
-          <div class="text-4xl mb-4">🏥</div>
-          <h3 class="text-xl font-bold mb-2">Cobertura de Salud</h3>
-          <p class="opacity-90">Planes de salud adaptados a artistas con cobertura nacional y atención especializada.</p>
-        </div>
-        
-        <!-- Beneficio 3 -->
-        <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
-          <div class="text-4xl mb-4">✈️</div>
-          <h3 class="text-xl font-bold mb-2">Viajes y Giras</h3>
-          <p class="opacity-90">Organizamos giras nacionales e internacionales con logística y seguros incluidos.</p>
-        </div>
-        
-        <!-- Beneficio 4 -->
-        <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
-          <div class="text-4xl mb-4">📚</div>
-          <h3 class="text-xl font-bold mb-2">Capacitación Gratuita</h3>
-          <p class="opacity-90">Talleres de actuación, danza, música y gestión artística con docentes reconocidos.</p>
-        </div>
-        
-        <!-- Beneficio 5 -->
-        <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
-          <div class="text-4xl mb-4">⚖️</div>
-          <h3 class="text-xl font-bold mb-2">Asesoría Legal</h3>
-          <p class="opacity-90">Defensa de tus derechos laborales y artísticos con abogados especializados en el rubro.</p>
-        </div>
-        
-        <!-- Beneficio 6 -->
-        <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
-          <div class="text-4xl mb-4">🤝</div>
-          <h3 class="text-xl font-bold mb-2">Red de Contactos</h3>
-          <p class="opacity-90">Conectate con productores, directores y otros artistas para potenciar tus proyectos.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== FOOTER ========== -->
-  <footer class="bg-dark text-white py-8 px-4 text-center">
-    <div class="max-w-4xl mx-auto">
-      <img src="assets/img/logo.svg" alt="UADAV" class="h-12 mx-auto mb-4" onerror="this.style.display='none'"/>
-      <p class="mb-2"><strong>Unión Argentina de Artistas de Variedades</strong></p>
-      <p class="text-gray-400 text-sm mb-4">
-        <i class="fas fa-map-marker-alt mr-1"></i> Buenos Aires, Argentina
-      </p>
-      
-      <div class="flex justify-center gap-4 mb-4">
-        <a href="#" class="text-2xl hover:text-secondary transition"><i class="fab fa-whatsapp"></i></a>
-        <a href="#" class="text-2xl hover:text-secondary transition"><i class="fab fa-instagram"></i></a>
-        <a href="#" class="text-2xl hover:text-secondary transition"><i class="fab fa-facebook"></i></a>
-      </div>
-      
-      <p class="text-gray-500 text-xs">
-        © 2026 UADAV - Plataforma digital por RedSindical-Digital<br/>
-        <a href="#" class="underline hover:text-secondary">Términos y Condiciones</a> | 
-        <a href="#" class="underline hover:text-secondary">Política de Privacidad</a>
-      </p>
-    </div>
-  </footer>
-
-  <!-- Smooth scroll para anclas -->
+  <!-- ============================================ -->
+  <!-- ⚙️ CONFIGURACIÓN: MODO MANTENIMIENTO -->
+  <!-- ============================================ -->
+  <!-- Cambiar a false para mostrar la landing normal -->
+  <!-- Cambiar a true para mostrar página de mantenimiento -->
   <script>
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    const MANTENIMIENTO_ACTIVO = true; // ← CAMBIAR ESTO: true o false
+  </script>
+
+  <!-- ============================================ -->
+  <!-- 🚧 PÁGINA DE MANTENIMIENTO -->
+  <!-- ============================================ -->
+  <div id="maintenance-page" class="hidden">
+    <div class="min-h-screen duotone-gradient flex items-center justify-center px-4">
+      <div class="max-w-2xl w-full text-center text-white">
+        
+        <!-- Iconos de engranajes animados -->
+        <div class="relative mb-8 flex justify-center">
+          <i class="fas fa-cog text-8xl text-secondary/30 absolute gear-spin" style="top: -20px; left: 20px;"></i>
+          <i class="fas fa-cog text-8xl text-secondary absolute gear-spin-reverse"></i>
+          <i class="fas fa-cog text-8xl text-secondary/30 absolute gear-spin" style="top: -20px; right: 20px;"></i>
+        </div>
+        
+        <!-- Título -->
+        <h1 class="text-5xl md:text-6xl font-bold mb-4">
+          🚧 Estamos en Mantenimiento
+        </h1>
+        
+        <!-- Subtítulo -->
+        <p class="text-2xl md:text-3xl mb-8 text-secondary font-semibold">
+          Volvemos Pronto
+        </p>
+        
+        <!-- Mensaje -->
+        <div class="bg-white/10 backdrop-blur rounded-xl p-8 mb-8">
+          <p class="text-xl mb-4">
+            Estamos trabajando para ofrecerte una mejor experiencia digital.
+          </p>
+          <p class="text-lg opacity-90">
+            En breve estaremos de vuelta con novedades y mejoras en nuestra plataforma.
+          </p>
+        </div>
+        
+        <!-- Email de contacto -->
+        <div class="bg-white/5 rounded-xl p-6 mb-8 border border-white/20">
+          <p class="text-lg mb-3">
+            <i class="fas fa-envelope mr-2"></i>
+            ¿Necesitás comunicarte con nosotros?
+          </p>
+          <a href="mailto:gremiales@uadav.org.ar" 
+             class="inline-block bg-secondary text-dark font-bold py-3 px-8 rounded-full hover:bg-yellow-400 transition text-xl">
+            gremiales@uadav.org.ar
+          </a>
+        </div>
+        
+        <!-- Redes sociales -->
+        <div class="flex justify-center gap-6 mb-8">
+          <a href="#" class="text-4xl hover:text-secondary transition transform hover:scale-110">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="#" class="text-4xl hover:text-secondary transition transform hover:scale-110">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="text-4xl hover:text-secondary transition transform hover:scale-110">
+            <i class="fab fa-facebook"></i>
+          </a>
+        </div>
+        
+        <!-- Footer -->
+        <p class="text-sm opacity-70">
+          © 2026 UADAV - Unión Argentina de Artistas de Variedades<br/>
+          <span class="text-xs">Plataforma digital por RedSindical-Digital</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 🎭 LANDING PAGE NORMAL (se muestra si MANTENIMIENTO_ACTIVO = false) -->
+  <!-- ============================================ -->
+  <div id="landing-page" class="hidden">
+    
+    <!-- Hero Section -->
+    <header class="duotone-gradient text-white py-20 px-4">
+      <div class="max-w-6xl mx-auto text-center">
+        <div class="mb-6">
+          <img src="assets/img/logo.svg" alt="Logo UADAV" class="h-20 mx-auto" onerror="this.src='https://via.placeholder.com/200x80?text=UADAV'"/>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-bold mb-4">
+          Unión Argentina de <span class="text-secondary">Artistas de Variedades</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 opacity-90">
+          Protegemos tu arte, impulsamos tu carrera 🎭✨
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#registro" class="bg-secondary text-dark font-bold py-3 px-8 rounded-full hover:bg-yellow-400 transition shadow-lg">
+            <i class="fas fa-user-plus mr-2"></i>Afiliate Ahora
+          </a>
+          <a href="#beneficios" class="border-2 border-white py-3 px-8 rounded-full hover:bg-white hover:text-primary transition">
+            <i class="fas fa-gift mr-2"></i>Ver Beneficios
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Registro Section -->
+    <section id="registro" class="py-16 px-4 bg-white">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-3xl font-bold text-primary mb-2">📝 Registro de Afiliación</h2>
+          <p class="text-gray-600">Completá el formulario en menos de 3 minutos. ¡Es gratis!</p>
+        </div>
+        
+        <div class="iframe-container shadow-2xl overflow-hidden border-2 border-gray-200">
+          <iframe 
+            src="https://docs.google.com/forms/d/e/1FAIpQLScYw4bPFaZwzvBSXNoWokc-RnJwYJ0Pk8aVw6zPzfBirKrJkA/viewform?embedded=true"
+            title="Formulario de Afiliación UADAV"
+            loading="lazy">
+            Cargando formulario...
+          </iframe>
+        </div>
+        
+        <p class="text-center text-sm text-gray-500 mt-4">
+          <i class="fas fa-lock mr-1"></i> Tus datos están protegidos.
+        </p>
+      </div>
+    </section>
+
+    <!-- Beneficios Section -->
+    <section id="beneficios" class="py-16 px-4 duotone-gradient text-white">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-12">🎁 Beneficios Exclusivos</h2>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
+            <div class="text-4xl mb-4">🎟️</div>
+            <h3 class="text-xl font-bold mb-2">Descuentos en Eventos</h3>
+            <p class="opacity-90">Acceso preferencial y tarifas reducidas en teatros y festivales.</p>
+          </div>
+          
+          <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
+            <div class="text-4xl mb-4">🏥</div>
+            <h3 class="text-xl font-bold mb-2">Cobertura de Salud</h3>
+            <p class="opacity-90">Planes de salud adaptados a artistas con cobertura nacional.</p>
+          </div>
+          
+          <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
+            <div class="text-4xl mb-4">✈️</div>
+            <h3 class="text-xl font-bold mb-2">Viajes y Giras</h3>
+            <p class="opacity-90">Giras nacionales e internacionales con logística incluida.</p>
+          </div>
+          
+          <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
+            <div class="text-4xl mb-4">📚</div>
+            <h3 class="text-xl font-bold mb-2">Capacitación Gratuita</h3>
+            <p class="opacity-90">Talleres de actuación, danza, música y gestión artística.</p>
+          </div>
+          
+          <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
+            <div class="text-4xl mb-4">⚖️</div>
+            <h3 class="text-xl font-bold mb-2">Asesoría Legal</h3>
+            <p class="opacity-90">Defensa de tus derechos laborales y artísticos.</p>
+          </div>
+          
+          <div class="bg-white/10 backdrop-blur p-6 rounded-xl card-hover">
+            <div class="text-4xl mb-4">🤝</div>
+            <h3 class="text-xl font-bold mb-2">Red de Contactos</h3>
+            <p class="opacity-90">Conectate con productores, directores y otros artistas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-8 px-4 text-center">
+      <div class="max-w-4xl mx-auto">
+        <p class="mb-2"><strong>Unión Argentina de Artistas de Variedades</strong></p>
+        <p class="text-gray-400 text-sm mb-4">
+          <i class="fas fa-map-marker-alt mr-1"></i> Buenos Aires, Argentina
+        </p>
+        
+        <div class="flex justify-center gap-4 mb-4">
+          <a href="#" class="text-2xl hover:text-secondary transition"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="text-2xl hover:text-secondary transition"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="text-2xl hover:text-secondary transition"><i class="fab fa-facebook"></i></a>
+        </div>
+        
+        <p class="text-gray-500 text-xs">
+          © 2026 UADAV - Plataforma digital por RedSindical-Digital
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Script para mostrar/ocultar según modo mantenimiento -->
+  <script>
+    // Mostrar página correspondiente según configuración
+    if (MANTENIMIENTO_ACTIVO) {
+      document.getElementById('maintenance-page').classList.remove('hidden');
+      document.title = "UADAV - Volvemos Pronto | En Mantenimiento";
+    } else {
+      document.getElementById('landing-page').classList.remove('hidden');
+      
+      // Smooth scroll para anclas (solo en landing normal)
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
       });
-    });
+    }
   </script>
 </body>
 </html>
