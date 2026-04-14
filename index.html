@@ -17,10 +17,10 @@
         extend: {
           colors: {
             uadav: {
-              dark: '#003366',      /* Azul oscuro institucional */
-              primary: '#0066CC',   /* Azul medio del logo */
-              light: '#0099FF',     /* Celeste brillante */
-              sky: '#33CCFF',       /* Celeste claro */
+              dark: '#003366',
+              primary: '#0066CC',
+              light: '#0099FF',
+              sky: '#33CCFF',
               white: '#FFFFFF'
             }
           },
@@ -40,7 +40,6 @@
       font-family: 'Poppins', sans-serif;
     }
     
-    /* Gradiente duo-tono basado en el logo UADAV */
     .duotone-gradient {
       background: linear-gradient(135deg, #003366 0%, #0066CC 50%, #0099FF 100%);
     }
@@ -78,7 +77,6 @@
       border: 0;
     }
     
-    /* Animación de estrella */
     @keyframes starPulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.1); }
@@ -88,7 +86,6 @@
       animation: starPulse 2s ease-in-out infinite;
     }
     
-    /* Animación de engranajes */
     @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
@@ -102,7 +99,6 @@
       animation: spin 8s linear infinite reverse;
     }
     
-    /* Efecto de brillo */
     .shine-effect {
       position: relative;
       overflow: hidden;
@@ -131,7 +127,6 @@
       100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
     }
     
-    /* Navegación sticky mejorada */
     .nav-sticky {
       position: sticky;
       top: 0;
@@ -148,7 +143,7 @@
   <!-- ⚙️ CONFIGURACIÓN: MODO MANTENIMIENTO -->
   <!-- ============================================ -->
   <script>
-    const MANTENIMIENTO_ACTIVO = true; // true = mantenimiento | false = landing normal
+    const MANTENIMIENTO_ACTIVO = false; // true = mantenimiento | false = landing normal
   </script>
 
   <!-- ============================================ -->
@@ -158,9 +153,9 @@
     <div class="min-h-screen duotone-gradient flex items-center justify-center px-4">
       <div class="max-w-2xl w-full text-center text-white">
         
-        <!-- Logo UADAV -->
+        <!-- Logo UADAV - PNG GRANDE -->
         <div class="mb-8">
-          <img src="assets/img/logo.svg" alt="UADAV" class="h-24 mx-auto" onerror="this.style.display='none'"/>
+          <img src="assets/img/logo.png" alt="UADAV" class="h-32 mx-auto drop-shadow-2xl" onerror="this.src='https://via.placeholder.com/300x120/0066CC/FFFFFF?text=UADAV'"/>
         </div>
         
         <!-- Iconos de engranajes animados -->
@@ -187,15 +182,24 @@
           </p>
         </div>
         
+        <!-- Contacto - Email y Seccional Santa Fe -->
         <div class="bg-white/5 rounded-xl p-6 mb-8 border border-white/20">
-          <p class="text-lg mb-3">
+          <p class="text-lg mb-4">
             <i class="fas fa-envelope mr-2"></i>
             ¿Necesitás comunicarte con nosotros?
           </p>
-          <a href="mailto:gremiales@uadav.org.ar" 
-             class="inline-block bg-uadav-sky text-uadav-dark font-bold py-3 px-8 rounded-full hover:bg-white transition text-xl shadow-uadav">
-            gremiales@uadav.org.ar
-          </a>
+          
+          <div class="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+            <a href="mailto:gremiales@uadav.org.ar" 
+               class="inline-block bg-uadav-sky text-uadav-dark font-bold py-3 px-6 rounded-full hover:bg-white transition text-lg shadow-uadav">
+              <i class="fas fa-envelope mr-2"></i>gremiales@uadav.org.ar
+            </a>
+            
+            <a href="https://linktr.ee/uadavcentro" target="_blank"
+               class="inline-block bg-white text-uadav-primary font-bold py-3 px-6 rounded-full hover:bg-uadav-sky transition text-lg shadow-uadav">
+              <i class="fas fa-map-marker-alt mr-2"></i>Seccional Santa Fe
+            </a>
+          </div>
         </div>
         
         <div class="flex justify-center gap-6 mb-8">
@@ -226,12 +230,12 @@
     <!-- Navegación mejorada -->
     <nav class="nav-sticky border-b border-uadav-primary/10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
+        <div class="flex justify-between items-center h-24">
           
-          <!-- Logo -->
+          <!-- Logo - PNG GRANDE -->
           <div class="flex-shrink-0 flex items-center">
             <a href="#" class="flex items-center gap-3">
-              <img src="assets/img/logo.svg" alt="UADAV" class="h-12" onerror="this.src='https://via.placeholder.com/150x50/0066CC/FFFFFF?text=UADAV'"/>
+              <img src="assets/img/logo.png" alt="UADAV" class="h-20" onerror="this.src='https://via.placeholder.com/200x80/0066CC/FFFFFF?text=UADAV'"/>
             </a>
           </div>
           
@@ -299,9 +303,9 @@
       </div>
       
       <div class="max-w-6xl mx-auto text-center relative z-10">
-        <!-- Logo -->
+        <!-- Logo - PNG MUY GRANDE -->
         <div class="mb-8">
-          <img src="assets/img/logo.svg" alt="Logo UADAV" class="h-28 mx-auto drop-shadow-2xl" onerror="this.src='https://via.placeholder.com/250x100/FFFFFF/0066CC?text=UADAV'"/>
+          <img src="assets/img/logo.png" alt="Logo UADAV" class="h-40 md:h-48 mx-auto drop-shadow-2xl" onerror="this.src='https://via.placeholder.com/350x140/FFFFFF/0066CC?text=UADAV'"/>
         </div>
         
         <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
@@ -461,7 +465,7 @@
         <div class="grid md:grid-cols-3 gap-8 mb-8">
           <!-- Logo y descripción -->
           <div>
-            <img src="assets/img/logo.svg" alt="UADAV" class="h-16 mb-4 brightness-0 invert" onerror="this.style.display='none'"/>
+            <img src="assets/img/logo.png" alt="UADAV" class="h-24 mb-4 brightness-0 invert" onerror="this.style.display='none'"/>
             <p class="text-gray-300 text-sm">
               Unión Argentina de Artistas de Variedades<br/>
               Defendiendo los derechos de los artistas desde 1950
