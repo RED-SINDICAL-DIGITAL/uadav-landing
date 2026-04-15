@@ -3,252 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UADAV Enterprise - Sistema Integral de Gestión Sindical</title>
-  
-  <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>UADAV Enterprise - Gestión Sindical</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
   <style>
-    :root {
-      --primary: #003366;
-      --secondary: #0066CC;
-      --accent: #0099FF;
-      --success: #28a745;
-      --warning: #ffc107;
-      --danger: #dc3545;
-      --info: #17a2b8;
-      --light: #f8f9fa;
-      --dark: #343a40;
-      --bg: #f0f2f5;
-      --card-bg: #ffffff;
-      --text: #333333;
-      --border: #e0e0e0;
-      --shadow: rgba(0,0,0,0.08);
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    [data-theme="dark"] {
-      --bg: #1a1a2e;
-      --card-bg: #16213e;
-      --text: #e4e4e4;
-      --border: #2d3748;
-      --shadow: rgba(0,0,0,0.3);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --primary:#003366; --secondary:#0066CC; --success:#28a745; --warning:#ffc107; --danger:#dc3545; --bg:#f0f2f5; --card:#fff; --text:#333; --border:#e0e0e0; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); }
     
-    body { 
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-      background: var(--bg); 
-      color: var(--text);
-      transition: var(--transition);
-      overflow-x: hidden;
-    }
-
-    /* Animations */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-    @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .header { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+    .logo { font-size:1.25rem; font-weight:bold; }
+    .nav { display:flex; gap:0.5rem; flex-wrap:wrap; }
+    .nav a { color:#fff; text-decoration:none; padding:0.5rem 1rem; border-radius:6px; font-size:0.85rem; }
+    .nav a:hover, .nav a.active { background:rgba(255,255,255,0.2); }
     
-    .animate-fade { animation: fadeIn 0.5s ease-out; }
-    .animate-slide { animation: slideIn 0.3s ease-out; }
-    .animate-scale { animation: scaleIn 0.3s ease-out; }
-
-    /* Header */
-    .header { 
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
-      color: #fff; 
-      padding: 1rem 2rem; 
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
+    .container { max-width:1400px; margin:2rem auto; padding:0 2rem; }
+    .card { background:var(--card); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 2px 10px rgba(0,0,0,0.1); border:1px solid var(--border); }
+    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:1rem; border-bottom:2px solid var(--border); flex-wrap:wrap; gap:1rem; }
+    .card-title { font-size:1.25rem; color:var(--primary); font-weight:700; }
     
-    .header-content { 
-      max-width: 1600px; 
-      margin: 0 auto; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-    }
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .stat { background:linear-gradient(135deg,var(--secondary),var(--primary)); color:#fff; padding:1rem; border-radius:8px; text-align:center; }
+    .stat-num { font-size:1.75rem; font-weight:bold; }
+    .stat-label { font-size:0.8rem; opacity:0.9; }
     
-    .logo { font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 0.5rem; }
+    .form-group { margin-bottom:1rem; }
+    .form-group label { display:block; margin-bottom:0.35rem; font-weight:600; font-size:0.875rem; }
+    .form-group input, .form-group select { width:100%; padding:0.625rem; border:2px solid var(--border); border-radius:8px; }
+    .form-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
     
-    .nav { display: flex; gap: 0.25rem; align-items: center; flex-wrap: wrap; }
-    .nav a, .nav button { 
-      color: #fff; text-decoration: none; padding: 0.5rem 0.75rem; 
-      border-radius: 6px; transition: var(--transition); border: none;
-      background: transparent; cursor: pointer; font-size: 0.85rem;
-      display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;
-    }
-    .nav a:hover, .nav button:hover { background: rgba(255,255,255,0.2); }
-    .nav a.active { background: rgba(255,255,255,0.3); font-weight: 600; }
-
-    /* Container */
-    .container { max-width: 1600px; margin: 2rem auto; padding: 0 2rem; }
-
-    /* Cards */
-    .card { 
-      background: var(--card-bg); border-radius: 12px; padding: 1.5rem; 
-      margin-bottom: 1.5rem; box-shadow: 0 2px 10px var(--shadow);
-      border: 1px solid var(--border);
-    }
-    .card-header { 
-      display: flex; justify-content: space-between; align-items: center; 
-      margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border);
-      flex-wrap: wrap; gap: 1rem;
-    }
-    .card-title { font-size: 1.25rem; color: var(--primary); font-weight: 700; }
-
-    /* Stats Grid */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-    .stat-card { 
-      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%); 
-      color: #fff; padding: 1.5rem; border-radius: 12px; text-align: center;
-      box-shadow: 0 4px 15px rgba(0,102,204,0.3);
-    }
-    .stat-number { font-size: 2rem; font-weight: bold; margin-bottom: 0.25rem; }
-    .stat-label { font-size: 0.875rem; opacity: 0.9; }
-
-    /* Forms */
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.875rem; }
-    .form-group input, .form-group select, .form-group textarea { 
-      width: 100%; padding: 0.625rem; border: 2px solid var(--border); 
-      border-radius: 8px; font-size: 0.9rem; transition: var(--transition);
-      background: var(--card-bg); color: var(--text);
-    }
-    .form-group input:focus, .form-group select:focus { 
-      outline: none; border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-    }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-
-    /* Buttons */
-    .btn { 
-      padding: 0.625rem 1.25rem; border: none; border-radius: 8px; 
-      font-size: 0.875rem; font-weight: 600; cursor: pointer; 
-      transition: var(--transition); display: inline-flex; 
-      align-items: center; gap: 0.35rem;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .btn-primary { background: var(--secondary); color: #fff; }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-warning { background: var(--warning); color: #000; }
-    .btn-info { background: var(--info); color: #fff; }
-    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8rem; }
-
-    /* Table */
-    .table-container { overflow-x: auto; border-radius: 8px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: var(--primary); color: #fff; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
-    tr:hover { background: rgba(0,102,204,0.03); }
+    .btn { padding:0.625rem 1.25rem; border:none; border-radius:8px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:0.35rem; }
+    .btn-primary { background:var(--secondary); color:#fff; }
+    .btn-success { background:var(--success); color:#fff; }
+    .btn-danger { background:var(--danger); color:#fff; }
+    .btn-sm { padding:0.375rem 0.75rem; font-size:0.8rem; }
     
-    .badge { padding: 0.25rem 0.625rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
-    .badge-nuevo { background: #fff3cd; color: #856404; }
-    .badge-contactado { background: #d4edda; color: #155724; }
-    .badge-afiliado { background: #cce5ff; color: #004085; }
-    .badge-mora { background: #f8d7da; color: #721c24; }
-    .badge-al-dia { background: #d4edda; color: #155724; }
-
-    /* Filters */
-    .filters { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .filters input, .filters select { flex: 1; min-width: 150px; padding: 0.625rem; border: 2px solid var(--border); border-radius: 8px; }
-
-    /* Modal */
-    .modal { 
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center;
-    }
-    .modal.active { display: flex; }
-    .modal-content { 
-      background: var(--card-bg); padding: 2rem; border-radius: 16px; 
-      max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;
-    }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-
-    /* Tabs */
-    .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
-    .tab { 
-      padding: 0.75rem 1.25rem; background: none; border: none; cursor: pointer; 
-      font-weight: 600; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px;
-      white-space: nowrap;
-    }
-    .tab.active { color: var(--secondary); border-bottom-color: var(--secondary); }
-
-    /* Module Sections */
-    .module-section { display: none; }
-    .module-section.active { display: block; animation: fadeIn 0.3s ease-out; }
-
-    /* Dashboard Widgets */
-    .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .filters { display:flex; gap:0.75rem; margin-bottom:1rem; flex-wrap:wrap; }
+    .filters input, .filters select { flex:1; min-width:150px; padding:0.625rem; border:2px solid var(--border); border-radius:8px; }
     
-    /* Login */
-    .login-container { 
-      display: flex; justify-content: center; align-items: center; min-height: 100vh; 
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    }
-    .login-box { 
-      background: var(--card-bg); padding: 2.5rem; border-radius: 16px; 
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 90%; max-width: 400px;
-    }
-
-    /* Toast */
-    .toast-container { position: fixed; top: 100px; right: 20px; z-index: 3000; }
-    .toast { 
-      background: var(--card-bg); padding: 1rem; border-radius: 8px; 
-      margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: flex; align-items: center; gap: 0.75rem; min-width: 300px;
-      border-left: 4px solid var(--secondary);
-      animation: slideIn 0.3s ease-out;
-    }
-    .toast.success { border-left-color: var(--success); }
-    .toast.error { border-left-color: var(--danger); }
-
-    /* Cobranzas */
-    .cuota-card { 
-      background: var(--card-bg); border: 2px solid var(--border); 
-      border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .cuota-card.mora { border-left: 4px solid var(--danger); }
-    .cuota-card.al-dia { border-left: 4px solid var(--success); }
-
-    /* Padrón */
-    .padron-card { 
-      background: var(--card-bg); border-radius: 8px; padding: 1rem; 
-      margin-bottom: 0.75rem; border: 1px solid var(--border);
-      display: grid; grid-template-columns: 80px 1fr auto; gap: 1rem; align-items: center;
-    }
-    .padron-foto { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--secondary); }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:0.75rem; text-align:left; border-bottom:1px solid var(--border); }
+    th { background:var(--primary); color:#fff; font-weight:600; font-size:0.8rem; }
+    tr:hover { background:rgba(0,102,204,0.03); }
     
-    /* Obras Sociales */
-    .prestador-card { 
-      background: var(--card-bg); border-radius: 8px; padding: 1rem; 
-      margin-bottom: 0.75rem; border-left: 4px solid var(--info);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header-content { flex-direction: column; gap: 1rem; }
-      .nav { justify-content: center; }
-      .stats-grid { grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; }
-      .filters { flex-direction: column; }
-      .filters input, .filters select { width: 100%; }
-      .padron-card { grid-template-columns: 1fr; text-align: center; }
-    }
-
-    .hidden { display: none !important; }
+    .badge { padding:0.25rem 0.625rem; border-radius:12px; font-size:0.75rem; font-weight:600; }
+    .badge-activo { background:#d4edda; color:#155724; }
+    .badge-mora { background:#f8d7da; color:#721c24; }
+    
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center; }
+    .modal.active { display:flex; }
+    .modal-content { background:var(--card); padding:2rem; border-radius:16px; max-width:600px; width:90%; max-height:90vh; overflow-y:auto; }
+    .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+    .modal-close { background:none; border:none; font-size:1.5rem; cursor:pointer; }
+    
+    .tabs { display:flex; gap:0.5rem; border-bottom:2px solid var(--border); margin-bottom:1rem; overflow-x:auto; }
+    .tab { padding:0.75rem 1rem; background:none; border:none; cursor:pointer; font-weight:600; color:#666; border-bottom:3px solid transparent; margin-bottom:-2px; }
+    .tab.active { color:var(--secondary); border-bottom-color:var(--secondary); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    
+    .login-container { display:flex; justify-content:center; align-items:center; min-height:100vh; background:linear-gradient(135deg,var(--primary),var(--secondary)); }
+    .login-box { background:var(--card); padding:2.5rem; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,0.2); width:90%; max-width:400px; text-align:center; }
+    
+    .toast { position:fixed; top:20px; right:20px; background:var(--card); padding:1rem; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); border-left:4px solid var(--secondary); z-index:3000; animation:slideIn 0.3s; }
+    .toast.success { border-left-color:var(--success); }
+    .toast.error { border-left-color:var(--danger); }
+    @keyframes slideIn { from { transform:translateX(400px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+    
+    .hidden { display:none !important; }
+    @media (max-width:768px) { .header { flex-direction:column; gap:1rem; } .nav { justify-content:center; } .filters { flex-direction:column; } }
   </style>
 </head>
 <body>
@@ -256,330 +78,145 @@
   <!-- LOGIN -->
   <div id="loginView" class="login-container">
     <div class="login-box">
-      <h1 style="text-align: center; color: var(--primary); margin-bottom: 0.5rem;">
-        <i class="fas fa-building"></i> UADAV Enterprise
-      </h1>
-      <p style="text-align: center; color: #666; margin-bottom: 2rem;">Sistema Integral de Gestión Sindical</p>
+      <h1 style="color:var(--primary); margin-bottom:0.5rem;"><i class="fas fa-building"></i> UADAV Enterprise</h1>
+      <p style="color:#666; margin-bottom:2rem;">Sistema de Gestión Sindical</p>
       <form onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label><i class="fas fa-lock"></i> Contraseña</label>
-          <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" required>
+          <input type="password" id="loginPassword" placeholder="Contraseña" required style="width:100%; padding:0.75rem; border:2px solid var(--border); border-radius:8px;">
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">
-          <i class="fas fa-sign-in-alt"></i> Ingresar
-        </button>
+        <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
       </form>
-      <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #666;">
-        Contraseña: <strong>admin123</strong>
-      </p>
+      <p style="margin-top:1rem; font-size:0.8rem; color:#666;">Contraseña: <strong>admin123</strong></p>
     </div>
   </div>
 
   <!-- MAIN APP -->
   <div id="mainView" class="hidden">
-    <!-- Header -->
     <header class="header">
-      <div class="header-content">
-        <div class="logo"><i class="fas fa-building"></i> UADAV Enterprise</div>
-        <nav class="nav">
-          <a href="#" onclick="showModule('dashboard')" class="active" id="nav-dashboard"><i class="fas fa-home"></i> Inicio</a>
-          <a href="#" onclick="showModule('padron')" id="nav-padron"><i class="fas fa-users"></i> Padrón</a>
-          <a href="#" onclick="showModule('cobranzas')" id="nav-cobranzas"><i class="fas fa-dollar-sign"></i> Cobranzas</a>
-          <a href="#" onclick="showModule('obras-sociales')" id="nav-obras-sociales"><i class="fas fa-hospital"></i> Obras Sociales</a>
-          <a href="#" onclick="showModule('ayuda-economica')" id="nav-ayuda-economica"><i class="fas fa-hand-holding-usd"></i> Ayuda Económica</a>
-          <a href="#" onclick="showModule('sindicato')" id="nav-sindicato"><i class="fas fa-briefcase"></i> Sindicato</a>
-          <a href="#" onclick="showModule('inspectores')" id="nav-inspectores"><i class="fas fa-user-shield"></i> Inspectores</a>
-          <a href="#" onclick="showModule('legales')" id="nav-legales"><i class="fas fa-gavel"></i> Legales</a>
-          <a href="#" onclick="showModule('carnets')" id="nav-carnets"><i class="fas fa-id-card"></i> Carnets</a>
-          <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</a>
-        </nav>
-      </div>
+      <div class="logo"><i class="fas fa-building"></i> UADAV Enterprise</div>
+      <nav class="nav">
+        <a href="#" onclick="showModule('dashboard')" class="active" id="nav-dashboard"><i class="fas fa-home"></i> Inicio</a>
+        <a href="#" onclick="showModule('padron')" id="nav-padron"><i class="fas fa-users"></i> Padrón</a>
+        <a href="#" onclick="showModule('cobranzas')" id="nav-cobranzas"><i class="fas fa-dollar-sign"></i> Cobranzas</a>
+        <a href="#" onclick="showModule('obras')" id="nav-obras"><i class="fas fa-hospital"></i> Obras Sociales</a>
+        <a href="#" onclick="showModule('prestamos')" id="nav-prestamos"><i class="fas fa-hand-holding-usd"></i> Préstamos</a>
+        <a href="#" onclick="showModule('legales')" id="nav-legales"><i class="fas fa-gavel"></i> Legales</a>
+        <a href="#" onclick="showModule('carnets')" id="nav-carnets"><i class="fas fa-id-card"></i> Carnets</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</a>
+      </nav>
     </header>
-
-    <div class="toast-container" id="toastContainer"></div>
 
     <div class="container">
       
-      <!-- DASHBOARD MODULE -->
-      <div id="dashboardModule" class="module-section active">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-number" id="statTotalAfiliados">0</div>
-            <div class="stat-label">Total Afiliados</div>
-          </div>
-          <div class="stat-card" style="background: linear-gradient(135deg, #28a745, #20c997);">
-            <div class="stat-number" id="statAlDia">0</div>
-            <div class="stat-label">Al Día</div>
-          </div>
-          <div class="stat-card" style="background: linear-gradient(135deg, #dc3545, #c82333);">
-            <div class="stat-number" id="statMorosos">0</div>
-            <div class="stat-label">Morosos</div>
-          </div>
-          <div class="stat-card" style="background: linear-gradient(135deg, #ffc107, #e0a800);">
-            <div class="stat-number" id="statPrestamos">0</div>
-            <div class="stat-label">Préstamos Activos</div>
-          </div>
+      <!-- DASHBOARD -->
+      <div id="dashboardModule">
+        <div class="stats">
+          <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Afiliados</div></div>
+          <div class="stat" style="background:linear-gradient(135deg,#28a745,#20c997);"><div class="stat-num" id="statAlDia">0</div><div class="stat-label">Al Día</div></div>
+          <div class="stat" style="background:linear-gradient(135deg,#dc3545,#c82333);"><div class="stat-num" id="statMorosos">0</div><div class="stat-label">Morosos</div></div>
+          <div class="stat" style="background:linear-gradient(135deg,#ffc107,#e0a800);"><div class="stat-num" id="statPrestamos">0</div><div class="stat-label">Préstamos</div></div>
         </div>
-
-        <div class="widget-grid">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title"><i class="fas fa-chart-pie"></i> Estado de Cuotas</h2>
-            </div>
-            <canvas id="cuotasChart" style="max-height: 300px;"></canvas>
-          </div>
-          
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Alertas Recientes</h2>
-            </div>
-            <div id="alertasList"></div>
-          </div>
-        </div>
-
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-tasks"></i> Accesos Rápidos</h2>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <button class="btn btn-primary" onclick="showModule('cobranzas')"><i class="fas fa-money-bill-wave"></i> Registrar Pago</button>
-            <button class="btn btn-success" onclick="showModule('padron')"><i class="fas fa-user-plus"></i> Nuevo Afiliado</button>
-            <button class="btn btn-info" onclick="showModule('ayuda-economica')"><i class="fas fa-hand-holding-usd"></i> Nuevo Préstamo</button>
+          <div class="card-header"><h2 class="card-title">Accesos Rápidos</h2></div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem;">
+            <button class="btn btn-primary" onclick="showModule('padron')"><i class="fas fa-user-plus"></i> Nuevo Afiliado</button>
+            <button class="btn btn-success" onclick="showModule('cobranzas')"><i class="fas fa-money-bill"></i> Registrar Pago</button>
+            <button class="btn btn-info" onclick="showModule('prestamos')"><i class="fas fa-hand-holding-usd"></i> Nuevo Préstamo</button>
             <button class="btn btn-warning" onclick="showModule('legales')"><i class="fas fa-folder-plus"></i> Nuevo Expediente</button>
           </div>
         </div>
       </div>
 
-      <!-- PADRÓN MODULE -->
-      <div id="padronModule" class="module-section">
+      <!-- PADRÓN -->
+      <div id="padronModule" class="hidden">
         <div class="card">
           <div class="card-header">
             <h2 class="card-title"><i class="fas fa-users"></i> Padrón de Afiliados</h2>
-            <div>
-              <button class="btn btn-success" onclick="openModal('nuevoAfiliadoModal')"><i class="fas fa-plus"></i> Nuevo Afiliado</button>
-              <button class="btn btn-primary" onclick="exportarPadron()"><i class="fas fa-download"></i> Exportar</button>
-            </div>
+            <button class="btn btn-success" onclick="openModal('modalAfiliado')"><i class="fas fa-plus"></i> Nuevo</button>
           </div>
-          
           <div class="filters">
-            <input type="text" id="padronSearch" placeholder="Buscar por nombre, DNI..." onkeyup="filtrarPadron()">
-            <select id="padronFilterEstado" onchange="filtrarPadron()">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-            <select id="padronFilterSeccional" onchange="filtrarPadron()">
-              <option value="">Todas las seccionales</option>
-              <option value="capital">Capital Federal</option>
-              <option value="santafe">Santa Fe</option>
-              <option value="cordoba">Córdoba</option>
+            <input type="text" id="padronSearch" placeholder="Buscar..." onkeyup="renderPadron()">
+            <select id="padronFilter" onchange="renderPadron()">
+              <option value="">Todos</option>
+              <option value="activo">Activos</option>
+              <option value="inactivo">Inactivos</option>
             </select>
           </div>
-
-          <div id="padronList"></div>
+          <div class="table-container">
+            <table>
+              <thead><tr><th>Nombre</th><th>DNI</th><th>Categoría</th><th>Seccional</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="padronTable"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- COBRANZAS MODULE -->
-      <div id="cobranzasModule" class="module-section">
+      <!-- COBRANZAS -->
+      <div id="cobranzasModule" class="hidden">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-dollar-sign"></i> Sistema de Cobranzas</h2>
-            <button class="btn btn-success" onclick="openModal('registrarPagoModal')"><i class="fas fa-plus"></i> Registrar Pago</button>
+            <h2 class="card-title"><i class="fas fa-dollar-sign"></i> Cobranzas</h2>
+            <button class="btn btn-success" onclick="openModal('modalPago')"><i class="fas fa-plus"></i> Registrar Pago</button>
           </div>
-
           <div class="tabs">
-            <button class="tab active" onclick="showTab('cobranzas', 'resumen')">Resumen</button>
-            <button class="tab" onclick="showTab('cobranzas', 'cuotas')">Cuotas</button>
-            <button class="tab" onclick="showTab('cobranzas', 'morosos')">Morosos</button>
-            <button class="tab" onclick="showTab('cobranzas', 'recibos')">Recibos</button>
+            <button class="tab active" onclick="showTab('cobranzas','cuotas')">Cuotas</button>
+            <button class="tab" onclick="showTab('cobranzas','morosos')">Morosos</button>
           </div>
-
-          <div id="cobranzas-resumen" class="tab-content">
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-number" id="totalRecaudado">$0</div>
-                <div class="stat-label">Recaudado este Mes</div>
-              </div>
-              <div class="stat-card" style="background: linear-gradient(135deg, #ffc107, #e0a800);">
-                <div class="stat-number" id="totalPendiente">$0</div>
-                <div class="stat-label">Pendiente</div>
-              </div>
-            </div>
-          </div>
-
-          <div id="cobranzas-cuotas" class="tab-content hidden">
-            <div class="filters">
-              <input type="text" id="cuotasSearch" placeholder="Buscar afiliado..." onkeyup="filtrarCuotas()">
-              <select id="cuotasFilterMes" onchange="filtrarCuotas()">
-                <option value="">Todos los meses</option>
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-              </select>
-            </div>
+          <div id="cobranzas-cuotas" class="tab-content active">
             <div id="cuotasList"></div>
           </div>
-
-          <div id="cobranzas-morosos" class="tab-content hidden">
+          <div id="cobranzas-morosos" class="tab-content">
             <div id="morososList"></div>
           </div>
-
-          <div id="cobranzas-recibos" class="tab-content hidden">
-            <button class="btn btn-primary" onclick="generarReciboMasivo()"><i class="fas fa-print"></i> Generar Recibos Masivos</button>
-            <div id="recibosList" style="margin-top: 1rem;"></div>
-          </div>
         </div>
       </div>
 
-      <!-- OBRAS SOCIALES MODULE -->
-      <div id="obrasSocialesModule" class="module-section">
+      <!-- OBRAS SOCIALES -->
+      <div id="obrasModule" class="hidden">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-hospital"></i> Obras Sociales y Prestadores</h2>
-            <button class="btn btn-success" onclick="openModal('nuevoPrestadorModal')"><i class="fas fa-plus"></i> Nuevo Prestador</button>
+            <h2 class="card-title"><i class="fas fa-hospital"></i> Obras Sociales - Prestadores</h2>
+            <button class="btn btn-success" onclick="openModal('modalPrestador')"><i class="fas fa-plus"></i> Nuevo Prestador</button>
           </div>
-
-          <div class="tabs">
-            <button class="tab active" onclick="showTab('obras', 'prestadores')">Prestadores</button>
-            <button class="tab" onclick="showTab('obras', 'cartilla')">Cartilla</button>
-            <button class="tab" onclick="showTab('obras', 'convenios')">Convenios</button>
+          <div class="filters">
+            <input type="text" id="prestadorSearch" placeholder="Buscar..." onkeyup="renderPrestadores()">
+            <select id="prestadorFilter" onchange="renderPrestadores()">
+              <option value="">Todas</option>
+              <option value="clinica">Clínica</option>
+              <option value="odontologia">Odontología</option>
+              <option value="farmacia">Farmacia</option>
+            </select>
           </div>
-
-          <div id="obras-prestadores" class="tab-content">
-            <div class="filters">
-              <input type="text" id="prestadorSearch" placeholder="Buscar prestador..." onkeyup="filtrarPrestadores()">
-              <select id="prestadorFilterEspecialidad" onchange="filtrarPrestadores()">
-                <option value="">Todas las especialidades</option>
-                <option value="clinica">Clínica Médica</option>
-                <option value="cardiologia">Cardiología</option>
-                <option value="odontologia">Odontología</option>
-                <option value="farmacia">Farmacia</option>
-              </select>
-            </div>
-            <div id="prestadoresList"></div>
-          </div>
-
-          <div id="obras-cartilla" class="tab-content hidden">
-            <div id="cartillaList"></div>
-          </div>
-
-          <div id="obras-convenios" class="tab-content hidden">
-            <div id="conveniosList"></div>
-          </div>
+          <div id="prestadoresList"></div>
         </div>
       </div>
 
-      <!-- AYUDA ECONÓMICA MODULE -->
-      <div id="ayudaEconomicaModule" class="module-section">
+      <!-- PRÉSTAMOS -->
+      <div id="prestamosModule" class="hidden">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-hand-holding-usd"></i> Ayuda Económica y Préstamos</h2>
-            <button class="btn btn-success" onclick="openModal('nuevoPrestamoModal')"><i class="fas fa-plus"></i> Nuevo Préstamo</button>
+            <h2 class="card-title"><i class="fas fa-hand-holding-usd"></i> Préstamos</h2>
+            <button class="btn btn-success" onclick="openModal('modalPrestamo')"><i class="fas fa-plus"></i> Nuevo Préstamo</button>
           </div>
-
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-number" id="totalPrestamosActivos">0</div>
-              <div class="stat-label">Préstamos Activos</div>
-            </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #28a745, #20c997);">
-              <div class="stat-number" id="totalPrestado">$0</div>
-              <div class="stat-label">Total Prestado</div>
-            </div>
-          </div>
-
           <div id="prestamosList"></div>
         </div>
       </div>
 
-      <!-- SINDICATO MODULE -->
-      <div id="sindicatoModule" class="module-section">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-briefcase"></i> Gestión Sindical</h2>
-            <button class="btn btn-success" onclick="openModal('nuevaActaModal')"><i class="fas fa-plus"></i> Nueva Acta</button>
-          </div>
-
-          <div class="tabs">
-            <button class="tab active" onclick="showTab('sindicato', 'actas')">Actas</button>
-            <button class="tab" onclick="showTab('sindicato', 'resoluciones')">Resoluciones</button>
-            <button class="tab" onclick="showTab('sindicato', 'normativa')">Normativa</button>
-          </div>
-
-          <div id="sindicato-actas" class="tab-content">
-            <div id="actasList"></div>
-          </div>
-
-          <div id="sindicato-resoluciones" class="tab-content hidden">
-            <div id="resolucionesList"></div>
-          </div>
-
-          <div id="sindicato-normativa" class="tab-content hidden">
-            <div id="normativaList"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- INSPECTORES MODULE -->
-      <div id="inspectoresModule" class="module-section">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-user-shield"></i> Inspectores Habilitados</h2>
-            <button class="btn btn-success" onclick="openModal('nuevoInspectorModal')"><i class="fas fa-plus"></i> Nuevo Inspector</button>
-          </div>
-
-          <div class="filters">
-            <select id="inspectorFilterZona" onchange="filtrarInspectores()">
-              <option value="">Todas las zonas</option>
-              <option value="general">General</option>
-              <option value="santafe">Santa Fe</option>
-              <option value="cordoba">Córdoba</option>
-            </select>
-          </div>
-
-          <div id="inspectoresList"></div>
-        </div>
-      </div>
-
-      <!-- LEGALES MODULE -->
-      <div id="legalesModule" class="module-section">
+      <!-- LEGALES -->
+      <div id="legalesModule" class="hidden">
         <div class="card">
           <div class="card-header">
             <h2 class="card-title"><i class="fas fa-gavel"></i> Departamento Legal</h2>
-            <button class="btn btn-success" onclick="openModal('nuevoExpedienteModal')"><i class="fas fa-plus"></i> Nuevo Expediente</button>
+            <button class="btn btn-success" onclick="openModal('modalExpediente')"><i class="fas fa-plus"></i> Nuevo Expediente</button>
           </div>
-
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-number" id="totalExpedientes">0</div>
-              <div class="stat-label">Expedientes Activos</div>
-            </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #ffc107, #e0a800);">
-              <div class="stat-number" id="expedientesPendientes">0</div>
-              <div class="stat-label">Pendientes</div>
-            </div>
-          </div>
-
           <div id="expedientesList"></div>
         </div>
       </div>
 
-      <!-- CARNETS MODULE -->
-      <div id="carnetsModule" class="module-section">
+      <!-- CARNETS -->
+      <div id="carnetsModule" class="hidden">
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-id-card"></i> Credenciales Digitales</h2>
-          </div>
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-id-card"></i> Carnets Digitales</h2></div>
           <div id="carnetsList"></div>
         </div>
       </div>
@@ -587,48 +224,29 @@
     </div>
   </div>
 
-  <!-- MODALS (ejemplos principales) -->
-  
-  <!-- Modal Nuevo Afiliado -->
-  <div id="nuevoAfiliadoModal" class="modal">
+  <!-- MODALS -->
+  <div id="modalAfiliado" class="modal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2><i class="fas fa-user-plus"></i> Nuevo Afiliado</h2>
-        <button class="modal-close" onclick="closeModal('nuevoAfiliadoModal')">&times;</button>
-      </div>
+      <div class="modal-header"><h2>Nuevo Afiliado</h2><button class="modal-close" onclick="closeModal('modalAfiliado')">&times;</button></div>
       <form onsubmit="saveAfiliado(event)">
         <div class="form-row">
-          <div class="form-group">
-            <label>Nombre Completo *</label>
-            <input type="text" id="afiliadoNombre" required>
-          </div>
-          <div class="form-group">
-            <label>DNI *</label>
-            <input type="text" id="afiliadoDNI" required>
-          </div>
+          <div class="form-group"><label>Nombre *</label><input type="text" id="afNombre" required></div>
+          <div class="form-group"><label>DNI *</label><input type="text" id="afDNI" required></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="afiliadoEmail">
-          </div>
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input type="tel" id="afiliadoTelefono">
-          </div>
+          <div class="form-group"><label>Email</label><input type="email" id="afEmail"></div>
+          <div class="form-group"><label>Teléfono</label><input type="tel" id="afTelefono"></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Seccional *</label>
-            <select id="afiliadoSeccional" required>
-              <option value="capital">Capital Federal</option>
+          <div class="form-group"><label>Seccional *</label>
+            <select id="afSeccional" required>
+              <option value="capital">Capital</option>
               <option value="santafe">Santa Fe</option>
               <option value="cordoba">Córdoba</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Categoría *</label>
-            <select id="afiliadoCategoria" required>
+          <div class="form-group"><label>Categoría *</label>
+            <select id="afCategoria" required>
               <option value="locutor">Locutor</option>
               <option value="cantante">Cantante</option>
               <option value="bailarin">Bailarín</option>
@@ -636,658 +254,336 @@
             </select>
           </div>
         </div>
-        <button type="submit" class="btn btn-success" style="width: 100%;"><i class="fas fa-save"></i> Guardar Afiliado</button>
+        <button type="submit" class="btn btn-success" style="width:100%;">Guardar</button>
       </form>
     </div>
   </div>
 
-  <!-- Modal Registrar Pago -->
-  <div id="registrarPagoModal" class="modal">
+  <div id="modalPago" class="modal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2><i class="fas fa-money-bill-wave"></i> Registrar Pago</h2>
-        <button class="modal-close" onclick="closeModal('registrarPagoModal')">&times;</button>
-      </div>
+      <div class="modal-header"><h2>Registrar Pago</h2><button class="modal-close" onclick="closeModal('modalPago')">&times;</button></div>
       <form onsubmit="savePago(event)">
-        <div class="form-group">
-          <label>Afiliado *</label>
-          <select id="pagoAfiliado" required></select>
-        </div>
+        <div class="form-group"><label>Afiliado *</label><select id="pagoAfiliado" required></select></div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Mes *</label>
+          <div class="form-group"><label>Mes *</label>
             <select id="pagoMes" required>
-              <option value="1">Enero</option>
-              <option value="2">Febrero</option>
-              <option value="3">Marzo</option>
-              <option value="4">Abril</option>
-              <option value="5">Mayo</option>
-              <option value="6">Junio</option>
-              <option value="7">Julio</option>
-              <option value="8">Agosto</option>
-              <option value="9">Septiembre</option>
-              <option value="10">Octubre</option>
-              <option value="11">Noviembre</option>
-              <option value="12">Diciembre</option>
+              <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+              <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+              <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Año *</label>
-            <input type="number" id="pagoAnio" value="2026" required>
-          </div>
+          <div class="form-group"><label>Año *</label><input type="number" id="pagoAnio" value="2026" required></div>
         </div>
-        <div class="form-group">
-          <label>Monto *</label>
-          <input type="number" id="pagoMonto" step="0.01" required>
-        </div>
-        <div class="form-group">
-          <label>Forma de Pago</label>
-          <select id="pagoForma">
-            <option value="efectivo">Efectivo</option>
-            <option value="transferencia">Transferencia</option>
-            <option value="debito">Débito Automático</option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-success" style="width: 100%;"><i class="fas fa-save"></i> Registrar Pago</button>
+        <div class="form-group"><label>Monto *</label><input type="number" id="pagoMonto" step="0.01" required></div>
+        <button type="submit" class="btn btn-success" style="width:100%;">Registrar</button>
       </form>
     </div>
   </div>
 
-  <!-- Más modals para préstamos, expedientes, etc. -->
+  <div id="modalPrestador" class="modal">
+    <div class="modal-content">
+      <div class="modal-header"><h2>Nuevo Prestador</h2><button class="modal-close" onclick="closeModal('modalPrestador')">&times;</button></div>
+      <form onsubmit="savePrestador(event)">
+        <div class="form-group"><label>Nombre *</label><input type="text" id="prNombre" required></div>
+        <div class="form-group"><label>Especialidad *</label>
+          <select id="prEspecialidad" required>
+            <option value="clinica">Clínica Médica</option>
+            <option value="cardiologia">Cardiología</option>
+            <option value="odontologia">Odontología</option>
+            <option value="farmacia">Farmacia</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Domicilio</label><input type="text" id="prDomicilio"></div>
+        <div class="form-group"><label>Teléfono</label><input type="tel" id="prTelefono"></div>
+        <button type="submit" class="btn btn-success" style="width:100%;">Guardar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalPrestamo" class="modal">
+    <div class="modal-content">
+      <div class="modal-header"><h2>Nuevo Préstamo</h2><button class="modal-close" onclick="closeModal('modalPrestamo')">&times;</button></div>
+      <form onsubmit="savePrestamo(event)">
+        <div class="form-group"><label>Afiliado *</label><select id="prestamoAfiliado" required></select></div>
+        <div class="form-group"><label>Monto *</label><input type="number" id="prestamoMonto" step="0.01" required></div>
+        <div class="form-group"><label>Cuotas *</label><input type="number" id="prestamoCuotas" min="1" max="24" value="12" required></div>
+        <button type="submit" class="btn btn-success" style="width:100%;">Crear Préstamo</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalExpediente" class="modal">
+    <div class="modal-content">
+      <div class="modal-header"><h2>Nuevo Expediente</h2><button class="modal-close" onclick="closeModal('modalExpediente')">&times;</button></div>
+      <form onsubmit="saveExpediente(event)">
+        <div class="form-group"><label>Número *</label><input type="text" id="expNumero" required></div>
+        <div class="form-group"><label>Título *</label><input type="text" id="expTitulo" required></div>
+        <div class="form-group"><label>Afiliado</label><input type="text" id="expAfiliado"></div>
+        <div class="form-group"><label>Estado *</label>
+          <select id="expEstado" required>
+            <option value="pendiente">Pendiente</option>
+            <option value="en-proceso">En Proceso</option>
+            <option value="resuelto">Resuelto</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%;">Crear Expediente</button>
+      </form>
+    </div>
+  </div>
 
   <script>
     // ==========================================
-    // BASE DE DATOS LOCAL
+    // BASE DE DATOS
     // ==========================================
+    const DB = 'uadav_db_v1';
+    let db = { afiliados:[], pagos:[], prestadores:[], prestamos:[], expedientes:[] };
     
-    const DB_KEY = 'uadav_enterprise_db_v1';
-    let db = {
-      afiliados: [],
-      cuotas: [],
-      pagos: [],
-      prestadores: [],
-      prestamos: [],
-      actas: [],
-      inspectores: [],
-      expedientes: [],
-      config: {
-        cuotaMensual: 5000,
-        interesMora: 10
-      }
-    };
-
-    let currentModule = 'dashboard';
-    let currentTab = {};
-
+    function loadDB() { const s=localStorage.getItem(DB); if(s) db=JSON.parse(s); }
+    function saveDB() { localStorage.setItem(DB, JSON.stringify(db)); }
+    
     // ==========================================
     // INICIALIZACIÓN
     // ==========================================
-
-    window.onload = function() {
-      loadData();
-      checkSession();
-    };
-
-    function loadData() {
-      const saved = localStorage.getItem(DB_KEY);
-      if (saved) {
-        db = JSON.parse(saved);
-      }
-    }
-
-    function saveData() {
-      localStorage.setItem(DB_KEY, JSON.stringify(db));
-    }
-
+    window.onload = function() { loadDB(); checkSession(); };
+    
     function checkSession() {
-      if (sessionStorage.getItem('loggedIn') === 'true') {
+      if(sessionStorage.getItem('loggedIn')==='true') {
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('mainView').classList.remove('hidden');
         updateDashboard();
       }
     }
-
+    
     function handleLogin(e) {
       e.preventDefault();
-      if (document.getElementById('loginPassword').value === 'admin123') {
-        sessionStorage.setItem('loggedIn', 'true');
+      if(document.getElementById('loginPassword').value==='admin123') {
+        sessionStorage.setItem('loggedIn','true');
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('mainView').classList.remove('hidden');
-        showToast('Bienvenido al sistema', 'success');
+        showToast('Bienvenido','success');
         updateDashboard();
-      } else {
-        showToast('Contraseña incorrecta', 'error');
-      }
+      } else { showToast('Contraseña incorrecta','error'); }
     }
-
-    function logout() {
-      sessionStorage.removeItem('loggedIn');
-      location.reload();
+    
+    function logout() { sessionStorage.removeItem('loggedIn'); location.reload(); }
+    
+    function showToast(msg,type) {
+      const t=document.createElement('div'); t.className='toast '+type; t.innerHTML='<i class="fas fa-'+(type==='success'?'check':'exclamation')+'-circle"></i> '+msg;
+      document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
     }
-
+    
     // ==========================================
     // NAVEGACIÓN
     // ==========================================
-
-    function showModule(moduleName) {
-      // Ocultar todos los módulos
-      document.querySelectorAll('.module-section').forEach(m => m.classList.remove('active'));
-      document.querySelectorAll('.nav a').forEach(n => n.classList.remove('active'));
-      
-      // Mostrar módulo seleccionado
-      document.getElementById(moduleName + 'Module').classList.add('active');
-      document.getElementById('nav-' + moduleName).classList.add('active');
-      
-      currentModule = moduleName;
-      
-      // Cargar datos específicos del módulo
-      if (moduleName === 'padron') renderPadron();
-      if (moduleName === 'cobranzas') renderCobranzas();
-      if (moduleName === 'obras-sociales') renderObrasSociales();
-      if (moduleName === 'ayuda-economica') renderAyudaEconomica();
-      if (moduleName === 'sindicato') renderSindicato();
-      if (moduleName === 'inspectores') renderInspectores();
-      if (moduleName === 'legales') renderLegales();
-      if (moduleName === 'carnets') renderCarnets();
+    function showModule(m) {
+      document.querySelectorAll('[id$="Module"]').forEach(el=>el.classList.add('hidden'));
+      document.querySelectorAll('.nav a').forEach(el=>el.classList.remove('active'));
+      document.getElementById(m+'Module').classList.remove('hidden');
+      document.getElementById('nav-'+m).classList.add('active');
+      if(m==='padron') renderPadron();
+      if(m==='cobranzas') renderCobranzas();
+      if(m==='obras') renderPrestadores();
+      if(m==='prestamos') renderPrestamos();
+      if(m==='legales') renderLegales();
+      if(m==='carnets') renderCarnets();
     }
-
-    function showTab(module, tabName) {
-      const modulePrefix = module === 'cobranzas' ? 'cobranzas' : 
-                          module === 'obras' ? 'obras' : 'sindicato';
-      
-      // Ocultar todos los tabs del módulo
-      document.querySelectorAll(`[id^="${modulePrefix}-"]`).forEach(t => t.classList.add('hidden'));
-      
-      // Mostrar tab seleccionado
-      document.getElementById(`${modulePrefix}-${tabName}`).classList.remove('hidden');
-      
-      // Actualizar botones de tabs
-      event.target.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    
+    function showTab(mod,tab) {
+      document.querySelectorAll('#'+mod+'Module .tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('#'+mod+'Module .tab-content').forEach(c=>c.classList.remove('active'));
       event.target.classList.add('active');
-      
-      currentTab[module] = tabName;
+      document.getElementById(mod+'-'+tab).classList.add('active');
     }
-
-    function openModal(modalId) {
-      document.getElementById(modalId).classList.add('active');
-      if (modalId === 'registrarPagoModal') loadAfiliadosSelect();
+    
+    function openModal(id) { 
+      document.getElementById(id).classList.add('active');
+      if(id==='modalPago') loadAfiliadosSelect('pagoAfiliado');
+      if(id==='modalPrestamo') loadAfiliadosSelect('prestamoAfiliado');
     }
-
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('active');
-    }
-
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle"></i><span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
-
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    
     // ==========================================
     // DASHBOARD
     // ==========================================
-
     function updateDashboard() {
-      const totalAfiliados = db.afiliados.length;
-      const alDia = db.afiliados.filter(a => estaAlDia(a.id)).length;
-      const morosos = totalAfiliados - alDia;
-      const prestamosActivos = db.prestamos.filter(p => p.estado === 'activo').length;
-      
-      document.getElementById('statTotalAfiliados').textContent = totalAfiliados;
-      document.getElementById('statAlDia').textContent = alDia;
-      document.getElementById('statMorosos').textContent = morosos;
-      document.getElementById('statPrestamos').textContent = prestamosActivos;
-      
-      // Gráfico de cuotas
-      const ctx = document.getElementById('cuotasChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'doughnut',
-         {
-          labels: ['Al Día', 'Morosos'],
-          datasets: [{
-             [alDia, morosos],
-            backgroundColor: ['#28a745', '#dc3545']
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
-      
-      // Alertas
-      renderAlertas();
+      const total=db.afiliados.length;
+      const alDia=db.afiliados.filter(a=>estaAlDia(a.id)).length;
+      document.getElementById('statTotal').textContent=total;
+      document.getElementById('statAlDia').textContent=alDia;
+      document.getElementById('statMorosos').textContent=total-alDia;
+      document.getElementById('statPrestamos').textContent=db.prestamos.filter(p=>p.estado==='activo').length;
     }
-
-    function estaAlDia(afiliadoId) {
-      const ultimoPago = db.pagos.filter(p => p.afiliadoId === afiliadoId).sort((a,b) => b.mes - a.mes)[0];
-      if (!ultimoPago) return false;
-      const mesActual = new Date().getMonth() + 1;
-      return ultimoPago.mes === mesActual;
+    
+    function estaAlDia(id) {
+      const p=db.pagos.filter(x=>x.afiliadoId===id).sort((a,b)=>b.mes-a.mes)[0];
+      return p && p.mes===new Date().getMonth()+1;
     }
-
-    function renderAlertas() {
-      const alertas = [];
-      
-      // Morosos
-      db.afiliados.forEach(a => {
-        if (!estaAlDia(a.id)) {
-          alertas.push({ tipo: 'mora', mensaje: `${a.nombre} está moroso`, afiliado: a });
-        }
-      });
-      
-      // Préstamos próximos a vencer
-      db.prestamos.forEach(p => {
-        if (p.estado === 'activo' && p.cuotasRestantes <= 2) {
-          alertas.push({ tipo: 'warning', mensaje: `Préstamo de ${p.afiliadoNombre} próximo a vencer` });
-        }
-      });
-      
-      const container = document.getElementById('alertasList');
-      container.innerHTML = alertas.slice(0, 5).map(a => `
-        <div style="padding: 0.75rem; background: ${a.tipo === 'mora' ? '#f8d7da' : '#fff3cd'}; 
-                    border-left: 4px solid ${a.tipo === 'mora' ? '#dc3545' : '#ffc107'}; 
-                    margin-bottom: 0.5rem; border-radius: 4px;">
-          <i class="fas fa-${a.tipo === 'mora' ? 'exclamation-circle' : 'exclamation-triangle'}"></i>
-          ${a.mensaje}
-        </div>
-      `).join('') || '<p style="color: #666; text-align: center;">No hay alertas</p>';
-    }
-
+    
     // ==========================================
-    // PADRÓN DE AFILIADOS
+    // PADRÓN
     // ==========================================
-
     function renderPadron() {
-      const list = document.getElementById('padronList');
-      const search = document.getElementById('padronSearch')?.value.toLowerCase() || '';
-      const filterEstado = document.getElementById('padronFilterEstado')?.value || '';
-      const filterSeccional = document.getElementById('padronFilterSeccional')?.value || '';
-      
-      let filtered = db.afiliados.filter(a => {
-        const matchSearch = !search || a.nombre.toLowerCase().includes(search) || a.dni.includes(search);
-        const matchEstado = !filterEstado || a.estado === filterEstado;
-        const matchSeccional = !filterSeccional || a.seccional === filterSeccional;
-        return matchSearch && matchEstado && matchSeccional;
-      });
-      
-      list.innerHTML = filtered.map(a => `
-        <div class="padron-card">
-          <img src="${a.foto || 'https://via.placeholder.com/80'}" class="padron-foto" alt="${a.nombre}">
-          <div>
-            <h3 style="margin: 0 0 0.25rem 0;">${a.nombre}</h3>
-            <p style="margin: 0; color: #666; font-size: 0.875rem;">
-              DNI: ${a.dni} | ${a.categoria} | ${a.seccional}
-            </p>
-            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">
-              ${a.email} | ${a.telefono}
-            </p>
-          </div>
-          <div>
-            <span class="badge ${a.estado === 'activo' ? 'badge-al-dia' : 'badge-mora'}">
-              ${a.estado === 'activo' ? 'Activo' : 'Inactivo'}
-            </span>
-            <button class="btn btn-sm btn-primary" onclick="verDetalleAfiliado(${a.id})" style="margin-top: 0.5rem;">
-              <i class="fas fa-eye"></i> Ver
-            </button>
-          </div>
-        </div>
-      `).join('') || '<p style="text-align: center; color: #666; padding: 2rem;">No hay afiliados registrados</p>';
+      const tbl=document.getElementById('padronTable');
+      const search=document.getElementById('padronSearch').value.toLowerCase();
+      const filter=document.getElementById('padronFilter').value;
+      let list=db.afiliados.filter(a=>(!search||a.nombre.toLowerCase().includes(search))&&(!filter||a.estado===filter));
+      tbl.innerHTML=list.map(a=>`<tr>
+        <td>${a.nombre}</td><td>${a.dni}</td><td>${a.categoria}</td><td>${a.seccional}</td>
+        <td><span class="badge badge-${a.estado==='activo'?'activo':'mora'}">${a.estado}</span></td>
+        <td><button class="btn btn-sm btn-primary" onclick="verAfiliado(${a.id})"><i class="fas fa-eye"></i></button></td>
+      </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:#666;">Sin registros</td></tr>';
     }
-
-    function filtrarPadron() {
-      renderPadron();
-    }
-
+    
     function saveAfiliado(e) {
       e.preventDefault();
-      
-      const nuevoAfiliado = {
-        id: Date.now(),
-        nombre: document.getElementById('afiliadoNombre').value,
-        dni: document.getElementById('afiliadoDNI').value,
-        email: document.getElementById('afiliadoEmail').value,
-        telefono: document.getElementById('afiliadoTelefono').value,
-        seccional: document.getElementById('afiliadoSeccional').value,
-        categoria: document.getElementById('afiliadoCategoria').value,
-        estado: 'activo',
-        fechaIngreso: new Date().toISOString()
-      };
-      
-      db.afiliados.push(nuevoAfiliado);
-      saveData();
-      
-      closeModal('nuevoAfiliadoModal');
-      e.target.reset();
-      renderPadron();
-      updateDashboard();
-      showToast('Afiliado registrado correctamente', 'success');
+      db.afiliados.push({
+        id:Date.now(), nombre:document.getElementById('afNombre').value, dni:document.getElementById('afDNI').value,
+        email:document.getElementById('afEmail').value, telefono:document.getElementById('afTelefono').value,
+        seccional:document.getElementById('afSeccional').value, categoria:document.getElementById('afCategoria').value,
+        estado:'activo', fecha:new Date().toISOString()
+      });
+      saveDB(); closeModal('modalAfiliado'); e.target.reset(); renderPadron(); updateDashboard(); showToast('Guardado','success');
     }
-
-    function exportarPadron() {
-      const dataStr = JSON.stringify(db.afiliados, null, 2);
-      const dataBlob = new Blob([dataStr], {type: 'application/json'});
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `padron_uadav_${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      showToast('Padrón exportado', 'success');
+    
+    function loadAfiliadosSelect(id) {
+      const sel=document.getElementById(id);
+      sel.innerHTML=db.afiliados.map(a=>`<option value="${a.id}">${a.nombre} - ${a.dni}</option>`).join('');
     }
-
+    
     // ==========================================
     // COBRANZAS
     // ==========================================
-
     function renderCobranzas() {
-      // Calcular totales
-      const mesActual = new Date().getMonth() + 1;
-      const anioActual = new Date().getFullYear();
-      
-      const recaudadoMes = db.pagos
-        .filter(p => p.mes === mesActual && p.anio === anioActual)
-        .reduce((sum, p) => sum + p.monto, 0);
-      
-      const pendiente = db.afiliados.length * db.config.cuotaMensual - recaudadoMes;
-      
-      document.getElementById('totalRecaudado').textContent = '$' + recaudadoMes.toLocaleString();
-      document.getElementById('totalPendiente').textContent = '$' + pendiente.toLocaleString();
-      
-      renderCuotas();
-      renderMorosos();
+      renderCuotas(); renderMorosos();
     }
-
+    
     function renderCuotas() {
-      const list = document.getElementById('cuotasList');
-      const search = document.getElementById('cuotasSearch')?.value.toLowerCase() || '';
-      const filterMes = document.getElementById('cuotasFilterMes')?.value || '';
-      
-      let cuotas = [];
-      
-      // Generar cuotas para cada afiliado
-      db.afiliados.forEach(a => {
-        for (let mes = 1; mes <= 12; mes++) {
-          const pago = db.pagos.find(p => p.afiliadoId === a.id && p.mes === mes && p.anio === 2026);
-          
-          if (!filterMes || filterMes == mes) {
-            if (!search || a.nombre.toLowerCase().includes(search)) {
-              cuotas.push({
-                afiliado: a,
-                mes: mes,
-                pago: pago,
-                monto: db.config.cuotaMensual
-              });
-            }
-          }
-        }
+      const list=document.getElementById('cuotasList');
+      const mesActual=new Date().getMonth()+1;
+      let html='';
+      db.afiliados.forEach(a=>{
+        const pago=db.pagos.find(p=>p.afiliadoId===a.id&&p.mes===mesActual);
+        html+=`<div style="padding:1rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">
+          <div><strong>${a.nombre}</strong><br><small style="color:#666;">Cuota ${mesActual}/2026</small></div>
+          <div>${pago?'<span class="badge badge-activo">Pagado</span>':'<span class="badge badge-mora">Pendiente</span>'}</div>
+          ${!pago?`<button class="btn btn-sm btn-success" onclick="pagoRapido(${a.id},${mesActual})"><i class="fas fa-dollar-sign"></i></button>`:''}
+        </div>`;
       });
-      
-      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-      
-      list.innerHTML = cuotas.map(c => `
-        <div class="cuota-card ${c.pago ? 'al-dia' : 'mora'}">
-          <div>
-            <strong>${c.afiliado.nombre}</strong><br>
-            <small>${meses[c.mes - 1]} 2026</small>
-          </div>
-          <div>
-            <strong>$${c.monto.toLocaleString()}</strong>
-          </div>
-          <div>
-            ${c.pago 
-              ? '<span class="badge badge-al-dia"><i class="fas fa-check"></i> Pagado</span>'
-              : '<span class="badge badge-mora"><i class="fas fa-exclamation"></i> Pendiente</span>'
-            }
-          </div>
-          ${!c.pago ? `
-            <button class="btn btn-sm btn-success" onclick="registrarPagoRapido(${c.afiliado.id}, ${c.mes})">
-              <i class="fas fa-dollar-sign"></i> Pagar
-            </button>
-          ` : ''}
-        </div>
-      `).join('') || '<p style="text-align: center; color: #666;">No hay cuotas registradas</p>';
+      list.innerHTML=html||'<p style="text-align:center;color:#666;">Sin cuotas</p>';
     }
-
-    function filtrarCuotas() {
-      renderCuotas();
-    }
-
+    
     function renderMorosos() {
-      const list = document.getElementById('morososList');
-      const morosos = db.afiliados.filter(a => !estaAlDia(a.id));
-      
-      list.innerHTML = morosos.map(a => `
-        <div class="cuota-card mora">
-          <div>
-            <strong>${a.nombre}</strong><br>
-            <small>DNI: ${a.dni} | ${a.telefono}</small>
-          </div>
-          <div>
-            <span class="badge badge-mora">Moroso</span>
-          </div>
-          <button class="btn btn-sm btn-primary" onclick="verDetalleAfiliado(${a.id})">
-            <i class="fas fa-user"></i> Ver
-          </button>
-        </div>
-      `).join('') || '<p style="text-align: center; color: #666;">No hay morosos</p>';
+      const list=document.getElementById('morososList');
+      const morosos=db.afiliados.filter(a=>!estaAlDia(a.id));
+      list.innerHTML=morosos.map(a=>`<div style="padding:1rem;border:1px solid var(--border);border-left:4px solid var(--danger);border-radius:8px;margin-bottom:0.5rem;">
+        <strong>${a.nombre}</strong> - DNI: ${a.dni} <span class="badge badge-mora">Moroso</span>
+      </div>`).join('')||'<p style="text-align:center;color:#666;">Sin morosos</p>';
     }
-
-    function loadAfiliadosSelect() {
-      const select = document.getElementById('pagoAfiliado');
-      select.innerHTML = db.afiliados.map(a => 
-        `<option value="${a.id}">${a.nombre} - DNI: ${a.dni}</option>`
-      ).join('');
-    }
-
+    
     function savePago(e) {
       e.preventDefault();
-      
-      const nuevoPago = {
-        id: Date.now(),
-        afiliadoId: parseInt(document.getElementById('pagoAfiliado').value),
-        mes: parseInt(document.getElementById('pagoMes').value),
-        anio: parseInt(document.getElementById('pagoAnio').value),
-        monto: parseFloat(document.getElementById('pagoMonto').value),
-        formaPago: document.getElementById('pagoForma').value,
-        fecha: new Date().toISOString()
-      };
-      
-      db.pagos.push(nuevoPago);
-      saveData();
-      
-      closeModal('registrarPagoModal');
-      e.target.reset();
-      renderCobranzas();
-      updateDashboard();
-      showToast('Pago registrado correctamente', 'success');
+      db.pagos.push({
+        id:Date.now(), afiliadoId:parseInt(document.getElementById('pagoAfiliado').value),
+        mes:parseInt(document.getElementById('pagoMes').value), anio:parseInt(document.getElementById('pagoAnio').value),
+        monto:parseFloat(document.getElementById('pagoMonto').value), fecha:new Date().toISOString()
+      });
+      saveDB(); closeModal('modalPago'); e.target.reset(); renderCobranzas(); updateDashboard(); showToast('Pago registrado','success');
     }
-
-    function registrarPagoRapido(afiliadoId, mes) {
-      document.getElementById('pagoAfiliado').value = afiliadoId;
-      document.getElementById('pagoMes').value = mes;
-      document.getElementById('pagoAnio').value = new Date().getFullYear();
-      openModal('registrarPagoModal');
+    
+    function pagoRapido(afId,mes) {
+      document.getElementById('pagoAfiliado').value=afId;
+      document.getElementById('pagoMes').value=mes;
+      openModal('modalPago');
     }
-
+    
     // ==========================================
     // OBRAS SOCIALES
     // ==========================================
-
-    function renderObrasSociales() {
-      renderPrestadores();
-    }
-
     function renderPrestadores() {
-      const list = document.getElementById('prestadoresList');
-      const search = document.getElementById('prestadorSearch')?.value.toLowerCase() || '';
-      
-      let filtered = db.prestadores.filter(p => 
-        !search || p.nombre.toLowerCase().includes(search)
-      );
-      
-      list.innerHTML = filtered.map(p => `
-        <div class="prestador-card">
-          <h3 style="margin: 0 0 0.5rem 0;">${p.nombre}</h3>
-          <p style="margin: 0; color: #666; font-size: 0.875rem;">
-            <i class="fas fa-stethoscope"></i> ${p.especialidad} | 
-            <i class="fas fa-map-marker-alt"></i> ${p.domicilio}
-          </p>
-          <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem;">
-            <i class="fas fa-phone"></i> ${p.telefono}
-          </p>
-        </div>
-      `).join('') || '<p style="text-align: center; color: #666;">No hay prestadores registrados</p>';
+      const list=document.getElementById('prestadoresList');
+      const search=document.getElementById('prestadorSearch').value.toLowerCase();
+      let prest=db.prestadores.filter(p=>!search||p.nombre.toLowerCase().includes(search));
+      list.innerHTML=prest.map(p=>`<div style="padding:1rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;">
+        <strong>${p.nombre}</strong><br><small style="color:#666;">${p.especialidad} | ${p.domicilio||''} | ${p.telefono||''}</small>
+      </div>`).join('')||'<p style="text-align:center;color:#666;">Sin prestadores</p>';
     }
-
-    function filtrarPrestadores() {
-      renderPrestadores();
+    
+    function savePrestador(e) {
+      e.preventDefault();
+      db.prestadores.push({
+        id:Date.now(), nombre:document.getElementById('prNombre').value, especialidad:document.getElementById('prEspecialidad').value,
+        domicilio:document.getElementById('prDomicilio').value, telefono:document.getElementById('prTelefono').value
+      });
+      saveDB(); closeModal('modalPrestador'); e.target.reset(); renderPrestadores(); showToast('Guardado','success');
     }
-
+    
     // ==========================================
-    // AYUDA ECONÓMICA / PRÉSTAMOS
+    // PRÉSTAMOS
     // ==========================================
-
-    function renderAyudaEconomica() {
-      const prestamosActivos = db.prestamos.filter(p => p.estado === 'activo');
-      const totalPrestado = prestamosActivos.reduce((sum, p) => sum + p.monto, 0);
-      
-      document.getElementById('totalPrestamosActivos').textContent = prestamosActivos.length;
-      document.getElementById('totalPrestado').textContent = '$' + totalPrestado.toLocaleString();
-      
-      const list = document.getElementById('prestamosList');
-      
-      list.innerHTML = prestamosActivos.map(p => `
-        <div class="card" style="border-left: 4px solid var(--warning);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h3 style="margin: 0 0 0.5rem 0;">${p.afiliadoNombre}</h3>
-              <p style="margin: 0; color: #666;">
-                Monto: $${p.monto.toLocaleString()} | 
-                Cuotas: ${p.cuotasTotales} | 
-                Restantes: ${p.cuotasRestantes}
-              </p>
-            </div>
-            <div>
-              <span class="badge badge-warning">Activo</span>
-              <button class="btn btn-sm btn-primary" style="margin-top: 0.5rem;">
-                <i class="fas fa-eye"></i> Ver
-              </button>
-            </div>
-          </div>
-        </div>
-      `).join('') || '<p style="text-align: center; color: #666;">No hay préstamos activos</p>';
+    function renderPrestamos() {
+      const list=document.getElementById('prestamosList');
+      const activos=db.prestamos.filter(p=>p.estado==='activo');
+      list.innerHTML=activos.map(p=>`<div style="padding:1rem;border:1px solid var(--border);border-left:4px solid var(--warning);border-radius:8px;margin-bottom:0.5rem;">
+        <strong>${p.afiliadoNombre}</strong><br>
+        <small style="color:#666;">Monto: $${p.monto.toLocaleString()} | Cuotas: ${p.cuotasRestantes}/${p.cuotasTotales}</small>
+      </div>`).join('')||'<p style="text-align:center;color:#666;">Sin préstamos activos</p>';
     }
-
-    // ==========================================
-    // SINDICATO
-    // ==========================================
-
-    function renderSindicato() {
-      // Renderizar actas, resoluciones, etc.
+    
+    function savePrestamo(e) {
+      e.preventDefault();
+      const af=db.afiliados.find(a=>a.id===parseInt(document.getElementById('prestamoAfiliado').value));
+      db.prestamos.push({
+        id:Date.now(), afiliadoId:af.id, afiliadoNombre:af.nombre,
+        monto:parseFloat(document.getElementById('prestamoMonto').value),
+        cuotasTotales:parseInt(document.getElementById('prestamoCuotas').value),
+        cuotasRestantes:parseInt(document.getElementById('prestamoCuotas').value),
+        estado:'activo', fecha:new Date().toISOString()
+      });
+      saveDB(); closeModal('modalPrestamo'); e.target.reset(); renderPrestamos(); updateDashboard(); showToast('Préstamo creado','success');
     }
-
-    // ==========================================
-    // INSPECTORES
-    // ==========================================
-
-    function renderInspectores() {
-      const list = document.getElementById('inspectoresList');
-      
-      list.innerHTML = db.inspectores.map(i => `
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h3 style="margin: 0 0 0.5rem 0;">${i.nombre}</h3>
-              <p style="margin: 0; color: #666;">
-                Zona: ${i.zona} | Habilitación: ${i.numeroHabilitacion}
-              </p>
-            </div>
-            <span class="badge ${i.estado === 'activo' ? 'badge-al-dia' : 'badge-mora'}">
-              ${i.estado === 'activo' ? 'Habilitado' : 'Inactivo'}
-            </span>
-          </div>
-        </div>
-      `).join('') || '<p style="text-align: center; color: #666;">No hay inspectores registrados</p>';
-    }
-
-    function filtrarInspectores() {
-      renderInspectores();
-    }
-
+    
     // ==========================================
     // LEGALES
     // ==========================================
-
     function renderLegales() {
-      const expedientes = db.expedientes;
-      
-      document.getElementById('totalExpedientes').textContent = expedientes.length;
-      document.getElementById('expedientesPendientes').textContent = 
-        expedientes.filter(e => e.estado === 'pendiente').length;
-      
-      const list = document.getElementById('expedientesList');
-      
-      list.innerHTML = expedientes.map(e => `
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h3 style="margin: 0 0 0.5rem 0;">Expediente ${e.numero}</h3>
-              <p style="margin: 0; color: #666;">
-                ${e.titulo} | ${e.afiliadoNombre}
-              </p>
-            </div>
-            <span class="badge ${e.estado === 'pendiente' ? 'badge-mora' : 'badge-al-dia'}">
-              ${e.estado}
-            </span>
-          </div>
-        </div>
-      `).join('') || '<p style="text-align: center; color: #666;">No hay expedientes</p>';
+      const list=document.getElementById('expedientesList');
+      list.innerHTML=db.expedientes.map(e=>`<div style="padding:1rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;">
+        <strong>Exp. ${e.numero}</strong> - ${e.titulo}<br>
+        <small style="color:#666;">${e.afiliado||''} <span class="badge badge-${e.estado==='pendiente'?'mora':'activo'}">${e.estado}</span></small>
+      </div>`).join('')||'<p style="text-align:center;color:#666;">Sin expedientes</p>';
     }
-
+    
+    function saveExpediente(e) {
+      e.preventDefault();
+      db.expedientes.push({
+        id:Date.now(), numero:document.getElementById('expNumero').value, titulo:document.getElementById('expTitulo').value,
+        afiliado:document.getElementById('expAfiliado').value, estado:document.getElementById('expEstado').value, fecha:new Date().toISOString()
+      });
+      saveDB(); closeModal('modalExpediente'); e.target.reset(); renderLegales(); showToast('Expediente creado','success');
+    }
+    
     // ==========================================
     // CARNETS
     // ==========================================
-
     function renderCarnets() {
-      const list = document.getElementById('carnetsList');
-      
-      list.innerHTML = db.afiliados.map(a => `
-        <div style="background: linear-gradient(135deg, #003366, #0066CC); color: #fff; 
-                    padding: 2rem; border-radius: 12px; margin-bottom: 1rem; 
-                    display: flex; align-items: center; gap: 1.5rem;">
-          <img src="${a.foto || 'https://via.placeholder.com/100'}" 
-               style="width: 100px; height: 120px; border-radius: 8px; object-fit: cover; border: 3px solid #fff;">
-          <div style="flex: 1;">
-            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">🎭 UADAV</h2>
-            <p style="margin: 0 0 1rem 0; opacity: 0.9;">Unión Argentina de Artistas de Variedades</p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
-              <div><strong>Nombre:</strong> ${a.nombre}</div>
-              <div><strong>DNI:</strong> ${a.dni}</div>
-              <div><strong>Categoría:</strong> ${a.categoria}</div>
-              <div><strong>ID:</strong> ${a.id.toString().slice(-6)}</div>
-            </div>
-          </div>
-          <button class="btn btn-sm" style="background: #fff; color: #003366;" onclick="imprimirCarnet(${a.id})">
-            <i class="fas fa-print"></i> Imprimir
-          </button>
+      const list=document.getElementById('carnetsList');
+      list.innerHTML=db.afiliados.map(a=>`<div style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:1.5rem;border-radius:12px;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;">
+        <div style="width:80px;height:100px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:2rem;"><i class="fas fa-user"></i></div>
+        <div style="flex:1;">
+          <h3 style="margin:0 0 0.5rem 0;">🎭 UADAV</h3>
+          <p style="margin:0 0 0.5rem 0;opacity:0.9;">${a.nombre}</p>
+          <p style="margin:0;font-size:0.85rem;">DNI: ${a.dni} | ${a.categoria} | ID: ${a.id.toString().slice(-6)}</p>
         </div>
-      `).join('') || '<p style="text-align: center; color: #666;">No hay carnets disponibles</p>';
+        <button class="btn btn-sm" style="background:#fff;color:var(--primary);" onclick="window.print()"><i class="fas fa-print"></i></button>
+      </div>`).join('')||'<p style="text-align:center;color:#666;">Sin carnets</p>';
     }
-
-    function imprimirCarnet(afiliadoId) {
-      window.print();
-    }
-
+    
     // ==========================================
     // UTILIDADES
     // ==========================================
-
-    window.onclick = function(event) {
-      if (event.target.classList.contains('modal')) {
-        event.target.classList.remove('active');
-      }
-    }
+    function verAfiliado(id) { showToast('Función en desarrollo','info'); }
+    window.onclick=function(e){ if(e.target.classList.contains('modal')) e.target.classList.remove('active'); };
   </script>
 </body>
 </html>
