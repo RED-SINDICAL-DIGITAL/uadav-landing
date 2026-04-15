@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UADAV - Sistema de Gestión</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+    
+    /* Header */
+    .header { background: linear-gradient(135deg, #003366 0%, #0066CC 100%); color: #fff; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.5rem; font-weight: bold; }
+    .nav { display: flex; gap: 1rem; }
+    .nav a { color: #fff; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .nav a:hover { background: rgba(255,255,255,0.2); }
+    .nav a.active { background: rgba(255,255,255,0.3); }
+    
+    /* Container */
+    .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+    
+    /* Cards */
+    .card { background: #fff; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f2f5; }
+    .card-title { font-size: 1.5rem; color: #003366; font-weight: 600; }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-card { background: linear-gradient(135deg, #0066CC 0%, #003366 100%); color: #fff; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,102,204,0.2); }
+    .stat-number { font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; }
+    .stat-label { font-size: 0.9rem; opacity: 0.9; }
+    
+    /* Forms */
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #0066CC; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    
+    /* Buttons */
+    .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .btn-primary { background: #0066CC; color: #fff; }
+    .btn-primary:hover { background: #003366; transform: translateY(-2px); }
+    .btn-success { background: #28a745; color: #fff; }
+    .btn-success:hover { background: #218838; }
+    .btn-danger { background: #dc3545; color: #fff; }
+    .btn-danger:hover { background: #c82333; }
+    .btn-secondary { background: #6c757d; color: #fff; }
+    .btn-secondary:hover { background: #5a6268; }
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+    
+    /* Table */
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { background: #003366; color: #fff; font-weight: 600; }
+    tr:hover { background: #f8f9fa; }
+    .badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 600; }
+    .badge-nuevo { background: #fff3cd; color: #856404; }
+    .badge-contactado { background: #d4edda; color: #155724; }
+    .badge-afiliado { background: #cce5ff; color: #004085; }
+    .badge-rechazado { background: #f8d7da; color: #721c24; }
+    
+    /* Filters */
+    .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .filters input { flex: 1; min-width: 200px; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; }
+    
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: #fff; padding: 2rem; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; }
+    
+    /* Backup Section */
+    .backup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .backup-card { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; text-align: center; }
+    .backup-card h3 { margin-bottom: 1rem; color: #003366; }
+    
+    /* Admin List */
+    .admin-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8f9fa; margin-bottom: 0.5rem; border-radius: 8px; }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content { flex-direction: column; gap: 1rem; }
+      .nav { flex-wrap: wrap; justify-content: center; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+    
+    /* Login */
+    .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #003366 0%, #0066CC 100%); }
+    .login-box { background: #fff; padding: 3rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 90%; max-width: 400px; }
+    .login-box h1 { text-align: center; color: #003366; margin-bottom: 0.5rem; }
+    .login-box p { text-align: center; color: #666; margin-bottom: 2rem; }
+    
+    /* Alert */
+    .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginView" class="login-container">
+    <div class="login-box">
+      <h1>🎭 UADAV</h1>
+      <p>Sistema de Gestión</p>
+      <div id="loginError" class="alert alert-error hidden">Contraseña incorrecta</div>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar</button>
+      </form>
+      <p style="text-align: center; margin-top: 1rem; font-size: 0.875rem; color: #666;">
+        Contraseña por defecto: <strong>admin123</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainView" class="hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">🎭 UADAV - Sistema de Gestión</div>
+        <nav class="nav">
+          <a href="#" onclick="showView('dashboard')" class="active" id="nav-dashboard">📊 Dashboard</a>
+          <a href="#" onclick="showView('registrations')" id="nav-registrations">📝 Registros</a>
+          <a href="#" onclick="showView('admins')" id="nav-admins">👥 Admins</a>
+          <a href="#" onclick="showView('backup')" id="nav-backup">💾 Backup</a>
+          <a href="#" onclick="logout()">🚪 Salir</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      
+      <!-- DASHBOARD VIEW -->
+      <div id="dashboardView">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="statTotal">0</div>
+            <div class="stat-label">Total Registros</div>
+          </div>
+          <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+            <div class="stat-number" id="statNuevos">0</div>
+            <div class="stat-label">Nuevos</div>
+          </div>
+          <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+            <div class="stat-number" id="statContactados">0</div>
+            <div class="stat-label">Contactados</div>
+          </div>
+          <div class="stat-card" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+            <div class="stat-number" id="statAfiliados">0</div>
+            <div class="stat-label">Afiliados</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Registros Recientes</h2>
+            <button class="btn btn-primary btn-sm" onclick="showView('registrations')">Ver Todos</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Nombre</th>
+                  <th>DNI</th>
+                  <th>WhatsApp</th>
+                  <th>Categoría</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="recentTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTRATIONS VIEW -->
+      <div id="registrationsView" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Gestión de Registros</h2>
+            <button class="btn btn-success" onclick="openModal('registrationModal')">➕ Nuevo Registro</button>
+          </div>
+          
+          <div class="filters">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre, DNI..." onkeyup="filterRegistrations()">
+            <select id="filterEstado" onchange="filterRegistrations()">
+              <option value="">Todos los estados</option>
+              <option value="Nuevo">Nuevo</option>
+              <option value="Contactado">Contactado</option>
+              <option value="Afiliado">Afiliado</option>
+              <option value="Rechazado">Rechazado</option>
+            </select>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Nombre</th>
+                  <th>DNI</th>
+                  <th>WhatsApp</th>
+                  <th>Categoría</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="registrationsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMINS VIEW -->
+      <div id="adminsView" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Administradores</h2>
+          </div>
+          
+          <div class="form-group">
+            <label>Agregar Nuevo Administrador</label>
+            <div style="display: flex; gap: 1rem;">
+              <input type="email" id="newAdminEmail" placeholder="admin@email.com">
+              <button class="btn btn-primary" onclick="addAdmin()">Agregar</button>
+            </div>
+          </div>
+
+          <div id="adminsList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Configuración de Notificaciones</h2>
+          </div>
+          
+          <div class="form-group">
+            <label>
+              <input type="radio" name="notifMode" value="ROUND_ROBIN" checked onchange="saveNotificationConfig()"> 
+              Round Robin (Uno por vez)
+            </label>
+            <label>
+              <input type="radio" name="notifMode" value="ALL" onchange="saveNotificationConfig()"> 
+              Todos los admins reciben todo
+            </label>
+            <label>
+              <input type="radio" name="notifMode" value="SPECIFIC" onchange="saveNotificationConfig()"> 
+              Admins específicos
+            </label>
+          </div>
+
+          <div id="specificAdminsSection" class="hidden">
+            <h3>Seleccionar admins:</h3>
+            <div id="specificAdminsCheckboxes"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BACKUP VIEW -->
+      <div id="backupView" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Backup y Restauración</h2>
+          </div>
+          
+          <div class="backup-grid">
+            <div class="backup-card">
+              <h3>📥 Exportar Datos</h3>
+              <p style="margin-bottom: 1rem; color: #666;">Descarga una copia de seguridad de todos los registros</p>
+              <button class="btn btn-primary" onclick="exportData()">💾 Descargar Backup</button>
+            </div>
+            
+            <div class="backup-card">
+              <h3>📤 Importar Datos</h3>
+              <p style="margin-bottom: 1rem; color: #666;">Restaura datos desde un archivo de backup</p>
+              <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem;">
+              <button class="btn btn-success" onclick="importData()">📂 Restaurar Backup</button>
+            </div>
+            
+            <div class="backup-card">
+              <h3>🗑️ Limpiar Todo</h3>
+              <p style="margin-bottom: 1rem; color: #666;">Elimina todos los datos del sistema</p>
+              <button class="btn btn-danger" onclick="clearAllData()">🗑️ Borrar Todo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL REGISTRATION -->
+  <div id="registrationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nuevo Registro</h2>
+        <button class="modal-close" onclick="closeModal('registrationModal')">&times;</button>
+      </div>
+      <form onsubmit="saveRegistration(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre Completo *</label>
+            <input type="text" id="regNombre" required>
+          </div>
+          <div class="form-group">
+            <label>DNI *</label>
+            <input type="text" id="regDNI" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>WhatsApp *</label>
+            <input type="tel" id="regWhatsApp" placeholder="1112345678" required>
+          </div>
+          <div class="form-group">
+            <label>Categoría *</label>
+            <select id="regCategoria" required>
+              <option value="">Seleccionar...</option>
+              <option value="Locutor">Locutor</option>
+              <option value="Cantante">Cantante</option>
+              <option value="Bailarin">Bailarín</option>
+              <option value="Musico">Músico</option>
+              <option value="Actor">Actor</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>¿Necesita atención urgente?</label>
+          <select id="regUrgencia">
+            <option value="No">No, puedo esperar</option>
+            <option value="Si">Sí, urgente</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notas</label>
+          <textarea id="regNotas" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Guardar Registro</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN Y DATOS
+    // ==========================================
+    
+    const CONFIG = {
+      PASSWORD: 'admin123',
+      DB_KEY: 'uadav_data_v1'
+    };
+
+    let db = {
+      registrations: [],
+      admins: ['marcosdinella@gmail.com'],
+      notificationConfig: { mode: 'ROUND_ROBIN', specificAdmins: [] }
+    };
+
+    // ==========================================
+    // INICIALIZACIÓN
+    // ==========================================
+
+    window.onload = function() {
+      loadData();
+      checkSession();
+    };
+
+    function loadData() {
+      const saved = localStorage.getItem(CONFIG.DB_KEY);
+      if (saved) {
+        db = JSON.parse(saved);
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(CONFIG.DB_KEY, JSON.stringify(db));
+    }
+
+    function checkSession() {
+      if (sessionStorage.getItem('loggedIn') === 'true') {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('mainView').classList.remove('hidden');
+        updateDashboard();
+        renderRegistrations();
+        renderAdmins();
+      }
+    }
+
+    // ==========================================
+    // LOGIN
+    // ==========================================
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('loginPassword').value;
+      
+      if (password === CONFIG.PASSWORD) {
+        sessionStorage.setItem('loggedIn', 'true');
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('mainView').classList.remove('hidden');
+        updateDashboard();
+        renderRegistrations();
+        renderAdmins();
+      } else {
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('loggedIn');
+      location.reload();
+    }
+
+    // ==========================================
+    // NAVEGACIÓN
+    // ==========================================
+
+    function showView(viewName) {
+      // Ocultar todas las vistas
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('registrationsView').classList.add('hidden');
+      document.getElementById('adminsView').classList.add('hidden');
+      document.getElementById('backupView').classList.add('hidden');
+      
+      // Remover active de todos los navs
+      document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+      
+      // Mostrar vista seleccionada
+      document.getElementById(viewName + 'View').classList.remove('hidden');
+      document.getElementById('nav-' + viewName).classList.add('active');
+      
+      // Actualizar datos si es necesario
+      if (viewName === 'dashboard') updateDashboard();
+      if (viewName === 'registrations') renderRegistrations();
+      if (viewName === 'admins') renderAdmins();
+    }
+
+    // ==========================================
+    // DASHBOARD
+    // ==========================================
+
+    function updateDashboard() {
+      const total = db.registrations.length;
+      const nuevos = db.registrations.filter(r => r.estado === 'Nuevo').length;
+      const contactados = db.registrations.filter(r => r.estado === 'Contactado').length;
+      const afiliados = db.registrations.filter(r => r.estado === 'Afiliado').length;
+      
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statNuevos').textContent = nuevos;
+      document.getElementById('statContactados').textContent = contactados;
+      document.getElementById('statAfiliados').textContent = afiliados;
+      
+      // Tabla de recientes (últimos 5)
+      const recent = db.registrations.slice(-5).reverse();
+      const tbody = document.getElementById('recentTable');
+      tbody.innerHTML = recent.map(r => `
+        <tr>
+          <td>${new Date(r.fecha).toLocaleDateString()}</td>
+          <td>${r.nombre}</td>
+          <td>${r.dni}</td>
+          <td>${r.whatsapp}</td>
+          <td>${r.categoria}</td>
+          <td><span class="badge badge-${r.estado.toLowerCase()}">${r.estado}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // ==========================================
+    // REGISTRATIONS
+    // ==========================================
+
+    function renderRegistrations() {
+      const tbody = document.getElementById('registrationsTable');
+      const filtered = getFilteredRegistrations();
+      
+      tbody.innerHTML = filtered.map((r, index) => `
+        <tr>
+          <td>${new Date(r.fecha).toLocaleDateString()}</td>
+          <td>${r.nombre}</td>
+          <td>${r.dni}</td>
+          <td>${r.whatsapp}</td>
+          <td>${r.categoria}</td>
+          <td>
+            <select onchange="updateStatus(${r.id}, this.value)" class="badge badge-${r.estado.toLowerCase()}">
+              <option value="Nuevo" ${r.estado==='Nuevo'?'selected':''}>Nuevo</option>
+              <option value="Contactado" ${r.estado==='Contactado'?'selected':''}>Contactado</option>
+              <option value="Afiliado" ${r.estado==='Afiliado'?'selected':''}>Afiliado</option>
+              <option value="Rechazado" ${r.estado==='Rechazado'?'selected':''}>Rechazado</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="deleteRegistration(${r.id})">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function getFilteredRegistrations() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const estadoFilter = document.getElementById('filterEstado').value;
+      
+      return db.registrations.filter(r => {
+        const matchSearch = !search || 
+          r.nombre.toLowerCase().includes(search) || 
+          r.dni.includes(search);
+        const matchEstado = !estadoFilter || r.estado === estadoFilter;
+        return matchSearch && matchEstado;
+      }).reverse();
+    }
+
+    function filterRegistrations() {
+      renderRegistrations();
+    }
+
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function saveRegistration(e) {
+      e.preventDefault();
+      
+      const newReg = {
+        id: Date.now(),
+        fecha: new Date().toISOString(),
+        nombre: document.getElementById('regNombre').value,
+        dni: document.getElementById('regDNI').value,
+        whatsapp: document.getElementById('regWhatsApp').value,
+        categoria: document.getElementById('regCategoria').value,
+        urgencia: document.getElementById('regUrgencia').value,
+        notas: document.getElementById('regNotas').value,
+        estado: 'Nuevo'
+      };
+      
+      db.registrations.push(newReg);
+      saveData();
+      
+      closeModal('registrationModal');
+      e.target.reset();
+      
+      updateDashboard();
+      renderRegistrations();
+      
+      alert('✅ Registro guardado correctamente');
+    }
+
+    function updateStatus(id, newStatus) {
+      const reg = db.registrations.find(r => r.id === id);
+      if (reg) {
+        reg.estado = newStatus;
+        saveData();
+        updateDashboard();
+      }
+    }
+
+    function deleteRegistration(id) {
+      if (!confirm('¿Estás seguro de eliminar este registro?')) return;
+      
+      db.registrations = db.registrations.filter(r => r.id !== id);
+      saveData();
+      updateDashboard();
+      renderRegistrations();
+    }
+
+    // ==========================================
+    // ADMINS
+    // ==========================================
+
+    function renderAdmins() {
+      const list = document.getElementById('adminsList');
+      list.innerHTML = db.admins.map(email => `
+        <div class="admin-item">
+          <span>📧 ${email}</span>
+          <button class="btn btn-sm btn-danger" onclick="removeAdmin('${email}')">Eliminar</button>
+        </div>
+      `).join('');
+      
+      // Render checkboxes para notificaciones específicas
+      const checkboxesDiv = document.getElementById('specificAdminsCheckboxes');
+      checkboxesDiv.innerHTML = db.admins.map(email => `
+        <label style="display: block; margin: 0.5rem 0;">
+          <input type="checkbox" class="specific-admin-cb" value="${email}" 
+            ${db.notificationConfig.specificAdmins.includes(email) ? 'checked' : ''}
+            onchange="saveSpecificAdmins()">
+          ${email}
+        </label>
+      `).join('');
+    }
+
+    function addAdmin() {
+      const email = document.getElementById('newAdminEmail').value.trim();
+      if (!email || !email.includes('@')) {
+        alert('Email inválido');
+        return;
+      }
+      
+      if (db.admins.includes(email)) {
+        alert('Este admin ya existe');
+        return;
+      }
+      
+      db.admins.push(email);
+      saveData();
+      renderAdmins();
+      document.getElementById('newAdminEmail').value = '';
+      alert('✅ Admin agregado');
+    }
+
+    function removeAdmin(email) {
+      if (db.admins.length <= 1) {
+        alert('Debe quedar al menos un admin');
+        return;
+      }
+      
+      if (!confirm(`¿Eliminar ${email}?`)) return;
+      
+      db.admins = db.admins.filter(a => a !== email);
+      saveData();
+      renderAdmins();
+    }
+
+    function saveNotificationConfig() {
+      const radios = document.getElementsByName('notifMode');
+      let mode = 'ROUND_ROBIN';
+      for (let r of radios) {
+        if (r.checked) {
+          mode = r.value;
+          break;
+        }
+      }
+      
+      db.notificationConfig.mode = mode;
+      saveData();
+      
+      const specificSection = document.getElementById('specificAdminsSection');
+      if (mode === 'SPECIFIC') {
+        specificSection.classList.remove('hidden');
+      } else {
+        specificSection.classList.add('hidden');
+      }
+    }
+
+    function saveSpecificAdmins() {
+      const checkboxes = document.querySelectorAll('.specific-admin-cb:checked');
+      db.notificationConfig.specificAdmins = Array.from(checkboxes).map(cb => cb.value);
+      saveData();
+    }
+
+    // ==========================================
+    // BACKUP
+    // ==========================================
+
+    function exportData() {
+      const dataStr = JSON.stringify(db, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `uadav_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      alert('✅ Backup descargado');
+    }
+
+    function importData() {
+      const fileInput = document.getElementById('importFile');
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        alert('Selecciona un archivo');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (confirm(`¿Restaurar ${imported.registrations?.length || 0} registros?`)) {
+            db = imported;
+            saveData();
+            updateDashboard();
+            renderRegistrations();
+            renderAdmins();
+            alert('✅ Datos restaurados correctamente');
+          }
+        } catch (err) {
+          alert('❌ Error al importar: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAllData() {
+      if (!confirm('⚠️ ¿Estás seguro de BORRAR TODOS los datos? Esta acción no se puede deshacer.')) return;
+      if (!confirm('¿Realmente estás seguro?')) return;
+      
+      db = {
+        registrations: [],
+        admins: ['marcosdinella@gmail.com'],
+        notificationConfig: { mode: 'ROUND_ROBIN', specificAdmins: [] }
+      };
+      saveData();
+      updateDashboard();
+      renderRegistrations();
+      renderAdmins();
+      alert('✅ Todos los datos fueron eliminados');
+    }
+
+    // Cerrar modal al hacer click fuera
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('active');
+      }
+    }
+  </script>
+</body>
+</html>
