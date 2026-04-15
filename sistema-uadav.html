@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UADAV Pro - Sistema de Gestión Empresarial</title>
+  <title>UADAV Enterprise - Sistema Integral de Gestión Sindical</title>
   
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
@@ -19,6 +21,7 @@
       --success: #28a745;
       --warning: #ffc107;
       --danger: #dc3545;
+      --info: #17a2b8;
       --light: #f8f9fa;
       --dark: #343a40;
       --bg: #f0f2f5;
@@ -51,7 +54,6 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
     @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     
     .animate-fade { animation: fadeIn 0.5s ease-out; }
     .animate-slide { animation: slideIn 0.3s ease-out; }
@@ -66,558 +68,209 @@
       position: sticky;
       top: 0;
       z-index: 1000;
-      backdrop-filter: blur(10px);
     }
     
     .header-content { 
-      max-width: 1400px; 
+      max-width: 1600px; 
       margin: 0 auto; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
     }
     
-    .logo { 
-      font-size: 1.5rem; 
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+    .logo { font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 0.5rem; }
     
-    .nav { 
-      display: flex; 
-      gap: 0.5rem; 
-      align-items: center;
-    }
-    
+    .nav { display: flex; gap: 0.25rem; align-items: center; flex-wrap: wrap; }
     .nav a, .nav button { 
-      color: #fff; 
-      text-decoration: none; 
-      padding: 0.5rem 1rem; 
-      border-radius: 8px; 
-      transition: var(--transition);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      color: #fff; text-decoration: none; padding: 0.5rem 0.75rem; 
+      border-radius: 6px; transition: var(--transition); border: none;
+      background: transparent; cursor: pointer; font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;
     }
-    
-    .nav a:hover, .nav button:hover { 
-      background: rgba(255,255,255,0.2);
-      transform: translateY(-2px);
-    }
-    
-    .nav a.active { 
-      background: rgba(255,255,255,0.3);
-      font-weight: 600;
-    }
-
-    /* Theme Toggle */
-    .theme-toggle {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: #fff;
-      padding: 0.5rem;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .theme-toggle:hover { background: rgba(255,255,255,0.3); transform: rotate(180deg); }
+    .nav a:hover, .nav button:hover { background: rgba(255,255,255,0.2); }
+    .nav a.active { background: rgba(255,255,255,0.3); font-weight: 600; }
 
     /* Container */
-    .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+    .container { max-width: 1600px; margin: 2rem auto; padding: 0 2rem; }
 
     /* Cards */
     .card { 
-      background: var(--card-bg); 
-      border-radius: 16px; 
-      padding: 2rem; 
-      margin-bottom: 2rem; 
-      box-shadow: 0 4px 20px var(--shadow);
-      transition: var(--transition);
+      background: var(--card-bg); border-radius: 12px; padding: 1.5rem; 
+      margin-bottom: 1.5rem; box-shadow: 0 2px 10px var(--shadow);
       border: 1px solid var(--border);
     }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px var(--shadow); }
-    
     .card-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 1.5rem; 
-      padding-bottom: 1rem; 
-      border-bottom: 2px solid var(--border);
-      flex-wrap: wrap;
-      gap: 1rem;
+      display: flex; justify-content: space-between; align-items: center; 
+      margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border);
+      flex-wrap: wrap; gap: 1rem;
     }
-    
-    .card-title { 
-      font-size: 1.5rem; 
-      color: var(--primary); 
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+    .card-title { font-size: 1.25rem; color: var(--primary); font-weight: 700; }
 
     /* Stats Grid */
-    .stats-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-      gap: 1.5rem; 
-      margin-bottom: 2rem; 
-    }
-    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     .stat-card { 
       background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%); 
-      color: #fff; 
-      padding: 2rem; 
-      border-radius: 16px; 
-      text-align: center; 
-      box-shadow: 0 8px 30px rgba(0,102,204,0.3);
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
+      color: #fff; padding: 1.5rem; border-radius: 12px; text-align: center;
+      box-shadow: 0 4px 15px rgba(0,102,204,0.3);
     }
-    
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: pulse 3s ease-in-out infinite;
-    }
-    
-    .stat-card:hover { transform: translateY(-10px) scale(1.02); }
-    
-    .stat-number { 
-      font-size: 3rem; 
-      font-weight: bold; 
-      margin-bottom: 0.5rem;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .stat-label { 
-      font-size: 1rem; 
-      opacity: 0.9;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .stat-icon {
-      font-size: 4rem;
-      opacity: 0.2;
-      position: absolute;
-      bottom: 10px;
-      right: 20px;
-    }
+    .stat-number { font-size: 2rem; font-weight: bold; margin-bottom: 0.25rem; }
+    .stat-label { font-size: 0.875rem; opacity: 0.9; }
 
     /* Forms */
-    .form-group { margin-bottom: 1.5rem; }
-    .form-group label { 
-      display: block; 
-      margin-bottom: 0.5rem; 
-      color: var(--text); 
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.875rem; }
     .form-group input, .form-group select, .form-group textarea { 
-      width: 100%; 
-      padding: 0.875rem; 
-      border: 2px solid var(--border); 
-      border-radius: 10px; 
-      font-size: 1rem; 
-      transition: var(--transition);
-      background: var(--card-bg);
-      color: var(--text);
+      width: 100%; padding: 0.625rem; border: 2px solid var(--border); 
+      border-radius: 8px; font-size: 0.9rem; transition: var(--transition);
+      background: var(--card-bg); color: var(--text);
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
-      outline: none; 
-      border-color: var(--secondary);
+    .form-group input:focus, .form-group select:focus { 
+      outline: none; border-color: var(--secondary);
       box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
     }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
 
     /* Buttons */
     .btn { 
-      padding: 0.875rem 1.5rem; 
-      border: none; 
-      border-radius: 10px; 
-      font-size: 0.95rem; 
-      font-weight: 600; 
-      cursor: pointer; 
-      transition: var(--transition); 
-      display: inline-flex; 
-      align-items: center; 
-      gap: 0.5rem;
-      position: relative;
-      overflow: hidden;
+      padding: 0.625rem 1.25rem; border: none; border-radius: 8px; 
+      font-size: 0.875rem; font-weight: 600; cursor: pointer; 
+      transition: var(--transition); display: inline-flex; 
+      align-items: center; gap: 0.35rem;
     }
-    
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-    
-    .btn:hover::before { width: 300px; height: 300px; }
-    .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
-    .btn:active { transform: translateY(-1px); }
-    
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .btn-primary { background: var(--secondary); color: #fff; }
     .btn-success { background: var(--success); color: #fff; }
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-warning { background: var(--warning); color: #000; }
-    .btn-secondary { background: #6c757d; color: #fff; }
-    .btn-info { background: var(--accent); color: #fff; }
-    .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
-    .btn-lg { padding: 1rem 2rem; font-size: 1.1rem; }
+    .btn-info { background: var(--info); color: #fff; }
+    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8rem; }
 
     /* Table */
-    .table-container { overflow-x: auto; border-radius: 10px; }
-    table { width: 100%; border-collapse: separate; border-spacing: 0; }
-    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-    th { 
-      background: var(--primary); 
-      color: #fff; 
-      font-weight: 600; 
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 0.5px;
-    }
-    th:first-child { border-top-left-radius: 10px; }
-    th:last-child { border-top-right-radius: 10px; }
-    tr:hover { background: rgba(0,102,204,0.05); }
-    tr:last-child td { border-bottom: none; }
+    .table-container { overflow-x: auto; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--primary); color: #fff; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+    tr:hover { background: rgba(0,102,204,0.03); }
     
-    .badge { 
-      padding: 0.375rem 0.875rem; 
-      border-radius: 20px; 
-      font-size: 0.875rem; 
-      font-weight: 600;
-      display: inline-block;
-    }
+    .badge { padding: 0.25rem 0.625rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
     .badge-nuevo { background: #fff3cd; color: #856404; }
     .badge-contactado { background: #d4edda; color: #155724; }
     .badge-afiliado { background: #cce5ff; color: #004085; }
-    .badge-rechazado { background: #f8d7da; color: #721c24; }
+    .badge-mora { background: #f8d7da; color: #721c24; }
+    .badge-al-dia { background: #d4edda; color: #155724; }
 
     /* Filters */
-    .filters { 
-      display: flex; 
-      gap: 1rem; 
-      margin-bottom: 1.5rem; 
-      flex-wrap: wrap;
-      background: var(--card-bg);
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px var(--shadow);
-    }
-    .filters input, .filters select { 
-      flex: 1; 
-      min-width: 200px; 
-      padding: 0.875rem; 
-      border: 2px solid var(--border); 
-      border-radius: 10px;
-      background: var(--card-bg);
-      color: var(--text);
-    }
+    .filters { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filters input, .filters select { flex: 1; min-width: 150px; padding: 0.625rem; border: 2px solid var(--border); border-radius: 8px; }
 
     /* Modal */
     .modal { 
-      display: none; 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 100%; 
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(5px);
-      z-index: 2000; 
-      justify-content: center; 
-      align-items: center;
-      animation: fadeIn 0.3s ease-out;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center;
     }
     .modal.active { display: flex; }
     .modal-content { 
-      background: var(--card-bg); 
-      padding: 2.5rem; 
-      border-radius: 20px; 
-      max-width: 700px; 
-      width: 90%; 
-      max-height: 90vh; 
-      overflow-y: auto;
-      animation: scaleIn 0.3s ease-out;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      background: var(--card-bg); padding: 2rem; border-radius: 16px; 
+      max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;
     }
-    .modal-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--border);
-    }
-    .modal-close { 
-      background: none; 
-      border: none; 
-      font-size: 2rem; 
-      cursor: pointer; 
-      color: var(--text);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-    }
-    .modal-close:hover { background: var(--bg); transform: rotate(90deg); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
 
-    /* Toast Notifications */
-    .toast-container {
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      z-index: 3000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    /* Tabs */
+    .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+    .tab { 
+      padding: 0.75rem 1.25rem; background: none; border: none; cursor: pointer; 
+      font-weight: 600; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px;
+      white-space: nowrap;
     }
-    .toast {
-      background: var(--card-bg);
-      color: var(--text);
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      min-width: 300px;
-      animation: slideIn 0.3s ease-out;
+    .tab.active { color: var(--secondary); border-bottom-color: var(--secondary); }
+
+    /* Module Sections */
+    .module-section { display: none; }
+    .module-section.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+    /* Dashboard Widgets */
+    .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    
+    /* Login */
+    .login-container { 
+      display: flex; justify-content: center; align-items: center; min-height: 100vh; 
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+    .login-box { 
+      background: var(--card-bg); padding: 2.5rem; border-radius: 16px; 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 90%; max-width: 400px;
+    }
+
+    /* Toast */
+    .toast-container { position: fixed; top: 100px; right: 20px; z-index: 3000; }
+    .toast { 
+      background: var(--card-bg); padding: 1rem; border-radius: 8px; 
+      margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex; align-items: center; gap: 0.75rem; min-width: 300px;
       border-left: 4px solid var(--secondary);
+      animation: slideIn 0.3s ease-out;
     }
     .toast.success { border-left-color: var(--success); }
     .toast.error { border-left-color: var(--danger); }
-    .toast.warning { border-left-color: var(--warning); }
-    .toast.info { border-left-color: var(--accent); }
 
-    /* Login */
-    .login-container { 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      min-height: 100vh; 
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      position: relative;
-      overflow: hidden;
+    /* Cobranzas */
+    .cuota-card { 
+      background: var(--card-bg); border: 2px solid var(--border); 
+      border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .login-container::before {
-      content: '';
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-      background-size: 50px 50px;
-      animation: move 20s linear infinite;
-    }
-    @keyframes move {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(50px, 50px); }
-    }
-    .login-box { 
-      background: var(--card-bg); 
-      padding: 3rem; 
-      border-radius: 20px; 
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
-      width: 90%; 
-      max-width: 450px;
-      position: relative;
-      z-index: 1;
-      animation: scaleIn 0.5s ease-out;
-    }
-    .login-box h1 { 
-      text-align: center; 
-      color: var(--primary); 
-      margin-bottom: 0.5rem;
-      font-size: 2rem;
-    }
-    .login-box p { text-align: center; color: #666; margin-bottom: 2rem; }
+    .cuota-card.mora { border-left: 4px solid var(--danger); }
+    .cuota-card.al-dia { border-left: 4px solid var(--success); }
 
-    /* Backup Grid */
-    .backup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-    .backup-card { 
-      background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg) 100%); 
-      padding: 2rem; 
-      border-radius: 16px; 
-      text-align: center;
-      border: 2px solid var(--border);
-      transition: var(--transition);
+    /* Padrón */
+    .padron-card { 
+      background: var(--card-bg); border-radius: 8px; padding: 1rem; 
+      margin-bottom: 0.75rem; border: 1px solid var(--border);
+      display: grid; grid-template-columns: 80px 1fr auto; gap: 1rem; align-items: center;
     }
-    .backup-card:hover { 
-      transform: translateY(-5px); 
-      border-color: var(--secondary);
-      box-shadow: 0 10px 30px var(--shadow);
+    .padron-foto { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--secondary); }
+    
+    /* Obras Sociales */
+    .prestador-card { 
+      background: var(--card-bg); border-radius: 8px; padding: 1rem; 
+      margin-bottom: 0.75rem; border-left: 4px solid var(--info);
     }
-    .backup-card h3 { margin-bottom: 1rem; color: var(--primary); font-size: 1.3rem; }
-    .backup-card .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.7; }
-
-    /* Admin List */
-    .admin-item { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding: 1rem; 
-      background: var(--bg); 
-      margin-bottom: 0.75rem; 
-      border-radius: 10px;
-      transition: var(--transition);
-    }
-    .admin-item:hover { background: rgba(0,102,204,0.1); transform: translateX(5px); }
-
-    /* Charts Container */
-    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
-    .chart-container { position: relative; height: 300px; }
-
-    /* Activity Log */
-    .activity-item {
-      padding: 1rem;
-      border-left: 3px solid var(--secondary);
-      background: var(--bg);
-      margin-bottom: 0.75rem;
-      border-radius: 0 10px 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .activity-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--secondary);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    /* Checkbox & Radio */
-    .checkbox-item, .radio-item {
-      display: flex;
-      align-items: center;
-      padding: 0.875rem;
-      background: var(--bg);
-      margin: 0.5rem 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .checkbox-item:hover, .radio-item:hover { background: rgba(0,102,204,0.1); }
-    .checkbox-item input, .radio-item input { margin-right: 0.75rem; width: 18px; height: 18px; }
-
-    /* Quick Actions */
-    .quick-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-    .quick-action-btn {
-      flex: 1;
-      min-width: 150px;
-      padding: 1.5rem;
-      background: var(--card-bg);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .quick-action-btn:hover {
-      border-color: var(--secondary);
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px var(--shadow);
-    }
-    .quick-action-btn .icon { font-size: 2rem; margin-bottom: 0.5rem; color: var(--secondary); }
 
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: 1rem; }
-      .nav { flex-wrap: wrap; justify-content: center; }
+      .nav { justify-content: center; }
       .stats-grid { grid-template-columns: 1fr; }
-      .charts-grid { grid-template-columns: 1fr; }
-      .card-header { flex-direction: column; align-items: flex-start; }
+      .form-row { grid-template-columns: 1fr; }
       .filters { flex-direction: column; }
       .filters input, .filters select { width: 100%; }
+      .padron-card { grid-template-columns: 1fr; text-align: center; }
     }
 
-    /* Loading Spinner */
-    .spinner {
-      border: 3px solid var(--border);
-      border-top: 3px solid var(--secondary);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 2rem auto;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* Hidden */
     .hidden { display: none !important; }
-
-    /* Print */
-    @media print {
-      .header, .nav, .btn, .filters, .quick-actions { display: none !important; }
-      .card { box-shadow: none; border: 1px solid #ddd; }
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 5px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
   </style>
 </head>
 <body>
 
   <!-- LOGIN -->
   <div id="loginView" class="login-container">
-    <div class="login-box animate-scale">
-      <h1><i class="fas fa-users-cog"></i> UADAV Pro</h1>
-      <p>Sistema de Gestión Empresarial</p>
-      <div id="loginError" class="alert alert-error hidden"></div>
+    <div class="login-box">
+      <h1 style="text-align: center; color: var(--primary); margin-bottom: 0.5rem;">
+        <i class="fas fa-building"></i> UADAV Enterprise
+      </h1>
+      <p style="text-align: center; color: #666; margin-bottom: 2rem;">Sistema Integral de Gestión Sindical</p>
       <form onsubmit="handleLogin(event)">
         <div class="form-group">
           <label><i class="fas fa-lock"></i> Contraseña</label>
-          <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" required autofocus>
+          <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-          <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <i class="fas fa-sign-in-alt"></i> Ingresar
         </button>
       </form>
-      <p style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: #666;">
-        <i class="fas fa-key"></i> Contraseña por defecto: <strong>admin123</strong>
+      <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #666;">
+        Contraseña: <strong>admin123</strong>
       </p>
     </div>
   </div>
@@ -627,509 +280,444 @@
     <!-- Header -->
     <header class="header">
       <div class="header-content">
-        <div class="logo">
-          <i class="fas fa-users-cog"></i>
-          <span>UADAV Pro</span>
-        </div>
+        <div class="logo"><i class="fas fa-building"></i> UADAV Enterprise</div>
         <nav class="nav">
-          <a href="#" onclick="showView('dashboard')" class="active" id="nav-dashboard">
-            <i class="fas fa-chart-line"></i> Dashboard
-          </a>
-          <a href="#" onclick="showView('registrations')" id="nav-registrations">
-            <i class="fas fa-users"></i> Registros
-          </a>
-          <a href="#" onclick="showView('calendar')" id="nav-calendar">
-            <i class="fas fa-calendar-alt"></i> Calendario
-          </a>
-          <a href="#" onclick="showView('documents')" id="nav-documents">
-            <i class="fas fa-folder-open"></i> Documentos
-          </a>
-          <a href="#" onclick="showView('admins')" id="nav-admins">
-            <i class="fas fa-user-shield"></i> Admins
-          </a>
-          <a href="#" onclick="showView('reports')" id="nav-reports">
-            <i class="fas fa-file-alt"></i> Reportes
-          </a>
-          <a href="#" onclick="showView('backup')" id="nav-backup">
-            <i class="fas fa-database"></i> Backup
-          </a>
-          <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
-            <i class="fas fa-moon" id="themeIcon"></i>
-          </button>
-          <a href="#" onclick="logout()" title="Cerrar sesión">
-            <i class="fas fa-sign-out-alt"></i>
-          </a>
+          <a href="#" onclick="showModule('dashboard')" class="active" id="nav-dashboard"><i class="fas fa-home"></i> Inicio</a>
+          <a href="#" onclick="showModule('padron')" id="nav-padron"><i class="fas fa-users"></i> Padrón</a>
+          <a href="#" onclick="showModule('cobranzas')" id="nav-cobranzas"><i class="fas fa-dollar-sign"></i> Cobranzas</a>
+          <a href="#" onclick="showModule('obras-sociales')" id="nav-obras-sociales"><i class="fas fa-hospital"></i> Obras Sociales</a>
+          <a href="#" onclick="showModule('ayuda-economica')" id="nav-ayuda-economica"><i class="fas fa-hand-holding-usd"></i> Ayuda Económica</a>
+          <a href="#" onclick="showModule('sindicato')" id="nav-sindicato"><i class="fas fa-briefcase"></i> Sindicato</a>
+          <a href="#" onclick="showModule('inspectores')" id="nav-inspectores"><i class="fas fa-user-shield"></i> Inspectores</a>
+          <a href="#" onclick="showModule('legales')" id="nav-legales"><i class="fas fa-gavel"></i> Legales</a>
+          <a href="#" onclick="showModule('carnets')" id="nav-carnets"><i class="fas fa-id-card"></i> Carnets</a>
+          <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</a>
         </nav>
       </div>
     </header>
 
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="container">
       
-      <!-- DASHBOARD VIEW -->
-      <div id="dashboardView" class="animate-fade">
+      <!-- DASHBOARD MODULE -->
+      <div id="dashboardModule" class="module-section active">
         <div class="stats-grid">
-          <div class="stat-card animate-scale">
-            <div class="stat-icon"><i class="fas fa-users"></i></div>
-            <div class="stat-number" id="statTotal">0</div>
-            <div class="stat-label">Total Registros</div>
+          <div class="stat-card">
+            <div class="stat-number" id="statTotalAfiliados">0</div>
+            <div class="stat-label">Total Afiliados</div>
           </div>
-          <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
-            <div class="stat-icon"><i class="fas fa-clock"></i></div>
-            <div class="stat-number" id="statNuevos">0</div>
-            <div class="stat-label">Nuevos</div>
+          <div class="stat-card" style="background: linear-gradient(135deg, #28a745, #20c997);">
+            <div class="stat-number" id="statAlDia">0</div>
+            <div class="stat-label">Al Día</div>
           </div>
-          <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-            <div class="stat-icon"><i class="fas fa-phone-alt"></i></div>
-            <div class="stat-number" id="statContactados">0</div>
-            <div class="stat-label">Contactados</div>
+          <div class="stat-card" style="background: linear-gradient(135deg, #dc3545, #c82333);">
+            <div class="stat-number" id="statMorosos">0</div>
+            <div class="stat-label">Morosos</div>
           </div>
-          <div class="stat-card" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
-            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-number" id="statAfiliados">0</div>
-            <div class="stat-label">Afiliados</div>
+          <div class="stat-card" style="background: linear-gradient(135deg, #ffc107, #e0a800);">
+            <div class="stat-number" id="statPrestamos">0</div>
+            <div class="stat-label">Préstamos Activos</div>
           </div>
         </div>
 
-        <div class="quick-actions">
-          <div class="quick-action-btn" onclick="openModal('registrationModal')">
-            <div class="icon"><i class="fas fa-user-plus"></i></div>
-            <div><strong>Nuevo Registro</strong><br><small>Ctrl + N</small></div>
-          </div>
-          <div class="quick-action-btn" onclick="generatePDF()">
-            <div class="icon"><i class="fas fa-file-pdf"></i></div>
-            <div><strong>Exportar PDF</strong><br><small>Ctrl + P</small></div>
-          </div>
-          <div class="quick-action-btn" onclick="showView('calendar')">
-            <div class="icon"><i class="fas fa-calendar-plus"></i></div>
-            <div><strong>Evento</strong><br><small>Ctrl + E</small></div>
-          </div>
-          <div class="quick-action-btn" onclick="exportData()">
-            <div class="icon"><i class="fas fa-download"></i></div>
-            <div><strong>Backup</strong><br><small>Ctrl + B</small></div>
-          </div>
-        </div>
-
-        <div class="charts-grid">
+        <div class="widget-grid">
           <div class="card">
             <div class="card-header">
-              <h2 class="card-title"><i class="fas fa-chart-pie"></i> Distribución por Estado</h2>
+              <h2 class="card-title"><i class="fas fa-chart-pie"></i> Estado de Cuotas</h2>
             </div>
-            <div class="chart-container">
-              <canvas id="statusChart"></canvas>
-            </div>
+            <canvas id="cuotasChart" style="max-height: 300px;"></canvas>
           </div>
+          
           <div class="card">
             <div class="card-header">
-              <h2 class="card-title"><i class="fas fa-chart-bar"></i> Registros por Categoría</h2>
+              <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Alertas Recientes</h2>
             </div>
-            <div class="chart-container">
-              <canvas id="categoryChart"></canvas>
-            </div>
+            <div id="alertasList"></div>
           </div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-history"></i> Actividad Reciente</h2>
-            <button class="btn btn-sm btn-secondary" onclick="showView('registrations')">Ver Todo</button>
+            <h2 class="card-title"><i class="fas fa-tasks"></i> Accesos Rápidos</h2>
           </div>
-          <div id="activityLog"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-table"></i> Últimos Registros</h2>
-            <button class="btn btn-primary btn-sm" onclick="showView('registrations')">Ver Todos</button>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Nombre</th>
-                  <th>DNI</th>
-                  <th>WhatsApp</th>
-                  <th>Categoría</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody id="recentTable"></tbody>
-            </table>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <button class="btn btn-primary" onclick="showModule('cobranzas')"><i class="fas fa-money-bill-wave"></i> Registrar Pago</button>
+            <button class="btn btn-success" onclick="showModule('padron')"><i class="fas fa-user-plus"></i> Nuevo Afiliado</button>
+            <button class="btn btn-info" onclick="showModule('ayuda-economica')"><i class="fas fa-hand-holding-usd"></i> Nuevo Préstamo</button>
+            <button class="btn btn-warning" onclick="showModule('legales')"><i class="fas fa-folder-plus"></i> Nuevo Expediente</button>
           </div>
         </div>
       </div>
 
-      <!-- REGISTRATIONS VIEW -->
-      <div id="registrationsView" class="hidden animate-fade">
+      <!-- PADRÓN MODULE -->
+      <div id="padronModule" class="module-section">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-users"></i> Gestión de Registros</h2>
-            <div style="display: flex; gap: 0.5rem;">
-              <button class="btn btn-success" onclick="openModal('registrationModal')">
-                <i class="fas fa-plus"></i> Nuevo
-              </button>
-              <button class="btn btn-primary" onclick="generatePDF()">
-                <i class="fas fa-file-pdf"></i> PDF
-              </button>
-              <button class="btn btn-secondary" onclick="selectAll()">
-                <i class="fas fa-check-square"></i> Seleccionar Todo
-              </button>
+            <h2 class="card-title"><i class="fas fa-users"></i> Padrón de Afiliados</h2>
+            <div>
+              <button class="btn btn-success" onclick="openModal('nuevoAfiliadoModal')"><i class="fas fa-plus"></i> Nuevo Afiliado</button>
+              <button class="btn btn-primary" onclick="exportarPadron()"><i class="fas fa-download"></i> Exportar</button>
             </div>
           </div>
           
           <div class="filters">
-            <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre, DNI, teléfono..." onkeyup="filterRegistrations()">
-            <select id="filterEstado" onchange="filterRegistrations()">
+            <input type="text" id="padronSearch" placeholder="Buscar por nombre, DNI..." onkeyup="filtrarPadron()">
+            <select id="padronFilterEstado" onchange="filtrarPadron()">
               <option value="">Todos los estados</option>
-              <option value="Nuevo">🟡 Nuevo</option>
-              <option value="Contactado">🟢 Contactado</option>
-              <option value="Afiliado">🔵 Afiliado</option>
-              <option value="Rechazado">🔴 Rechazado</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
             </select>
-            <select id="filterCategoria" onchange="filterRegistrations()">
-              <option value="">Todas las categorías</option>
-              <option value="Locutor">Locutor</option>
-              <option value="Cantante">Cantante</option>
-              <option value="Bailarin">Bailarín</option>
-              <option value="Musico">Músico</option>
-              <option value="Actor">Actor</option>
-              <option value="Otro">Otro</option>
+            <select id="padronFilterSeccional" onchange="filtrarPadron()">
+              <option value="">Todas las seccionales</option>
+              <option value="capital">Capital Federal</option>
+              <option value="santafe">Santa Fe</option>
+              <option value="cordoba">Córdoba</option>
             </select>
           </div>
 
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
-                  <th>Fecha</th>
-                  <th>Nombre</th>
-                  <th>DNI</th>
-                  <th>WhatsApp</th>
-                  <th>Categoría</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="registrationsTable"></tbody>
-            </table>
-          </div>
+          <div id="padronList"></div>
         </div>
       </div>
 
-      <!-- CALENDAR VIEW -->
-      <div id="calendarView" class="hidden animate-fade">
+      <!-- COBRANZAS MODULE -->
+      <div id="cobranzasModule" class="module-section">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-calendar-alt"></i> Calendario de Eventos</h2>
-            <button class="btn btn-primary" onclick="openModal('eventModal')">
-              <i class="fas fa-plus"></i> Nuevo Evento
-            </button>
-          </div>
-          <div id="calendarContainer">
-            <p style="text-align: center; color: #666; padding: 3rem;">
-              <i class="fas fa-calendar" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-              Calendario interactivo - Próximamente
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- DOCUMENTS VIEW -->
-      <div id="documentsView" class="hidden animate-fade">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-folder-open"></i> Gestión de Documentos</h2>
-            <button class="btn btn-primary" onclick="alert('Función de carga de documentos - Próximamente')">
-              <i class="fas fa-upload"></i> Subir Documento
-            </button>
-          </div>
-          <div class="backup-grid">
-            <div class="backup-card">
-              <div class="icon"><i class="fas fa-file-pdf"></i></div>
-              <h3>Formularios</h3>
-              <p>Formularios de afiliación y documentación</p>
-            </div>
-            <div class="backup-card">
-              <div class="icon"><i class="fas fa-file-contract"></i></div>
-              <h3>Contratos</h3>
-              <p>Contratos y convenios laborales</p>
-            </div>
-            <div class="backup-card">
-              <div class="icon"><i class="fas fa-file-invoice"></i></div>
-              <h3>Facturas</h3>
-              <p>Documentación administrativa</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ADMINS VIEW -->
-      <div id="adminsView" class="hidden animate-fade">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-user-shield"></i> Administradores del Sistema</h2>
-          </div>
-          
-          <div class="form-group">
-            <label><i class="fas fa-user-plus"></i> Agregar Nuevo Administrador</label>
-            <div style="display: flex; gap: 1rem;">
-              <input type="email" id="newAdminEmail" placeholder="admin@email.com">
-              <button class="btn btn-primary" onclick="addAdmin()">
-                <i class="fas fa-plus"></i> Agregar
-              </button>
-            </div>
+            <h2 class="card-title"><i class="fas fa-dollar-sign"></i> Sistema de Cobranzas</h2>
+            <button class="btn btn-success" onclick="openModal('registrarPagoModal')"><i class="fas fa-plus"></i> Registrar Pago</button>
           </div>
 
-          <div id="adminsList"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-cog"></i> Configuración de Notificaciones</h2>
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('cobranzas', 'resumen')">Resumen</button>
+            <button class="tab" onclick="showTab('cobranzas', 'cuotas')">Cuotas</button>
+            <button class="tab" onclick="showTab('cobranzas', 'morosos')">Morosos</button>
+            <button class="tab" onclick="showTab('cobranzas', 'recibos')">Recibos</button>
           </div>
-          
-          <div class="form-group">
-            <label class="radio-item">
-              <input type="radio" name="notifMode" value="ROUND_ROBIN" checked onchange="saveNotificationConfig()">
-              <div>
-                <strong>🔄 Round Robin (Uno por vez)</strong><br>
-                <small style="color: #666;">Cada registro nuevo se asigna a un admin diferente en forma rotativa</small>
+
+          <div id="cobranzas-resumen" class="tab-content">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-number" id="totalRecaudado">$0</div>
+                <div class="stat-label">Recaudado este Mes</div>
               </div>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="notifMode" value="ALL" onchange="saveNotificationConfig()">
-              <div>
-                <strong>📢 Todos los admins reciben todo</strong><br>
-                <small style="color: #666;">Todos los administradores reciben cada notificación</small>
+              <div class="stat-card" style="background: linear-gradient(135deg, #ffc107, #e0a800);">
+                <div class="stat-number" id="totalPendiente">$0</div>
+                <div class="stat-label">Pendiente</div>
               </div>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="notifMode" value="SPECIFIC" onchange="saveNotificationConfig()">
-              <div>
-                <strong>🎯 Admins específicos</strong><br>
-                <small style="color: #666;">Selecciona qué administradores reciben las notificaciones</small>
-              </div>
-            </label>
+            </div>
           </div>
 
-          <div id="specificAdminsSection" class="hidden">
-            <h3 style="margin-bottom: 1rem;"><i class="fas fa-check-square"></i> Seleccionar administradores:</h3>
-            <div id="specificAdminsCheckboxes"></div>
+          <div id="cobranzas-cuotas" class="tab-content hidden">
+            <div class="filters">
+              <input type="text" id="cuotasSearch" placeholder="Buscar afiliado..." onkeyup="filtrarCuotas()">
+              <select id="cuotasFilterMes" onchange="filtrarCuotas()">
+                <option value="">Todos los meses</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+            </div>
+            <div id="cuotasList"></div>
+          </div>
+
+          <div id="cobranzas-morosos" class="tab-content hidden">
+            <div id="morososList"></div>
+          </div>
+
+          <div id="cobranzas-recibos" class="tab-content hidden">
+            <button class="btn btn-primary" onclick="generarReciboMasivo()"><i class="fas fa-print"></i> Generar Recibos Masivos</button>
+            <div id="recibosList" style="margin-top: 1rem;"></div>
           </div>
         </div>
       </div>
 
-      <!-- REPORTS VIEW -->
-      <div id="reportsView" class="hidden animate-fade">
+      <!-- OBRAS SOCIALES MODULE -->
+      <div id="obrasSocialesModule" class="module-section">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-file-alt"></i> Reportes y Estadísticas</h2>
+            <h2 class="card-title"><i class="fas fa-hospital"></i> Obras Sociales y Prestadores</h2>
+            <button class="btn btn-success" onclick="openModal('nuevoPrestadorModal')"><i class="fas fa-plus"></i> Nuevo Prestador</button>
           </div>
-          
-          <div class="quick-actions">
-            <div class="quick-action-btn" onclick="generatePDF()">
-              <div class="icon"><i class="fas fa-file-pdf"></i></div>
-              <div><strong>Reporte Completo</strong><br><small>PDF con todos los registros</small></div>
+
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('obras', 'prestadores')">Prestadores</button>
+            <button class="tab" onclick="showTab('obras', 'cartilla')">Cartilla</button>
+            <button class="tab" onclick="showTab('obras', 'convenios')">Convenios</button>
+          </div>
+
+          <div id="obras-prestadores" class="tab-content">
+            <div class="filters">
+              <input type="text" id="prestadorSearch" placeholder="Buscar prestador..." onkeyup="filtrarPrestadores()">
+              <select id="prestadorFilterEspecialidad" onchange="filtrarPrestadores()">
+                <option value="">Todas las especialidades</option>
+                <option value="clinica">Clínica Médica</option>
+                <option value="cardiologia">Cardiología</option>
+                <option value="odontologia">Odontología</option>
+                <option value="farmacia">Farmacia</option>
+              </select>
             </div>
-            <div class="quick-action-btn" onclick="alert('Reporte Excel - Próximamente')">
-              <div class="icon"><i class="fas fa-file-excel"></i></div>
-              <div><strong>Exportar Excel</strong><br><small>Formato XLSX</small></div>
-            </div>
-            <div class="quick-action-btn" onclick="alert('Reporte personalizado - Próximamente')">
-              <div class="icon"><i class="fas fa-filter"></i></div>
-              <div><strong>Reporte Personalizado</strong><br><small>Filtrar por fecha/estado</small></div>
-            </div>
+            <div id="prestadoresList"></div>
+          </div>
+
+          <div id="obras-cartilla" class="tab-content hidden">
+            <div id="cartillaList"></div>
+          </div>
+
+          <div id="obras-convenios" class="tab-content hidden">
+            <div id="conveniosList"></div>
           </div>
         </div>
       </div>
 
-      <!-- BACKUP VIEW -->
-      <div id="backupView" class="hidden animate-fade">
+      <!-- AYUDA ECONÓMICA MODULE -->
+      <div id="ayudaEconomicaModule" class="module-section">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-database"></i> Backup y Restauración</h2>
+            <h2 class="card-title"><i class="fas fa-hand-holding-usd"></i> Ayuda Económica y Préstamos</h2>
+            <button class="btn btn-success" onclick="openModal('nuevoPrestamoModal')"><i class="fas fa-plus"></i> Nuevo Préstamo</button>
           </div>
-          
-          <div class="backup-grid">
-            <div class="backup-card">
-              <div class="icon"><i class="fas fa-download"></i></div>
-              <h3>📥 Exportar Datos</h3>
-              <p style="margin-bottom: 1rem; color: #666;">Descarga una copia de seguridad completa de todos los registros, admins y configuración</p>
-              <button class="btn btn-primary" onclick="exportData()">
-                <i class="fas fa-download"></i> Descargar Backup JSON
-              </button>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number" id="totalPrestamosActivos">0</div>
+              <div class="stat-label">Préstamos Activos</div>
             </div>
-            
-            <div class="backup-card">
-              <div class="icon"><i class="fas fa-upload"></i></div>
-              <h3>📤 Importar Datos</h3>
-              <p style="margin-bottom: 1rem; color: #666;">Restaura datos desde un archivo de backup previamente exportado</p>
-              <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem; width: 100%;">
-              <button class="btn btn-success" onclick="importData()">
-                <i class="fas fa-upload"></i> Restaurar Backup
-              </button>
+            <div class="stat-card" style="background: linear-gradient(135deg, #28a745, #20c997);">
+              <div class="stat-number" id="totalPrestado">$0</div>
+              <div class="stat-label">Total Prestado</div>
             </div>
-            
-            <div class="backup-card">
-              <div class="icon"><i class="fas fa-trash-alt"></i></div>
-              <h3>🗑️ Limpiar Todo</h3>
-              <p style="margin-bottom: 1rem; color: #666;">Elimina permanentemente todos los datos del sistema (acción irreversible)</p>
-              <button class="btn btn-danger" onclick="clearAllData()">
-                <i class="fas fa-trash-alt"></i> Borrar Todos los Datos
-              </button>
-            </div>
+          </div>
+
+          <div id="prestamosList"></div>
+        </div>
+      </div>
+
+      <!-- SINDICATO MODULE -->
+      <div id="sindicatoModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-briefcase"></i> Gestión Sindical</h2>
+            <button class="btn btn-success" onclick="openModal('nuevaActaModal')"><i class="fas fa-plus"></i> Nueva Acta</button>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('sindicato', 'actas')">Actas</button>
+            <button class="tab" onclick="showTab('sindicato', 'resoluciones')">Resoluciones</button>
+            <button class="tab" onclick="showTab('sindicato', 'normativa')">Normativa</button>
+          </div>
+
+          <div id="sindicato-actas" class="tab-content">
+            <div id="actasList"></div>
+          </div>
+
+          <div id="sindicato-resoluciones" class="tab-content hidden">
+            <div id="resolucionesList"></div>
+          </div>
+
+          <div id="sindicato-normativa" class="tab-content hidden">
+            <div id="normativaList"></div>
           </div>
         </div>
+      </div>
 
+      <!-- INSPECTORES MODULE -->
+      <div id="inspectoresModule" class="module-section">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-info-circle"></i> Información del Sistema</h2>
+            <h2 class="card-title"><i class="fas fa-user-shield"></i> Inspectores Habilitados</h2>
+            <button class="btn btn-success" onclick="openModal('nuevoInspectorModal')"><i class="fas fa-plus"></i> Nuevo Inspector</button>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-            <div style="padding: 1rem; background: var(--bg); border-radius: 8px;">
-              <strong>Versión:</strong> 2.0 Pro
+
+          <div class="filters">
+            <select id="inspectorFilterZona" onchange="filtrarInspectores()">
+              <option value="">Todas las zonas</option>
+              <option value="general">General</option>
+              <option value="santafe">Santa Fe</option>
+              <option value="cordoba">Córdoba</option>
+            </select>
+          </div>
+
+          <div id="inspectoresList"></div>
+        </div>
+      </div>
+
+      <!-- LEGALES MODULE -->
+      <div id="legalesModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-gavel"></i> Departamento Legal</h2>
+            <button class="btn btn-success" onclick="openModal('nuevoExpedienteModal')"><i class="fas fa-plus"></i> Nuevo Expediente</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number" id="totalExpedientes">0</div>
+              <div class="stat-label">Expedientes Activos</div>
             </div>
-            <div style="padding: 1rem; background: var(--bg); border-radius: 8px;">
-              <strong>Total Registros:</strong> <span id="infoTotal">0</span>
-            </div>
-            <div style="padding: 1rem; background: var(--bg); border-radius: 8px;">
-              <strong>Último Backup:</strong> <span id="lastBackup">Nunca</span>
-            </div>
-            <div style="padding: 1rem; background: var(--bg); border-radius: 8px;">
-              <strong>Almacenamiento:</strong> <span id="storageUsed">0 KB</span>
+            <div class="stat-card" style="background: linear-gradient(135deg, #ffc107, #e0a800);">
+              <div class="stat-number" id="expedientesPendientes">0</div>
+              <div class="stat-label">Pendientes</div>
             </div>
           </div>
+
+          <div id="expedientesList"></div>
+        </div>
+      </div>
+
+      <!-- CARNETS MODULE -->
+      <div id="carnetsModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-id-card"></i> Credenciales Digitales</h2>
+          </div>
+          <div id="carnetsList"></div>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- MODAL REGISTRATION -->
-  <div id="registrationModal" class="modal">
+  <!-- MODALS (ejemplos principales) -->
+  
+  <!-- Modal Nuevo Afiliado -->
+  <div id="nuevoAfiliadoModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2><i class="fas fa-user-plus"></i> Nuevo Registro de Afiliado</h2>
-        <button class="modal-close" onclick="closeModal('registrationModal')">&times;</button>
+        <h2><i class="fas fa-user-plus"></i> Nuevo Afiliado</h2>
+        <button class="modal-close" onclick="closeModal('nuevoAfiliadoModal')">&times;</button>
       </div>
-      <form onsubmit="saveRegistration(event)">
+      <form onsubmit="saveAfiliado(event)">
         <div class="form-row">
           <div class="form-group">
-            <label><i class="fas fa-user"></i> Nombre Completo *</label>
-            <input type="text" id="regNombre" required placeholder="Ej: Juan Pérez">
+            <label>Nombre Completo *</label>
+            <input type="text" id="afiliadoNombre" required>
           </div>
           <div class="form-group">
-            <label><i class="fas fa-id-card"></i> DNI *</label>
-            <input type="text" id="regDNI" required placeholder="Ej: 12345678">
+            <label>DNI *</label>
+            <input type="text" id="afiliadoDNI" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label><i class="fas fa-phone"></i> WhatsApp *</label>
-            <input type="tel" id="regWhatsApp" placeholder="Ej: 1112345678" required>
+            <label>Email</label>
+            <input type="email" id="afiliadoEmail">
           </div>
           <div class="form-group">
-            <label><i class="fas fa-briefcase"></i> Categoría *</label>
-            <select id="regCategoria" required>
-              <option value="">Seleccionar...</option>
-              <option value="Locutor">Locutor</option>
-              <option value="Cantante">Cantante</option>
-              <option value="Bailarin">Bailarín</option>
-              <option value="Musico">Músico</option>
-              <option value="Actor">Actor</option>
-              <option value="Otro">Otro</option>
-            </select>
+            <label>Teléfono</label>
+            <input type="tel" id="afiliadoTelefono">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label><i class="fas fa-exclamation-circle"></i> ¿Necesita atención urgente?</label>
-            <select id="regUrgencia">
-              <option value="No">No, puedo esperar</option>
-              <option value="Si">Sí, urgente</option>
+            <label>Seccional *</label>
+            <select id="afiliadoSeccional" required>
+              <option value="capital">Capital Federal</option>
+              <option value="santafe">Santa Fe</option>
+              <option value="cordoba">Córdoba</option>
             </select>
           </div>
           <div class="form-group">
-            <label><i class="fas fa-envelope"></i> Email</label>
-            <input type="email" id="regEmail" placeholder="opcional@email.com">
+            <label>Categoría *</label>
+            <select id="afiliadoCategoria" required>
+              <option value="locutor">Locutor</option>
+              <option value="cantante">Cantante</option>
+              <option value="bailarin">Bailarín</option>
+              <option value="musico">Músico</option>
+            </select>
           </div>
         </div>
-        <div class="form-group">
-          <label><i class="fas fa-sticky-note"></i> Notas Adicionales</label>
-          <textarea id="regNotas" rows="3" placeholder="Información adicional..."></textarea>
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
-            <i class="fas fa-save"></i> Guardar Registro
-          </button>
-          <button type="button" class="btn btn-secondary btn-lg" onclick="closeModal('registrationModal')">
-            <i class="fas fa-times"></i> Cancelar
-          </button>
-        </div>
+        <button type="submit" class="btn btn-success" style="width: 100%;"><i class="fas fa-save"></i> Guardar Afiliado</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL EVENT -->
-  <div id="eventModal" class="modal">
+  <!-- Modal Registrar Pago -->
+  <div id="registrarPagoModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2><i class="fas fa-calendar-plus"></i> Nuevo Evento</h2>
-        <button class="modal-close" onclick="closeModal('eventModal')">&times;</button>
+        <h2><i class="fas fa-money-bill-wave"></i> Registrar Pago</h2>
+        <button class="modal-close" onclick="closeModal('registrarPagoModal')">&times;</button>
       </div>
-      <form onsubmit="saveEvent(event)">
+      <form onsubmit="savePago(event)">
         <div class="form-group">
-          <label>Título del Evento *</label>
-          <input type="text" id="eventTitle" required placeholder="Ej: Reunión de Afiliados">
+          <label>Afiliado *</label>
+          <select id="pagoAfiliado" required></select>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Fecha *</label>
-            <input type="date" id="eventDate" required>
+            <label>Mes *</label>
+            <select id="pagoMes" required>
+              <option value="1">Enero</option>
+              <option value="2">Febrero</option>
+              <option value="3">Marzo</option>
+              <option value="4">Abril</option>
+              <option value="5">Mayo</option>
+              <option value="6">Junio</option>
+              <option value="7">Julio</option>
+              <option value="8">Agosto</option>
+              <option value="9">Septiembre</option>
+              <option value="10">Octubre</option>
+              <option value="11">Noviembre</option>
+              <option value="12">Diciembre</option>
+            </select>
           </div>
           <div class="form-group">
-            <label>Hora</label>
-            <input type="time" id="eventTime">
+            <label>Año *</label>
+            <input type="number" id="pagoAnio" value="2026" required>
           </div>
         </div>
         <div class="form-group">
-          <label>Descripción</label>
-          <textarea id="eventDesc" rows="3"></textarea>
+          <label>Monto *</label>
+          <input type="number" id="pagoMonto" step="0.01" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-          <i class="fas fa-save"></i> Guardar Evento
-        </button>
+        <div class="form-group">
+          <label>Forma de Pago</label>
+          <select id="pagoForma">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="debito">Débito Automático</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-success" style="width: 100%;"><i class="fas fa-save"></i> Registrar Pago</button>
       </form>
     </div>
   </div>
+
+  <!-- Más modals para préstamos, expedientes, etc. -->
 
   <script>
     // ==========================================
-    // CONFIGURACIÓN Y DATOS
+    // BASE DE DATOS LOCAL
     // ==========================================
     
-    const CONFIG = {
-      PASSWORD: 'admin123',
-      DB_KEY: 'uadav_pro_data_v2',
-      VERSION: '2.0'
-    };
-
+    const DB_KEY = 'uadav_enterprise_db_v1';
     let db = {
-      registrations: [],
-      admins: ['marcosdinella@gmail.com'],
-      notificationConfig: { mode: 'ROUND_ROBIN', specificAdmins: [] },
-      events: [],
-      documents: [],
-      activityLog: [],
-      lastBackup: null
+      afiliados: [],
+      cuotas: [],
+      pagos: [],
+      prestadores: [],
+      prestamos: [],
+      actas: [],
+      inspectores: [],
+      expedientes: [],
+      config: {
+        cuotaMensual: 5000,
+        interesMora: 10
+      }
     };
 
-    let charts = {};
-    let selectedItems = new Set();
+    let currentModule = 'dashboard';
+    let currentTab = {};
 
     // ==========================================
     // INICIALIZACIÓN
@@ -1138,39 +726,17 @@
     window.onload = function() {
       loadData();
       checkSession();
-      setupKeyboardShortcuts();
-      updateStorageInfo();
     };
 
     function loadData() {
-      const saved = localStorage.getItem(CONFIG.DB_KEY);
+      const saved = localStorage.getItem(DB_KEY);
       if (saved) {
         db = JSON.parse(saved);
       }
-      // Inicializar log de actividad si no existe
-      if (!db.activityLog) db.activityLog = [];
     }
 
     function saveData() {
-      localStorage.setItem(CONFIG.DB_KEY, JSON.stringify(db));
-      updateStorageInfo();
-    }
-
-    function logActivity(action, details) {
-      db.activityLog.unshift({
-        timestamp: new Date().toISOString(),
-        action: action,
-        details: details
-      });
-      // Mantener solo últimos 100 registros
-      if (db.activityLog.length > 100) db.activityLog = db.activityLog.slice(0, 100);
-      saveData();
-      renderActivityLog();
-    }
-
-    function saveData() {
-      localStorage.setItem(CONFIG.DB_KEY, JSON.stringify(db));
-      updateStorageInfo();
+      localStorage.setItem(DB_KEY, JSON.stringify(db));
     }
 
     function checkSession() {
@@ -1178,67 +744,17 @@
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('mainView').classList.remove('hidden');
         updateDashboard();
-        renderRegistrations();
-        renderAdmins();
-        renderActivityLog();
       }
     }
-
-    function setupKeyboardShortcuts() {
-      document.addEventListener('keydown', function(e) {
-        // Ctrl + N: Nuevo registro
-        if (e.ctrlKey && e.key === 'n') {
-          e.preventDefault();
-          if (!document.getElementById('loginView').classList.contains('hidden')) return;
-          openModal('registrationModal');
-        }
-        // Ctrl + P: Generar PDF
-        if (e.ctrlKey && e.key === 'p') {
-          e.preventDefault();
-          if (!document.getElementById('loginView').classList.contains('hidden')) return;
-          generatePDF();
-        }
-        // Ctrl + B: Backup
-        if (e.ctrlKey && e.key === 'b') {
-          e.preventDefault();
-          if (!document.getElementById('loginView').classList.contains('hidden')) return;
-          exportData();
-        }
-        // Escape: Cerrar modal
-        if (e.key === 'Escape') {
-          document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-        }
-      });
-    }
-
-    function updateStorageInfo() {
-      const used = localStorage.getItem(CONFIG.DB_KEY).length;
-      const usedKB = (used / 1024).toFixed(2);
-      document.getElementById('storageUsed').textContent = usedKB + ' KB';
-      document.getElementById('infoTotal').textContent = db.registrations.length;
-      if (db.lastBackup) {
-        document.getElementById('lastBackup').textContent = new Date(db.lastBackup).toLocaleString();
-      }
-    }
-
-    // ==========================================
-    // LOGIN
-    // ==========================================
 
     function handleLogin(e) {
       e.preventDefault();
-      const password = document.getElementById('loginPassword').value;
-      
-      if (password === CONFIG.PASSWORD) {
+      if (document.getElementById('loginPassword').value === 'admin123') {
         sessionStorage.setItem('loggedIn', 'true');
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('mainView').classList.remove('hidden');
-        showToast('¡Bienvenido al sistema!', 'success');
-        logActivity('Login', 'Usuario inició sesión');
+        showToast('Bienvenido al sistema', 'success');
         updateDashboard();
-        renderRegistrations();
-        renderAdmins();
-        renderActivityLog();
       } else {
         showToast('Contraseña incorrecta', 'error');
       }
@@ -1246,659 +762,527 @@
 
     function logout() {
       sessionStorage.removeItem('loggedIn');
-      showToast('Sesión cerrada correctamente', 'info');
-      setTimeout(() => location.reload(), 1000);
+      location.reload();
     }
 
     // ==========================================
     // NAVEGACIÓN
     // ==========================================
 
-    function showView(viewName) {
-      // Ocultar todas las vistas
-      ['dashboard', 'registrations', 'calendar', 'documents', 'admins', 'reports', 'backup'].forEach(v => {
-        document.getElementById(v + 'View').classList.add('hidden');
-        document.getElementById('nav-' + v).classList.remove('active');
-      });
+    function showModule(moduleName) {
+      // Ocultar todos los módulos
+      document.querySelectorAll('.module-section').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.nav a').forEach(n => n.classList.remove('active'));
       
-      // Mostrar vista seleccionada
-      document.getElementById(viewName + 'View').classList.remove('hidden');
-      document.getElementById('nav-' + viewName).classList.add('active');
+      // Mostrar módulo seleccionado
+      document.getElementById(moduleName + 'Module').classList.add('active');
+      document.getElementById('nav-' + moduleName).classList.add('active');
       
-      // Actualizar datos si es necesario
-      if (viewName === 'dashboard') updateDashboard();
-      if (viewName === 'registrations') renderRegistrations();
-      if (viewName === 'admins') renderAdmins();
+      currentModule = moduleName;
       
-      showToast('Vista cambiada: ' + viewName, 'info');
+      // Cargar datos específicos del módulo
+      if (moduleName === 'padron') renderPadron();
+      if (moduleName === 'cobranzas') renderCobranzas();
+      if (moduleName === 'obras-sociales') renderObrasSociales();
+      if (moduleName === 'ayuda-economica') renderAyudaEconomica();
+      if (moduleName === 'sindicato') renderSindicato();
+      if (moduleName === 'inspectores') renderInspectores();
+      if (moduleName === 'legales') renderLegales();
+      if (moduleName === 'carnets') renderCarnets();
     }
 
-    // ==========================================
-    // DASHBOARD & CHARTS
-    // ==========================================
-
-    function updateDashboard() {
-      const total = db.registrations.length;
-      const nuevos = db.registrations.filter(r => r.estado === 'Nuevo').length;
-      const contactados = db.registrations.filter(r => r.estado === 'Contactado').length;
-      const afiliados = db.registrations.filter(r => r.estado === 'Afiliado').length;
+    function showTab(module, tabName) {
+      const modulePrefix = module === 'cobranzas' ? 'cobranzas' : 
+                          module === 'obras' ? 'obras' : 'sindicato';
       
-      // Animar números
-      animateNumber('statTotal', total);
-      animateNumber('statNuevos', nuevos);
-      animateNumber('statContactados', contactados);
-      animateNumber('statAfiliados', afiliados);
+      // Ocultar todos los tabs del módulo
+      document.querySelectorAll(`[id^="${modulePrefix}-"]`).forEach(t => t.classList.add('hidden'));
       
-      // Tabla de recientes
-      const recent = db.registrations.slice(-5).reverse();
-      const tbody = document.getElementById('recentTable');
-      tbody.innerHTML = recent.map(r => `
-        <tr>
-          <td>${new Date(r.fecha).toLocaleDateString()}</td>
-          <td><strong>${r.nombre}</strong></td>
-          <td>${r.dni}</td>
-          <td>${r.whatsapp}</td>
-          <td>${r.categoria}</td>
-          <td><span class="badge badge-${r.estado.toLowerCase()}">${r.estado}</span></td>
-        </tr>
-      `).join('');
+      // Mostrar tab seleccionado
+      document.getElementById(`${modulePrefix}-${tabName}`).classList.remove('hidden');
       
-      // Actualizar gráficos
-      updateCharts();
-    }
-
-    function animateNumber(id, value) {
-      const el = document.getElementById(id);
-      const duration = 1000;
-      const start = 0;
-      const increment = value / (duration / 16);
-      let current = start;
+      // Actualizar botones de tabs
+      event.target.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
       
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= value) {
-          el.textContent = value;
-          clearInterval(timer);
-        } else {
-          el.textContent = Math.floor(current);
-        }
-      }, 16);
-    }
-
-    function updateCharts() {
-      // Gráfico de estados
-      const statusData = {
-        'Nuevo': db.registrations.filter(r => r.estado === 'Nuevo').length,
-        'Contactado': db.registrations.filter(r => r.estado === 'Contactado').length,
-        'Afiliado': db.registrations.filter(r => r.estado === 'Afiliado').length,
-        'Rechazado': db.registrations.filter(r => r.estado === 'Rechazado').length
-      };
-      
-      if (charts.status) charts.status.destroy();
-      charts.status = new Chart(document.getElementById('statusChart'), {
-        type: 'doughnut',
-        data: {
-          labels: Object.keys(statusData),
-          datasets: [{
-            data: Object.values(statusData),
-            backgroundColor: ['#ffc107', '#28a745', '#17a2b8', '#dc3545']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom' }
-          }
-        }
-      });
-      
-      // Gráfico de categorías
-      const categories = {};
-      db.registrations.forEach(r => {
-        categories[r.categoria] = (categories[r.categoria] || 0) + 1;
-      });
-      
-      if (charts.category) charts.category.destroy();
-      charts.category = new Chart(document.getElementById('categoryChart'), {
-        type: 'bar',
-        data: {
-          labels: Object.keys(categories),
-          datasets: [{
-            label: 'Registros',
-            data: Object.values(categories),
-            backgroundColor: '#0066CC'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          }
-        }
-      });
-    }
-
-    function renderActivityLog() {
-      const container = document.getElementById('activityLog');
-      if (!container) return;
-      
-      const recent = db.activityLog.slice(0, 10);
-      container.innerHTML = recent.map(log => `
-        <div class="activity-item">
-          <div class="activity-icon">
-            <i class="fas fa-${getActivityIcon(log.action)}"></i>
-          </div>
-          <div>
-            <strong>${log.action}</strong><br>
-            <small style="color: #666;">${log.details}</small><br>
-            <small style="color: #999;">${new Date(log.timestamp).toLocaleString()}</small>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function getActivityIcon(action) {
-      const icons = {
-        'Login': 'sign-in-alt',
-        'Nuevo Registro': 'user-plus',
-        'Actualizar Estado': 'edit',
-        'Eliminar': 'trash',
-        'Exportar': 'download'
-      };
-      return icons[action] || 'info-circle';
-    }
-
-    // ==========================================
-    // REGISTRATIONS
-    // ==========================================
-
-    function renderRegistrations() {
-      const tbody = document.getElementById('registrationsTable');
-      if (!tbody) return;
-      
-      const filtered = getFilteredRegistrations();
-      
-      tbody.innerHTML = filtered.map(r => `
-        <tr>
-          <td><input type="checkbox" class="row-checkbox" value="${r.id}" onchange="toggleSelection(${r.id})"></td>
-          <td>${new Date(r.fecha).toLocaleDateString()}</td>
-          <td><strong>${r.nombre}</strong></td>
-          <td>${r.dni}</td>
-          <td>${r.whatsapp}</td>
-          <td>${r.categoria}</td>
-          <td>
-            <select onchange="updateStatus(${r.id}, this.value)" class="badge badge-${r.estado.toLowerCase()}" style="border: none; cursor: pointer;">
-              <option value="Nuevo" ${r.estado==='Nuevo'?'selected':''}>Nuevo</option>
-              <option value="Contactado" ${r.estado==='Contactado'?'selected':''}>Contactado</option>
-              <option value="Afiliado" ${r.estado==='Afiliado'?'selected':''}>Afiliado</option>
-              <option value="Rechazado" ${r.estado==='Rechazado'?'selected':''}>Rechazado</option>
-            </select>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-primary" onclick="editRegistration(${r.id})" title="Editar">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-sm btn-danger" onclick="deleteRegistration(${r.id})" title="Eliminar">
-              <i class="fas fa-trash"></i>
-            </button>
-            <a href="https://wa.me/${r.whatsapp}" target="_blank" class="btn btn-sm btn-success" title="WhatsApp">
-              <i class="fab fa-whatsapp"></i>
-            </a>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function getFilteredRegistrations() {
-      const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-      const estadoFilter = document.getElementById('filterEstado')?.value || '';
-      const categoriaFilter = document.getElementById('filterCategoria')?.value || '';
-      
-      return db.registrations.filter(r => {
-        const matchSearch = !search || 
-          r.nombre.toLowerCase().includes(search) || 
-          r.dni.includes(search) ||
-          r.whatsapp.includes(search);
-        const matchEstado = !estadoFilter || r.estado === estadoFilter;
-        const matchCategoria = !categoriaFilter || r.categoria === categoriaFilter;
-        return matchSearch && matchEstado && matchCategoria;
-      }).reverse();
-    }
-
-    function filterRegistrations() {
-      renderRegistrations();
+      currentTab[module] = tabName;
     }
 
     function openModal(modalId) {
       document.getElementById(modalId).classList.add('active');
+      if (modalId === 'registrarPagoModal') loadAfiliadosSelect();
     }
 
     function closeModal(modalId) {
       document.getElementById(modalId).classList.remove('active');
     }
 
-    function saveRegistration(e) {
-      e.preventDefault();
-      
-      const newReg = {
-        id: Date.now(),
-        fecha: new Date().toISOString(),
-        nombre: document.getElementById('regNombre').value,
-        dni: document.getElementById('regDNI').value,
-        whatsapp: document.getElementById('regWhatsApp').value,
-        categoria: document.getElementById('regCategoria').value,
-        urgencia: document.getElementById('regUrgencia').value,
-        email: document.getElementById('regEmail').value,
-        notas: document.getElementById('regNotas').value,
-        estado: 'Nuevo'
-      };
-      
-      db.registrations.push(newReg);
-      saveData();
-      logActivity('Nuevo Registro', `Se registró a ${newReg.nombre}`);
-      
-      closeModal('registrationModal');
-      e.target.reset();
-      
-      updateDashboard();
-      renderRegistrations();
-      
-      showToast('✅ Registro guardado correctamente', 'success');
-    }
-
-    function updateStatus(id, newStatus) {
-      const reg = db.registrations.find(r => r.id === id);
-      if (reg) {
-        const oldStatus = reg.estado;
-        reg.estado = newStatus;
-        saveData();
-        logActivity('Actualizar Estado', `${reg.nombre}: ${oldStatus} → ${newStatus}`);
-        updateDashboard();
-        showToast(`Estado actualizado a: ${newStatus}`, 'success');
-      }
-    }
-
-    function editRegistration(id) {
-      const reg = db.registrations.find(r => r.id === id);
-      if (!reg) return;
-      
-      document.getElementById('regNombre').value = reg.nombre;
-      document.getElementById('regDNI').value = reg.dni;
-      document.getElementById('regWhatsApp').value = reg.whatsapp;
-      document.getElementById('regCategoria').value = reg.categoria;
-      document.getElementById('regUrgencia').value = reg.urgencia;
-      document.getElementById('regEmail').value = reg.email || '';
-      document.getElementById('regNotas').value = reg.notas || '';
-      
-      openModal('registrationModal');
-      
-      // Cambiar el submit para actualizar en lugar de crear
-      const form = document.querySelector('#registrationModal form');
-      const originalOnSubmit = form.onsubmit;
-      form.onsubmit = function(e) {
-        e.preventDefault();
-        reg.nombre = document.getElementById('regNombre').value;
-        reg.dni = document.getElementById('regDNI').value;
-        reg.whatsapp = document.getElementById('regWhatsApp').value;
-        reg.categoria = document.getElementById('regCategoria').value;
-        reg.urgencia = document.getElementById('regUrgencia').value;
-        reg.email = document.getElementById('regEmail').value;
-        reg.notas = document.getElementById('regNotas').value;
-        saveData();
-        logActivity('Editar Registro', `Se actualizó ${reg.nombre}`);
-        closeModal('registrationModal');
-        renderRegistrations();
-        updateDashboard();
-        showToast('✅ Registro actualizado', 'success');
-        form.onsubmit = originalOnSubmit;
-      };
-    }
-
-    function deleteRegistration(id) {
-      if (!confirm('¿Estás seguro de eliminar este registro?')) return;
-      
-      const reg = db.registrations.find(r => r.id === id);
-      db.registrations = db.registrations.filter(r => r.id !== id);
-      saveData();
-      logActivity('Eliminar', `Se eliminó el registro de ${reg?.nombre || 'ID: ' + id}`);
-      updateDashboard();
-      renderRegistrations();
-      showToast('🗑️ Registro eliminado', 'info');
-    }
-
-    function toggleSelection(id) {
-      if (selectedItems.has(id)) {
-        selectedItems.delete(id);
-      } else {
-        selectedItems.add(id);
-      }
-    }
-
-    function toggleSelectAll() {
-      const checkboxes = document.querySelectorAll('.row-checkbox');
-      const selectAll = document.getElementById('selectAll');
-      
-      if (selectAll.checked) {
-        checkboxes.forEach(cb => {
-          cb.checked = true;
-          selectedItems.add(parseInt(cb.value));
-        });
-      } else {
-        checkboxes.forEach(cb => {
-          cb.checked = false;
-          selectedItems.clear();
-        });
-      }
-    }
-
-    function selectAll() {
-      const checkboxes = document.querySelectorAll('.row-checkbox');
-      checkboxes.forEach(cb => cb.checked = !cb.checked);
-    }
-
-    // ==========================================
-    // ADMINS
-    // ==========================================
-
-    function renderAdmins() {
-      const list = document.getElementById('adminsList');
-      if (!list) return;
-      
-      list.innerHTML = db.admins.map(email => `
-        <div class="admin-item">
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #0066CC, #003366); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">
-              ${email.charAt(0).toUpperCase()}
-            </div>
-            <span><i class="fas fa-envelope"></i> ${email}</span>
-          </div>
-          <button class="btn btn-sm btn-danger" onclick="removeAdmin('${email}')">
-            <i class="fas fa-trash"></i> Eliminar
-          </button>
-        </div>
-      `).join('');
-      
-      // Render checkboxes para notificaciones específicas
-      const checkboxesDiv = document.getElementById('specificAdminsCheckboxes');
-      if (checkboxesDiv) {
-        checkboxesDiv.innerHTML = db.admins.map(email => `
-          <label class="checkbox-item">
-            <input type="checkbox" class="specific-admin-cb" value="${email}" 
-              ${db.notificationConfig.specificAdmins.includes(email) ? 'checked' : ''}
-              onchange="saveSpecificAdmins()">
-            <span>${email}</span>
-          </label>
-        `).join('');
-      }
-    }
-
-    function addAdmin() {
-      const email = document.getElementById('newAdminEmail').value.trim();
-      if (!email || !email.includes('@')) {
-        showToast('Email inválido', 'error');
-        return;
-      }
-      
-      if (db.admins.includes(email)) {
-        showToast('Este admin ya existe', 'warning');
-        return;
-      }
-      
-      db.admins.push(email);
-      saveData();
-      logActivity('Agregar Admin', `Se agregó ${email} como administrador`);
-      renderAdmins();
-      document.getElementById('newAdminEmail').value = '';
-      showToast('✅ Admin agregado correctamente', 'success');
-    }
-
-    function removeAdmin(email) {
-      if (db.admins.length <= 1) {
-        showToast('Debe quedar al menos un admin', 'warning');
-        return;
-      }
-      
-      if (!confirm(`¿Eliminar ${email}?`)) return;
-      
-      db.admins = db.admins.filter(a => a !== email);
-      saveData();
-      logActivity('Eliminar Admin', `Se eliminó ${email}`);
-      renderAdmins();
-      showToast('✅ Admin eliminado', 'success');
-    }
-
-    function saveNotificationConfig() {
-      const radios = document.getElementsByName('notifMode');
-      let mode = 'ROUND_ROBIN';
-      for (let r of radios) {
-        if (r.checked) {
-          mode = r.value;
-          break;
-        }
-      }
-      
-      db.notificationConfig.mode = mode;
-      saveData();
-      
-      const specificSection = document.getElementById('specificAdminsSection');
-      if (specificSection) {
-        specificSection.classList.toggle('hidden', mode !== 'SPECIFIC');
-      }
-      
-      showToast('✅ Configuración guardada', 'success');
-    }
-
-    function saveSpecificAdmins() {
-      const checkboxes = document.querySelectorAll('.specific-admin-cb:checked');
-      db.notificationConfig.specificAdmins = Array.from(checkboxes).map(cb => cb.value);
-      saveData();
-      showToast('✅ Admins específicos guardados', 'success');
-    }
-
-    // ==========================================
-    // EVENTOS
-    // ==========================================
-
-    function saveEvent(e) {
-      e.preventDefault();
-      
-      const event = {
-        id: Date.now(),
-        title: document.getElementById('eventTitle').value,
-        date: document.getElementById('eventDate').value,
-        time: document.getElementById('eventTime').value,
-        description: document.getElementById('eventDesc').value
-      };
-      
-      db.events.push(event);
-      saveData();
-      logActivity('Nuevo Evento', `Se creó el evento: ${event.title}`);
-      
-      closeModal('eventModal');
-      e.target.reset();
-      showToast('✅ Evento guardado', 'success');
-    }
-
-    // ==========================================
-    // BACKUP & EXPORT
-    // ==========================================
-
-    function exportData() {
-      db.lastBackup = new Date().toISOString();
-      saveData();
-      
-      const dataStr = JSON.stringify(db, null, 2);
-      const dataBlob = new Blob([dataStr], {type: 'application/json'});
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `uadav_backup_${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      
-      logActivity('Exportar', 'Se exportó backup de datos');
-      showToast('✅ Backup descargado correctamente', 'success');
-    }
-
-    function importData() {
-      const fileInput = document.getElementById('importFile');
-      const file = fileInput.files[0];
-      
-      if (!file) {
-        showToast('Selecciona un archivo', 'warning');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          const count = imported.registrations?.length || 0;
-          
-          if (confirm(`¿Restaurar ${count} registros? Esto reemplazará los datos actuales.`)) {
-            db = imported;
-            saveData();
-            logActivity('Importar', `Se restauraron ${count} registros`);
-            updateDashboard();
-            renderRegistrations();
-            renderAdmins();
-            showToast('✅ Datos restaurados correctamente', 'success');
-          }
-        } catch (err) {
-          showToast('❌ Error al importar: ' + err.message, 'error');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function clearAllData() {
-      if (!confirm('⚠️ ¿Estás seguro de BORRAR TODOS los datos? Esta acción NO se puede deshacer.')) return;
-      if (!confirm('¿Realmente estás seguro? Se perderán todos los registros.')) return;
-      
-      db = {
-        registrations: [],
-        admins: ['marcosdinella@gmail.com'],
-        notificationConfig: { mode: 'ROUND_ROBIN', specificAdmins: [] },
-        events: [],
-        documents: [],
-        activityLog: [],
-        lastBackup: null
-      };
-      saveData();
-      logActivity('Limpiar', 'Se eliminaron todos los datos');
-      updateDashboard();
-      renderRegistrations();
-      renderAdmins();
-      showToast('🗑️ Todos los datos fueron eliminados', 'info');
-    }
-
-    // ==========================================
-    // PDF GENERATION
-    // ==========================================
-
-    function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      
-      // Título
-      doc.setFontSize(20);
-      doc.text('UADAV - Reporte de Afiliados', 14, 20);
-      
-      // Fecha
-      doc.setFontSize(10);
-      doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 30);
-      
-      // Estadísticas
-      doc.setFontSize(12);
-      doc.text(`Total: ${db.registrations.length} | Nuevos: ${db.registrations.filter(r => r.estado === 'Nuevo').length} | Afiliados: ${db.registrations.filter(r => r.estado === 'Afiliado').length}`, 14, 40);
-      
-      // Tabla
-      const tableData = db.registrations.map(r => [
-        r.nombre,
-        r.dni,
-        r.whatsapp,
-        r.categoria,
-        r.estado
-      ]);
-      
-      doc.autoTable({
-        head: [['Nombre', 'DNI', 'WhatsApp', 'Categoría', 'Estado']],
-        body: tableData,
-        startY: 50,
-        theme: 'striped',
-        headStyles: { fillColor: [0, 51, 102] }
-      });
-      
-      // Guardar
-      doc.save(`uadav_reporte_${new Date().toISOString().split('T')[0]}.pdf`);
-      logActivity('Exportar PDF', 'Se generó reporte PDF');
-      showToast('📄 PDF generado correctamente', 'success');
-    }
-
-    // ==========================================
-    // THEME TOGGLE
-    // ==========================================
-
-    function toggleTheme() {
-      const html = document.documentElement;
-      const icon = document.getElementById('themeIcon');
-      
-      if (html.getAttribute('data-theme') === 'dark') {
-        html.removeAttribute('data-theme');
-        icon.classList.remove('fa-sun');
-        icon.classList.add('fa-moon');
-        localStorage.setItem('theme', 'light');
-      } else {
-        html.setAttribute('data-theme', 'dark');
-        icon.classList.remove('fa-moon');
-        icon.classList.add('fa-sun');
-        localStorage.setItem('theme', 'dark');
-      }
-    }
-
-    // Cargar tema guardado
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      const icon = document.getElementById('themeIcon');
-      if (icon) {
-        icon.classList.remove('fa-moon');
-        icon.classList.add('fa-sun');
-      }
-    }
-
-    // ==========================================
-    // TOAST NOTIFICATIONS
-    // ==========================================
-
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
-      
-      const icons = {
-        success: 'check-circle',
-        error: 'exclamation-circle',
-        warning: 'exclamation-triangle',
-        info: 'info-circle'
-      };
-      
-      toast.innerHTML = `
-        <i class="fas fa-${icons[type]}"></i>
-        <span>${message}</span>
-      `;
-      
+      toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle"></i><span>${message}</span>`;
       container.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(400px)';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      setTimeout(() => toast.remove(), 3000);
     }
 
-    // Cerrar modal al hacer click fuera
+    // ==========================================
+    // DASHBOARD
+    // ==========================================
+
+    function updateDashboard() {
+      const totalAfiliados = db.afiliados.length;
+      const alDia = db.afiliados.filter(a => estaAlDia(a.id)).length;
+      const morosos = totalAfiliados - alDia;
+      const prestamosActivos = db.prestamos.filter(p => p.estado === 'activo').length;
+      
+      document.getElementById('statTotalAfiliados').textContent = totalAfiliados;
+      document.getElementById('statAlDia').textContent = alDia;
+      document.getElementById('statMorosos').textContent = morosos;
+      document.getElementById('statPrestamos').textContent = prestamosActivos;
+      
+      // Gráfico de cuotas
+      const ctx = document.getElementById('cuotasChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+         {
+          labels: ['Al Día', 'Morosos'],
+          datasets: [{
+             [alDia, morosos],
+            backgroundColor: ['#28a745', '#dc3545']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+      
+      // Alertas
+      renderAlertas();
+    }
+
+    function estaAlDia(afiliadoId) {
+      const ultimoPago = db.pagos.filter(p => p.afiliadoId === afiliadoId).sort((a,b) => b.mes - a.mes)[0];
+      if (!ultimoPago) return false;
+      const mesActual = new Date().getMonth() + 1;
+      return ultimoPago.mes === mesActual;
+    }
+
+    function renderAlertas() {
+      const alertas = [];
+      
+      // Morosos
+      db.afiliados.forEach(a => {
+        if (!estaAlDia(a.id)) {
+          alertas.push({ tipo: 'mora', mensaje: `${a.nombre} está moroso`, afiliado: a });
+        }
+      });
+      
+      // Préstamos próximos a vencer
+      db.prestamos.forEach(p => {
+        if (p.estado === 'activo' && p.cuotasRestantes <= 2) {
+          alertas.push({ tipo: 'warning', mensaje: `Préstamo de ${p.afiliadoNombre} próximo a vencer` });
+        }
+      });
+      
+      const container = document.getElementById('alertasList');
+      container.innerHTML = alertas.slice(0, 5).map(a => `
+        <div style="padding: 0.75rem; background: ${a.tipo === 'mora' ? '#f8d7da' : '#fff3cd'}; 
+                    border-left: 4px solid ${a.tipo === 'mora' ? '#dc3545' : '#ffc107'}; 
+                    margin-bottom: 0.5rem; border-radius: 4px;">
+          <i class="fas fa-${a.tipo === 'mora' ? 'exclamation-circle' : 'exclamation-triangle'}"></i>
+          ${a.mensaje}
+        </div>
+      `).join('') || '<p style="color: #666; text-align: center;">No hay alertas</p>';
+    }
+
+    // ==========================================
+    // PADRÓN DE AFILIADOS
+    // ==========================================
+
+    function renderPadron() {
+      const list = document.getElementById('padronList');
+      const search = document.getElementById('padronSearch')?.value.toLowerCase() || '';
+      const filterEstado = document.getElementById('padronFilterEstado')?.value || '';
+      const filterSeccional = document.getElementById('padronFilterSeccional')?.value || '';
+      
+      let filtered = db.afiliados.filter(a => {
+        const matchSearch = !search || a.nombre.toLowerCase().includes(search) || a.dni.includes(search);
+        const matchEstado = !filterEstado || a.estado === filterEstado;
+        const matchSeccional = !filterSeccional || a.seccional === filterSeccional;
+        return matchSearch && matchEstado && matchSeccional;
+      });
+      
+      list.innerHTML = filtered.map(a => `
+        <div class="padron-card">
+          <img src="${a.foto || 'https://via.placeholder.com/80'}" class="padron-foto" alt="${a.nombre}">
+          <div>
+            <h3 style="margin: 0 0 0.25rem 0;">${a.nombre}</h3>
+            <p style="margin: 0; color: #666; font-size: 0.875rem;">
+              DNI: ${a.dni} | ${a.categoria} | ${a.seccional}
+            </p>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">
+              ${a.email} | ${a.telefono}
+            </p>
+          </div>
+          <div>
+            <span class="badge ${a.estado === 'activo' ? 'badge-al-dia' : 'badge-mora'}">
+              ${a.estado === 'activo' ? 'Activo' : 'Inactivo'}
+            </span>
+            <button class="btn btn-sm btn-primary" onclick="verDetalleAfiliado(${a.id})" style="margin-top: 0.5rem;">
+              <i class="fas fa-eye"></i> Ver
+            </button>
+          </div>
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666; padding: 2rem;">No hay afiliados registrados</p>';
+    }
+
+    function filtrarPadron() {
+      renderPadron();
+    }
+
+    function saveAfiliado(e) {
+      e.preventDefault();
+      
+      const nuevoAfiliado = {
+        id: Date.now(),
+        nombre: document.getElementById('afiliadoNombre').value,
+        dni: document.getElementById('afiliadoDNI').value,
+        email: document.getElementById('afiliadoEmail').value,
+        telefono: document.getElementById('afiliadoTelefono').value,
+        seccional: document.getElementById('afiliadoSeccional').value,
+        categoria: document.getElementById('afiliadoCategoria').value,
+        estado: 'activo',
+        fechaIngreso: new Date().toISOString()
+      };
+      
+      db.afiliados.push(nuevoAfiliado);
+      saveData();
+      
+      closeModal('nuevoAfiliadoModal');
+      e.target.reset();
+      renderPadron();
+      updateDashboard();
+      showToast('Afiliado registrado correctamente', 'success');
+    }
+
+    function exportarPadron() {
+      const dataStr = JSON.stringify(db.afiliados, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `padron_uadav_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      showToast('Padrón exportado', 'success');
+    }
+
+    // ==========================================
+    // COBRANZAS
+    // ==========================================
+
+    function renderCobranzas() {
+      // Calcular totales
+      const mesActual = new Date().getMonth() + 1;
+      const anioActual = new Date().getFullYear();
+      
+      const recaudadoMes = db.pagos
+        .filter(p => p.mes === mesActual && p.anio === anioActual)
+        .reduce((sum, p) => sum + p.monto, 0);
+      
+      const pendiente = db.afiliados.length * db.config.cuotaMensual - recaudadoMes;
+      
+      document.getElementById('totalRecaudado').textContent = '$' + recaudadoMes.toLocaleString();
+      document.getElementById('totalPendiente').textContent = '$' + pendiente.toLocaleString();
+      
+      renderCuotas();
+      renderMorosos();
+    }
+
+    function renderCuotas() {
+      const list = document.getElementById('cuotasList');
+      const search = document.getElementById('cuotasSearch')?.value.toLowerCase() || '';
+      const filterMes = document.getElementById('cuotasFilterMes')?.value || '';
+      
+      let cuotas = [];
+      
+      // Generar cuotas para cada afiliado
+      db.afiliados.forEach(a => {
+        for (let mes = 1; mes <= 12; mes++) {
+          const pago = db.pagos.find(p => p.afiliadoId === a.id && p.mes === mes && p.anio === 2026);
+          
+          if (!filterMes || filterMes == mes) {
+            if (!search || a.nombre.toLowerCase().includes(search)) {
+              cuotas.push({
+                afiliado: a,
+                mes: mes,
+                pago: pago,
+                monto: db.config.cuotaMensual
+              });
+            }
+          }
+        }
+      });
+      
+      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      
+      list.innerHTML = cuotas.map(c => `
+        <div class="cuota-card ${c.pago ? 'al-dia' : 'mora'}">
+          <div>
+            <strong>${c.afiliado.nombre}</strong><br>
+            <small>${meses[c.mes - 1]} 2026</small>
+          </div>
+          <div>
+            <strong>$${c.monto.toLocaleString()}</strong>
+          </div>
+          <div>
+            ${c.pago 
+              ? '<span class="badge badge-al-dia"><i class="fas fa-check"></i> Pagado</span>'
+              : '<span class="badge badge-mora"><i class="fas fa-exclamation"></i> Pendiente</span>'
+            }
+          </div>
+          ${!c.pago ? `
+            <button class="btn btn-sm btn-success" onclick="registrarPagoRapido(${c.afiliado.id}, ${c.mes})">
+              <i class="fas fa-dollar-sign"></i> Pagar
+            </button>
+          ` : ''}
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666;">No hay cuotas registradas</p>';
+    }
+
+    function filtrarCuotas() {
+      renderCuotas();
+    }
+
+    function renderMorosos() {
+      const list = document.getElementById('morososList');
+      const morosos = db.afiliados.filter(a => !estaAlDia(a.id));
+      
+      list.innerHTML = morosos.map(a => `
+        <div class="cuota-card mora">
+          <div>
+            <strong>${a.nombre}</strong><br>
+            <small>DNI: ${a.dni} | ${a.telefono}</small>
+          </div>
+          <div>
+            <span class="badge badge-mora">Moroso</span>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="verDetalleAfiliado(${a.id})">
+            <i class="fas fa-user"></i> Ver
+          </button>
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666;">No hay morosos</p>';
+    }
+
+    function loadAfiliadosSelect() {
+      const select = document.getElementById('pagoAfiliado');
+      select.innerHTML = db.afiliados.map(a => 
+        `<option value="${a.id}">${a.nombre} - DNI: ${a.dni}</option>`
+      ).join('');
+    }
+
+    function savePago(e) {
+      e.preventDefault();
+      
+      const nuevoPago = {
+        id: Date.now(),
+        afiliadoId: parseInt(document.getElementById('pagoAfiliado').value),
+        mes: parseInt(document.getElementById('pagoMes').value),
+        anio: parseInt(document.getElementById('pagoAnio').value),
+        monto: parseFloat(document.getElementById('pagoMonto').value),
+        formaPago: document.getElementById('pagoForma').value,
+        fecha: new Date().toISOString()
+      };
+      
+      db.pagos.push(nuevoPago);
+      saveData();
+      
+      closeModal('registrarPagoModal');
+      e.target.reset();
+      renderCobranzas();
+      updateDashboard();
+      showToast('Pago registrado correctamente', 'success');
+    }
+
+    function registrarPagoRapido(afiliadoId, mes) {
+      document.getElementById('pagoAfiliado').value = afiliadoId;
+      document.getElementById('pagoMes').value = mes;
+      document.getElementById('pagoAnio').value = new Date().getFullYear();
+      openModal('registrarPagoModal');
+    }
+
+    // ==========================================
+    // OBRAS SOCIALES
+    // ==========================================
+
+    function renderObrasSociales() {
+      renderPrestadores();
+    }
+
+    function renderPrestadores() {
+      const list = document.getElementById('prestadoresList');
+      const search = document.getElementById('prestadorSearch')?.value.toLowerCase() || '';
+      
+      let filtered = db.prestadores.filter(p => 
+        !search || p.nombre.toLowerCase().includes(search)
+      );
+      
+      list.innerHTML = filtered.map(p => `
+        <div class="prestador-card">
+          <h3 style="margin: 0 0 0.5rem 0;">${p.nombre}</h3>
+          <p style="margin: 0; color: #666; font-size: 0.875rem;">
+            <i class="fas fa-stethoscope"></i> ${p.especialidad} | 
+            <i class="fas fa-map-marker-alt"></i> ${p.domicilio}
+          </p>
+          <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem;">
+            <i class="fas fa-phone"></i> ${p.telefono}
+          </p>
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666;">No hay prestadores registrados</p>';
+    }
+
+    function filtrarPrestadores() {
+      renderPrestadores();
+    }
+
+    // ==========================================
+    // AYUDA ECONÓMICA / PRÉSTAMOS
+    // ==========================================
+
+    function renderAyudaEconomica() {
+      const prestamosActivos = db.prestamos.filter(p => p.estado === 'activo');
+      const totalPrestado = prestamosActivos.reduce((sum, p) => sum + p.monto, 0);
+      
+      document.getElementById('totalPrestamosActivos').textContent = prestamosActivos.length;
+      document.getElementById('totalPrestado').textContent = '$' + totalPrestado.toLocaleString();
+      
+      const list = document.getElementById('prestamosList');
+      
+      list.innerHTML = prestamosActivos.map(p => `
+        <div class="card" style="border-left: 4px solid var(--warning);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="margin: 0 0 0.5rem 0;">${p.afiliadoNombre}</h3>
+              <p style="margin: 0; color: #666;">
+                Monto: $${p.monto.toLocaleString()} | 
+                Cuotas: ${p.cuotasTotales} | 
+                Restantes: ${p.cuotasRestantes}
+              </p>
+            </div>
+            <div>
+              <span class="badge badge-warning">Activo</span>
+              <button class="btn btn-sm btn-primary" style="margin-top: 0.5rem;">
+                <i class="fas fa-eye"></i> Ver
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666;">No hay préstamos activos</p>';
+    }
+
+    // ==========================================
+    // SINDICATO
+    // ==========================================
+
+    function renderSindicato() {
+      // Renderizar actas, resoluciones, etc.
+    }
+
+    // ==========================================
+    // INSPECTORES
+    // ==========================================
+
+    function renderInspectores() {
+      const list = document.getElementById('inspectoresList');
+      
+      list.innerHTML = db.inspectores.map(i => `
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="margin: 0 0 0.5rem 0;">${i.nombre}</h3>
+              <p style="margin: 0; color: #666;">
+                Zona: ${i.zona} | Habilitación: ${i.numeroHabilitacion}
+              </p>
+            </div>
+            <span class="badge ${i.estado === 'activo' ? 'badge-al-dia' : 'badge-mora'}">
+              ${i.estado === 'activo' ? 'Habilitado' : 'Inactivo'}
+            </span>
+          </div>
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666;">No hay inspectores registrados</p>';
+    }
+
+    function filtrarInspectores() {
+      renderInspectores();
+    }
+
+    // ==========================================
+    // LEGALES
+    // ==========================================
+
+    function renderLegales() {
+      const expedientes = db.expedientes;
+      
+      document.getElementById('totalExpedientes').textContent = expedientes.length;
+      document.getElementById('expedientesPendientes').textContent = 
+        expedientes.filter(e => e.estado === 'pendiente').length;
+      
+      const list = document.getElementById('expedientesList');
+      
+      list.innerHTML = expedientes.map(e => `
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="margin: 0 0 0.5rem 0;">Expediente ${e.numero}</h3>
+              <p style="margin: 0; color: #666;">
+                ${e.titulo} | ${e.afiliadoNombre}
+              </p>
+            </div>
+            <span class="badge ${e.estado === 'pendiente' ? 'badge-mora' : 'badge-al-dia'}">
+              ${e.estado}
+            </span>
+          </div>
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666;">No hay expedientes</p>';
+    }
+
+    // ==========================================
+    // CARNETS
+    // ==========================================
+
+    function renderCarnets() {
+      const list = document.getElementById('carnetsList');
+      
+      list.innerHTML = db.afiliados.map(a => `
+        <div style="background: linear-gradient(135deg, #003366, #0066CC); color: #fff; 
+                    padding: 2rem; border-radius: 12px; margin-bottom: 1rem; 
+                    display: flex; align-items: center; gap: 1.5rem;">
+          <img src="${a.foto || 'https://via.placeholder.com/100'}" 
+               style="width: 100px; height: 120px; border-radius: 8px; object-fit: cover; border: 3px solid #fff;">
+          <div style="flex: 1;">
+            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">🎭 UADAV</h2>
+            <p style="margin: 0 0 1rem 0; opacity: 0.9;">Unión Argentina de Artistas de Variedades</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+              <div><strong>Nombre:</strong> ${a.nombre}</div>
+              <div><strong>DNI:</strong> ${a.dni}</div>
+              <div><strong>Categoría:</strong> ${a.categoria}</div>
+              <div><strong>ID:</strong> ${a.id.toString().slice(-6)}</div>
+            </div>
+          </div>
+          <button class="btn btn-sm" style="background: #fff; color: #003366;" onclick="imprimirCarnet(${a.id})">
+            <i class="fas fa-print"></i> Imprimir
+          </button>
+        </div>
+      `).join('') || '<p style="text-align: center; color: #666;">No hay carnets disponibles</p>';
+    }
+
+    function imprimirCarnet(afiliadoId) {
+      window.print();
+    }
+
+    // ==========================================
+    // UTILIDADES
+    // ==========================================
+
     window.onclick = function(event) {
       if (event.target.classList.contains('modal')) {
         event.target.classList.remove('active');
