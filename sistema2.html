@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UADAV Enterprise V.2026 - Gestión Gremial</title>
+  
+  <!-- Fuentes y Librerías -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #003366; --secondary: #0056b3; --accent: #e63946;
+      --bg: #f8f9fa; --card: #ffffff; --text: #212529; --border: #dee2e6;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1); --radius: 12px;
+    }
+    [data-theme="dark"] { --bg:#121212; --card:#1e1e1e; --text:#e0e0e0; --border:#333; }
+
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg); color: var(--text); transition: 0.3s; }
+
+    /* HEADER & NAV MOBILE */
+    .header { background: var(--primary); color: #fff; padding: 1rem; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); }
+    .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .hamburger { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+    .nav { display: flex; gap: 0.5rem; }
+    .nav a { color: #fff; text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 500; transition: 0.2s; }
+    .nav a:hover, .nav a.active { background: rgba(255,255,255,0.15); }
+    .nav a.btn-logout { background: var(--accent); }
+
+    @media (max-width: 768px) {
+      .hamburger { display: block; }
+      .nav { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: var(--primary); flex-direction: column; padding: 1rem; box-shadow: var(--shadow); }
+      .nav.open { display: flex; }
+    }
+
+    /* LAYOUT & CARDS */
+    .container { max-width: 1400px; margin: 2rem auto; padding: 0 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--border); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+    .card-title { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+
+    /* UI ELEMENTS */
+    .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.9rem; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--secondary); color: #fff; }
+    .btn-success { background: #198754; color: #fff; }
+    .btn-warning { background: #ffc107; color: #000; }
+    .btn-danger { background: var(--accent); color: #fff; }
+    .btn-sync { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #fff; width: 100%; justify-content: center; margin-bottom: 2rem; padding: 1rem; font-size: 1.1rem; }
+
+    input, select, textarea { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); margin-bottom: 1rem; }
+    input:focus, select:focus { outline: 2px solid var(--secondary); border-color: transparent; }
+
+    /* TABLES */
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--primary); color: #fff; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; }
+    tr:hover { background: rgba(0,0,0,0.02); }
+
+    /* TOGGLE SWITCH (Inspectores) */
+    .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--secondary); }
+    input:checked + .slider:before { transform: translateX(26px); }
+
+    /* MODALS */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--card); padding: 2rem; border-radius: var(--radius); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+
+    /* LOGIN */
+    .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary), #001a33); }
+    .login-box { background: var(--card); padding: 2.5rem; border-radius: var(--radius); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+
+    /* ==========================================
+       CARNETS ESTILO PAMI (PRINT CSS)
+       ========================================== */
+    .carnet-print-zone { display: none; }
+    
+    @media print {
+      body * { visibility: hidden; }
+      .carnet-print-zone, .carnet-print-zone * { visibility: visible; }
+      .carnet-print-zone { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; height: 100%; }
+      
+      .carnet-page { width: 85.6mm; height: 53.98mm; position: relative; border: 1px solid #ccc; background: #fff; page-break-inside: avoid; margin: 0 auto; overflow: hidden; }
+      
+      /* FRENTE */
+      .carnet-front { display: flex; flex-direction: row; }
+      .carnet-photo-area { width: 30%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-right: 2px solid var(--primary); }
+      .carnet-photo-area img { width: 100%; height: 100%; object-fit: cover; }
+      .carnet-data-area { width: 70%; padding: 8px; background: linear-gradient(to bottom, #fff 80%, #e6f0ff 100%); }
+      .carnet-header-print { background: var(--primary); color: #fff; padding: 5px 10px; font-size: 8pt; font-weight: bold; display: flex; justify-content: space-between; }
+      .carnet-name-print { font-size: 11pt; font-weight: 800; color: var(--primary); margin: 5px 0 2px 0; text-transform: uppercase; }
+      .carnet-role-print { font-size: 9pt; color: var(--accent); font-weight: 600; margin-bottom: 5px; }
+      .carnet-id-print { font-size: 8pt; color: #555; }
+      .carnet-footer-print { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--primary); color: #fff; font-size: 6pt; padding: 3px 5px; text-align: center; }
+
+      /* DORSO */
+      .carnet-back { display: flex; flex-direction: column; background: #f8f9fa; border-top: 2px solid var(--primary); }
+      .carnet-back-header { background: var(--primary); color: #fff; font-size: 8pt; padding: 5px; text-align: center; }
+      .carnet-qr-area { display: flex; justify-content: space-around; align-items: center; padding: 10px; }
+      .carnet-qr-area img { width: 70px; height: 70px; }
+      .carnet-back-info { font-size: 7pt; color: #333; text-align: center; line-height: 1.4; }
+      .carnet-barcode { height: 25px; background: repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); width: 80%; margin: 5px auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginView" class="login-container">
+    <div class="login-box">
+      <h1 style="color:var(--primary); margin-bottom:0.5rem;"><i class="fas fa-building"></i> UADAV V.2026</h1>
+      <p style="color:#666; margin-bottom:2rem;">Sistema de Gestión Gremial Integrado</p>
+      <form onsubmit="handleLogin(event)">
+        <input type="text" id="loginUser" placeholder="Usuario (admin, finanzas, consulta)" required>
+        <input type="password" id="loginPass" placeholder="Contraseña (1234)" required>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Ingresar</button>
+      </form>
+      <p style="margin-top:1rem; font-size:0.8rem; color:#888;">Roles: superadmin, admin_area, consultor</p>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainView" class="hidden">
+    <header class="header">
+      <div class="header-content">
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <button class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+          <div class="logo"><i class="fas fa-star"></i> UADAV Enterprise</div>
+        </div>
+        <nav class="nav" id="mainNav">
+          <a href="#" onclick="showModule('dashboard')" class="active" id="nav-dashboard"><i class="fas fa-home"></i> Inicio</a>
+          <a href="#" onclick="showModule('padron')" id="nav-padron"><i class="fas fa-users"></i> Padrón</a>
+          <a href="#" onclick="showModule('prestamos')" id="nav-prestamos"><i class="fas fa-hand-holding-usd"></i> Préstamos</a>
+          <a href="#" onclick="showModule('carnets')" id="nav-carnets"><i class="fas fa-id-card"></i> Carnets</a>
+          <a href="#" onclick="showModule('inspectores')" id="nav-inspectores"><i class="fas fa-user-shield"></i> Inspectores</a>
+          <a href="#" onclick="showModule('legales')" id="nav-legales"><i class="fas fa-gavel"></i> Legales/CCT</a>
+          <a href="#" onclick="showModule('usuarios')" id="nav-usuarios" class="rbac-super"><i class="fas fa-user-cog"></i> Usuarios</a>
+          <a href="#" onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Salir</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      
+      <!-- BOTÓN DE SINCRONIZACIÓN GLOBAL -->
+      <button class="btn btn-sync" onclick="sincronizarSistema()">
+        <i class="fas fa-sync-alt fa-spin" style="display:none" id="syncIcon"></i> 
+        <span id="syncText">💾 Sincronización Total y Respaldo</span>
+      </button>
+
+      <!-- DASHBOARD -->
+      <div id="dashboardModule" class="module-section active">
+        <div class="grid">
+          <div class="card stat-card" style="border-left: 5px solid var(--secondary);">
+            <h3>Total Afiliados</h3>
+            <p style="font-size:2.5rem; font-weight:bold;" id="statTotal">0</p>
+          </div>
+          <div class="card stat-card" style="border-left: 5px solid #198754;">
+            <h3>Préstamos Activos</h3>
+            <p style="font-size:2.5rem; font-weight:bold;" id="statPrestamos">$0</p>
+          </div>
+          <div class="card stat-card" style="border-left: 5px solid var(--accent);">
+            <h3>Inspectores Activos</h3>
+            <p style="font-size:2.5rem; font-weight:bold;" id="statInspectores">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PADRÓN -->
+      <div id="padronModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-users"></i> Padrón Gremial</h2>
+            <div>
+              <button class="btn btn-success" onclick="openModal('modalAfiliado')"><i class="fas fa-plus"></i> Nuevo</button>
+              <button class="btn btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+              <button class="btn btn-danger" onclick="exportarPDFCompleto()"><i class="fas fa-file-pdf"></i> PDF Full</button>
+            </div>
+          </div>
+          <input type="text" id="searchPadron" placeholder="🔍 Buscar por Nombre, DNI o N° Afiliado..." onkeyup="renderPadron()">
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Foto</th><th>N° Afiliado</th><th>Nombre</th><th>DNI</th><th>Categoría</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="padronTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRÉSTAMOS -->
+      <div id="prestamosModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-hand-holding-usd"></i> Gestión de Préstamos</h2>
+            <button class="btn btn-success" onclick="openModal('modalPrestamo')"><i class="fas fa-plus"></i> Nuevo Préstamo</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Afiliado</th><th>Monto</th><th>Cuotas</th><th>Restantes</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="prestamosTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARNETS -->
+      <div id="carnetsModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-id-card"></i> Generación de Carnets (Estilo PAMI)</h2>
+          </div>
+          <p style="margin-bottom:1rem; color:#666;">Seleccione un afiliado para generar su credencial profesional de doble faz.</p>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Foto</th><th>Nombre</th><th>N° Afiliado</th><th>Acción</th></tr></thead>
+              <tbody id="carnetsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSPECTORES -->
+      <div id="inspectoresModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-user-shield"></i> Cuerpo de Inspectores</h2>
+            <button class="btn btn-success" onclick="openModal('modalInspector')"><i class="fas fa-plus"></i> Nuevo Inspector</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Nombre</th><th>Zona</th><th>Habilitación</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="inspectoresTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEGALES / CCT -->
+      <div id="legalesModule" class="module-section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-gavel"></i> Legales y CCT</h2>
+            <button class="btn btn-primary" onclick="alert('Funcionalidad de carga de PDF simulada.')"><i class="fas fa-upload"></i> Subir CCT</button>
+          </div>
+          <div class="grid" style="margin-top:1rem;">
+            <div class="card" style="text-align:center; border:2px dashed var(--border);">
+              <i class="fas fa-file-pdf" style="font-size:3rem; color:var(--accent); margin-bottom:1rem;"></i>
+              <h4>CCT 258/95 (Artistas)</h4>
+              <p style="font-size:0.8rem; color:#666;">Última actualización: 2024</p>
+              <button class="btn btn-sm btn-primary" style="margin-top:0.5rem;">Descargar PDF</button>
+            </div>
+            <div class="card" style="text-align:center; border:2px dashed var(--border);">
+              <i class="fas fa-file-pdf" style="font-size:3rem; color:var(--accent); margin-bottom:1rem;"></i>
+              <h4>Convenio de Obra Social</h4>
+              <p style="font-size:0.8rem; color:#666;">Anexo I - Coberturas</p>
+              <button class="btn btn-sm btn-primary" style="margin-top:0.5rem;">Descargar PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USUARIOS (RBAC) -->
+      <div id="usuariosModule" class="module-section">
+        <div class="card">
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-user-cog"></i> Gestión de Usuarios (Solo SuperAdmin)</h2></div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Usuario</th><th>Rol</th><th>Último Acceso</th></tr></thead>
+              <tbody>
+                <tr><td>admin</td><td><span class="badge" style="background:var(--primary); color:#fff; padding:2px 8px; border-radius:4px;">SuperAdmin</span></td><td>Hoy</td></tr>
+                <tr><td>finanzas</td><td><span class="badge" style="background:#ffc107; color:#000; padding:2px 8px; border-radius:4px;">Admin Area</span></td><td>Ayer</td></tr>
+                <tr><td>consulta</td><td><span class="badge" style="background:#6c757d; color:#fff; padding:2px 8px; border-radius:4px;">Consultor</span></td><td>Hace 3 días</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODALES -->
+  <div id="modalAfiliado" class="modal">
+    <div class="modal-content">
+      <h2 style="margin-bottom:1rem;">Nuevo Afiliado</h2>
+      <form onsubmit="saveAfiliado(event)">
+        <input type="text" id="afNombre" placeholder="Nombre y Apellido" required>
+        <input type="text" id="afDNI" placeholder="DNI" required>
+        <input type="text" id="afCategoria" placeholder="Categoría (Ej: Locutor, Cantante)" required>
+        <input type="file" id="afFoto" accept="image/*">
+        <button type="submit" class="btn btn-success" style="width:100%;">Guardar Afiliado</button>
+        <button type="button" class="btn btn-danger" style="width:100%; margin-top:0.5rem;" onclick="closeModal('modalAfiliado')">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalPrestamo" class="modal">
+    <div class="modal-content">
+      <h2 style="margin-bottom:1rem;">Registrar Préstamo</h2>
+      <form onsubmit="savePrestamo(event)">
+        <input type="number" id="prAfiliadoId" placeholder="ID de Afiliado" required>
+        <input type="number" id="prMonto" placeholder="Monto ($)" required>
+        <input type="number" id="prCuotas" placeholder="Total Cuotas" value="12" required>
+        <button type="submit" class="btn btn-success" style="width:100%;">Confirmar Préstamo</button>
+        <button type="button" class="btn btn-danger" style="width:100%; margin-top:0.5rem;" onclick="closeModal('modalPrestamo')">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalInspector" class="modal">
+    <div class="modal-content">
+      <h2 style="margin-bottom:1rem;">Nuevo Inspector</h2>
+      <form onsubmit="saveInspector(event)">
+        <input type="text" id="insNombre" placeholder="Nombre Completo" required>
+        <input type="text" id="insZona" placeholder="Zona/Seccional" required>
+        <input type="text" id="insHab" placeholder="N° Habilitación" required>
+        <button type="submit" class="btn btn-success" style="width:100%;">Guardar Inspector</button>
+        <button type="button" class="btn btn-danger" style="width:100%; margin-top:0.5rem;" onclick="closeModal('modalInspector')">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ZONA DE IMPRESIÓN DE CARNETS (OCULTA) -->
+  <div class="carnet-print-zone" id="carnetPrintZone">
+    <!-- Se inyecta dinámicamente -->
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. BASE DE DATOS & INICIALIZACIÓN
+    // ==========================================
+    const DB_KEY = 'uadav_v2026_db';
+    let db = {
+      afiliados: [],
+      prestamos: [],
+      inspectores: [],
+      usuarios: [
+        { user: 'admin', pass: '1234', role: 'superadmin' },
+        { user: 'finanzas', pass: '1234', role: 'admin_area' },
+        { user: 'consulta', pass: '1234', role: 'consultor' }
+      ],
+      lastId: 1000
+    };
+    let currentUser = null;
+
+    window.onload = function() {
+      loadData();
+      if(!db.inspectores) db.inspectores = [];
+      if(!db.prestamos) db.prestamos = [];
+    };
+
+    function loadData() {
+      const saved = localStorage.getItem(DB_KEY);
+      if(saved) db = JSON.parse(saved);
+    }
+
+    function saveData() {
+      localStorage.setItem(DB_KEY, JSON.stringify(db));
+    }
+
+    // ==========================================
+    // 2. RBAC & AUTH
+    // ==========================================
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUser').value;
+      const p = document.getElementById('loginPass').value;
+      
+      const found = db.usuarios.find(user => user.user === u && user.pass === p);
+      if(found) {
+        currentUser = found;
+        applyRBAC();
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('mainView').classList.remove('hidden');
+        updateDashboard();
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    }
+
+    function applyRBAC() {
+      // Ocultar menú de usuarios si no es SuperAdmin
+      if(currentUser.role !== 'superadmin') {
+        document.getElementById('nav-usuarios').style.display = 'none';
+      }
+      // Consultor solo lectura (deshabilitar botones de agregar)
+      if(currentUser.role === 'consultor') {
+        document.querySelectorAll('.btn-success').forEach(btn => btn.style.display = 'none');
+      }
+    }
+
+    function logout() {
+      location.reload();
+    }
+
+    // ==========================================
+    // 3. NAVEGACIÓN & UI
+    // ==========================================
+    function showModule(id) {
+      document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
+      document.getElementById(id + 'Module').classList.add('active');
+      document.querySelectorAll('.nav a').forEach(el => el.classList.remove('active'));
+      const navLink = document.getElementById('nav-' + id);
+      if(navLink) navLink.classList.add('active');
+      
+      if(id === 'padron') renderPadron();
+      if(id === 'prestamos') renderPrestamos();
+      if(id === 'inspectores') renderInspectores();
+      if(id === 'carnets') renderCarnets();
+      
+      // Cerrar menú mobile
+      document.getElementById('mainNav').classList.remove('open');
+    }
+
+    function toggleMenu() {
+      document.getElementById('mainNav').classList.toggle('open');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // ==========================================
+    // 4. MÓDULO PRÉSTAMOS (FIX & SAVE)
+    // ==========================================
+    function savePrestamo(e) {
+      e.preventDefault();
+      const idAf = parseInt(document.getElementById('prAfiliadoId').value);
+      const monto = parseFloat(document.getElementById('prMonto').value);
+      const cuotas = parseInt(document.getElementById('prCuotas').value);
+
+      // Validación
+      const afiliadoExiste = db.afiliados.find(a => a.id === idAf);
+      if(!afiliadoExiste) { alert('Error: El ID de afiliado no existe.'); return; }
+      if(isNaN(monto) || monto <= 0) { alert('Error: Monto inválido.'); return; }
+
+      // Estructura JSON
+      const nuevoPrestamo = {
+        id_prestamo: 'PR-' + Date.now(),
+        id_afiliado: idAf,
+        nombre_afiliado: afiliadoExiste.nombre,
+        monto: monto,
+        cuotas_totales: cuotas,
+        cuotas_restantes: cuotas,
+        fecha_solicitud: new Date().toISOString(),
+        estado: 'activo'
+      };
+
+      try {
+        db.prestamos.push(nuevoPrestamo);
+        saveData(); // Persistencia
+        updateDashboard();
+        closeModal('modalPrestamo');
+        e.target.reset();
+        renderPrestamos();
+        alert('✅ Préstamo registrado y guardado correctamente.');
+      } catch(err) {
+        alert('❌ Error al guardar: ' + err.message);
+      }
+    }
+
+    function renderPrestamos() {
+      const tbody = document.getElementById('prestamosTable');
+      tbody.innerHTML = db.prestamos.map(p => `
+        <tr>
+          <td>${p.nombre_afiliado}</td>
+          <td>$${p.monto.toLocaleString()}</td>
+          <td>${p.cuotas_totales}</td>
+          <td>${p.cuotas_restantes}</td>
+          <td><span class="badge" style="background:${p.estado==='activo'?'#198754':'#6c757d'};color:#fff;padding:2px 8px;border-radius:4px;">${p.estado.toUpperCase()}</span></td>
+          <td>
+            ${p.estado === 'activo' ? `<button class="btn btn-sm btn-primary" onclick="pagarCuota('${p.id_prestamo}')">Pagar Cuota</button>` : '-'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function pagarCuota(idPrestamo) {
+      const p = db.prestamos.find(x => x.id_prestamo === idPrestamo);
+      if(p && p.cuotas_restantes > 0) {
+        if(confirm('¿Confirmar pago de cuota?')) {
+          p.cuotas_restantes--;
+          if(p.cuotas_restantes === 0) p.estado = 'finalizado';
+          saveData();
+          renderPrestamos();
+          updateDashboard();
+        }
+      }
+    }
+
+    // ==========================================
+    // 5. MÓDULO PADRÓN & CARNETS
+    // ==========================================
+    function generateId() {
+      db.lastId++;
+      saveData();
+      return db.lastId;
+    }
+
+    function saveAfiliado(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('afFoto');
+      
+      const processSave = (fotoBase64) => {
+        const newId = generateId();
+        db.afiliados.push({
+          id: newId,
+          nombre: document.getElementById('afNombre').value,
+          dni: document.getElementById('afDNI').value,
+          categoria: document.getElementById('afCategoria').value,
+          foto: fotoBase64,
+          fecha_alta: new Date().toISOString()
+        });
+        saveData();
+        closeModal('modalAfiliado');
+        renderPadron();
+        updateDashboard();
+      };
+
+      if(fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) { processSave(e.target.result); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        processSave(null);
+      }
+    }
+
+    function renderPadron() {
+      const search = document.getElementById('searchPadron').value.toLowerCase();
+      const filtered = db.afiliados.filter(a => 
+        a.nombre.toLowerCase().includes(search) || 
+        a.dni.includes(search) || 
+        a.id.toString().includes(search)
+      );
+
+      document.getElementById('padronTable').innerHTML = filtered.map(a => `
+        <tr>
+          <td>${a.foto ? `<img src="${a.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<i class="fas fa-user"></i>'}</td>
+          <td><strong>#${a.id}</strong></td>
+          <td>${a.nombre}</td>
+          <td>${a.dni}</td>
+          <td>${a.categoria}</td>
+          <td>Activo</td>
+          <td><button class="btn btn-sm btn-primary" onclick="imprimirCarnet(${a.id})"><i class="fas fa-print"></i> Carnet</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // ==========================================
+    // 6. GENERADOR DE CARNETS (ESTILO PAMI)
+    // ==========================================
+    function imprimirCarnet(id) {
+      const af = db.afiliados.find(a => a.id === id);
+      if(!af) return;
+
+      const zone = document.getElementById('carnetPrintZone');
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=UADAV-VALIDAR-${af.id}-${af.dni}`;
+
+      zone.innerHTML = `
+        <!-- FRENTE -->
+        <div class="carnet-page carnet-front">
+          <div class="carnet-header-print"><span>UADAV</span><span>CREDENCIAL</span></div>
+          <div class="carnet-photo-area">
+            ${af.foto ? `<img src="${af.foto}">` : '<i class="fas fa-user" style="font-size:3rem;color:#ccc;"></i>'}
+          </div>
+          <div class="carnet-data-area">
+            <div class="carnet-name-print">${af.nombre}</div>
+            <div class="carnet-role-print">${af.categoria.toUpperCase()}</div>
+            <div class="carnet-id-print">N° AFILIADO: ${af.id}</div>
+            <div class="carnet-id-print">DNI: ${af.dni}</div>
+          </div>
+          <div class="carnet-footer-print">Union Argentina de Artistas de Variedades | Personería Gremial N° 210</div>
+        </div>
+
+        <!-- DORSO -->
+        <div class="carnet-page carnet-back">
+          <div class="carnet-back-header">VALIDEZ Y CONTACTO</div>
+          <div class="carnet-qr-area">
+            <div>
+              <img src="${qrUrl}">
+            </div>
+            <div class="carnet-back-info">
+              <p>Escaneá para verificar validez</p>
+              <p>uadavofi@gmail.com</p>
+              <p>11-5375-7711</p>
+              <div class="carnet-barcode"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+
+    function renderCarnets() {
+      document.getElementById('carnetsTable').innerHTML = db.afiliados.map(a => `
+        <tr>
+          <td>${a.foto ? `<img src="${a.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '-'}</td>
+          <td>${a.nombre}</td>
+          <td>#${a.id}</td>
+          <td><button class="btn btn-sm btn-primary" onclick="imprimirCarnet(${a.id})">Generar e Imprimir</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // ==========================================
+    // 7. INSPECTORES (TOGGLE)
+    // ==========================================
+    function saveInspector(e) {
+      e.preventDefault();
+      db.inspectores.push({
+        id: Date.now(),
+        nombre: document.getElementById('insNombre').value,
+        zona: document.getElementById('insZona').value,
+        hab: document.getElementById('insHab').value,
+        activo: true
+      });
+      saveData();
+      closeModal('modalInspector');
+      renderInspectores();
+    }
+
+    function toggleInspector(id) {
+      const ins = db.inspectores.find(i => i.id === id);
+      if(ins) {
+        ins.activo = !ins.activo;
+        saveData();
+        renderInspectores();
+      }
+    }
+
+    function renderInspectores() {
+      document.getElementById('inspectoresTable').innerHTML = db.inspectores.map(i => `
+        <tr>
+          <td>${i.nombre}</td>
+          <td>${i.zona}</td>
+          <td>${i.hab}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" ${i.activo ? 'checked' : ''} onchange="toggleInspector(${i.id})">
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteInspector(${i.id})"><i class="fas fa-trash"></i></button></td>
+        </tr>
+      `).join('');
+    }
+    
+    function deleteInspector(id) {
+      if(confirm('¿Eliminar inspector?')) {
+        db.inspectores = db.inspectores.filter(i => i.id !== id);
+        saveData();
+        renderInspectores();
+      }
+    }
+
+    // ==========================================
+    // 8. SINCRONIZACIÓN Y EXPORTACIÓN
+    // ==========================================
+    function sincronizarSistema() {
+      const btnText = document.getElementById('syncText');
+      const icon = document.getElementById('syncIcon');
+      
+      btnText.innerText = "Sincronizando...";
+      icon.style.display = "inline-block";
+
+      // 1. Guardado Local
+      saveData();
+
+      // 2. Simulación de Server Update
+      setTimeout(() => {
+        // 3. Exportaciones Automáticas (Opcional, o solo aviso)
+        if(confirm('Respaldo Local Completado.\n¿Desea generar reporte Excel completo ahora?')) {
+          exportarExcel();
+        }
+        
+        btnText.innerText = "✅ Sincronización Total y Respaldo";
+        icon.style.display = "none";
+        alert('Sistema Sincronizado y Actualizado.');
+      }, 1500);
+    }
+
+    function exportarExcel() {
+      const wb = XLSX.utils.book_new();
+      
+      // Hoja 1: Padrón
+      const wsPadron = XLSX.utils.json_to_sheet(db.afiliados);
+      XLSX.utils.book_append_sheet(wb, wsPadron, "Padrón");
+      
+      // Hoja 2: Préstamos
+      const wsPrestamos = XLSX.utils.json_to_sheet(db.prestamos);
+      XLSX.utils.book_append_sheet(wb, wsPrestamos, "Prestamos");
+
+      XLSX.writeFile(wb, `Reporte_UADAV_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
+    function exportarPDFCompleto() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      doc.setFontSize(20);
+      doc.setTextColor(0, 51, 102);
+      doc.text("UADAV - Padrón Gremial Completo", 14, 20);
+      doc.setFontSize(10);
+      doc.text("Generado: " + new Date().toLocaleString(), 14, 28);
+
+      const tableColumn = ["ID", "Nombre", "DNI", "Categoría", "Fecha Alta"];
+      const tableRows = db.afiliados.map(a => [a.id, a.nombre, a.dni, a.categoria, new Date(a.fecha_alta).toLocaleDateString()]);
+
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 35,
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [0, 51, 102] }
+      });
+
+      doc.save(`Padron_Completo_UADAV_${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+
+    // ==========================================
+    // DASHBOARD UPDATER
+    // ==========================================
+    function updateDashboard() {
+      document.getElementById('statTotal').innerText = db.afiliados.length;
+      document.getElementById('statPrestamos').innerText = db.prestamos.filter(p=>p.estado==='activo').length;
+      document.getElementById('statInspectores').innerText = db.inspectores.filter(i=>i.activo).length;
+    }
+  </script>
+</body>
+</html>
