@@ -82,35 +82,38 @@
     .login-box { background: var(--card); padding: 2.5rem; border-radius: var(--radius); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
 
     /* ==========================================
-       CARNETS ESTILO PAMI (PRINT CSS)
+       CARNETS ESTILO PAMI / PDF EXACTO (PRINT CSS)
        ========================================== */
     .carnet-print-zone { display: none; }
     
     @media print {
       body * { visibility: hidden; }
       .carnet-print-zone, .carnet-print-zone * { visibility: visible; }
-      .carnet-print-zone { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; height: 100%; }
+      .carnet-print-zone { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; height: 100%; background: #fff; padding: 20px; }
       
-      .carnet-page { width: 85.6mm; height: 53.98mm; position: relative; border: 1px solid #ccc; background: #fff; page-break-inside: avoid; margin: 0 auto; overflow: hidden; }
+      .carnet-page { width: 85.6mm; height: 53.98mm; position: relative; border: 1px solid #000; background: #fff; page-break-inside: avoid; margin: 0 auto; overflow: hidden; box-shadow: none; }
       
-      /* FRENTE */
-      .carnet-front { display: flex; flex-direction: row; }
-      .carnet-photo-area { width: 30%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-right: 2px solid var(--primary); }
-      .carnet-photo-area img { width: 100%; height: 100%; object-fit: cover; }
-      .carnet-data-area { width: 70%; padding: 8px; background: linear-gradient(to bottom, #fff 80%, #e6f0ff 100%); }
-      .carnet-header-print { background: var(--primary); color: #fff; padding: 5px 10px; font-size: 8pt; font-weight: bold; display: flex; justify-content: space-between; }
-      .carnet-name-print { font-size: 11pt; font-weight: 800; color: var(--primary); margin: 5px 0 2px 0; text-transform: uppercase; }
-      .carnet-role-print { font-size: 9pt; color: var(--accent); font-weight: 600; margin-bottom: 5px; }
-      .carnet-id-print { font-size: 8pt; color: #555; }
-      .carnet-footer-print { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--primary); color: #fff; font-size: 6pt; padding: 3px 5px; text-align: center; }
+      /* FRENTE (Basado en PDF) */
+      .carnet-front { display: flex; flex-direction: column; }
+      .carnet-header-strip { background: var(--primary); color: #fff; padding: 4px 8px; font-size: 7pt; display: flex; justify-content: space-between; align-items: center; }
+      .carnet-title-strip { background: #e0e0e0; color: #000; text-align: center; padding: 2px; font-weight: bold; font-size: 8pt; border-bottom: 1px solid #000; }
+      
+      .carnet-body-flex { display: flex; flex: 1; }
+      .carnet-photo-box { width: 30%; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; background: #f9f9f9; }
+      .carnet-photo-box img { width: 100%; height: 100%; object-fit: cover; }
+      
+      .carnet-info-box { width: 70%; padding: 5px; display: flex; flex-direction: column; justify-content: space-around; }
+      .carnet-field { font-size: 8pt; margin-bottom: 2px; }
+      .carnet-label { font-weight: bold; font-size: 7pt; color: #555; }
+      .carnet-value { font-weight: 800; color: #000; text-transform: uppercase; }
+      
+      .carnet-footer-info { background: #f0f0f0; border-top: 1px solid #000; font-size: 6pt; padding: 3px; text-align: center; color: #333; }
 
-      /* DORSO */
-      .carnet-back { display: flex; flex-direction: column; background: #f8f9fa; border-top: 2px solid var(--primary); }
-      .carnet-back-header { background: var(--primary); color: #fff; font-size: 8pt; padding: 5px; text-align: center; }
-      .carnet-qr-area { display: flex; justify-content: space-around; align-items: center; padding: 10px; }
-      .carnet-qr-area img { width: 70px; height: 70px; }
-      .carnet-back-info { font-size: 7pt; color: #333; text-align: center; line-height: 1.4; }
-      .carnet-barcode { height: 25px; background: repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); width: 80%; margin: 5px auto; }
+      /* DORSO (Basado en PDF) */
+      .carnet-back { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; }
+      .carnet-back-header { font-weight: bold; font-size: 9pt; margin-bottom: 10px; color: var(--primary); }
+      .carnet-back-qr { width: 70px; height: 70px; margin-bottom: 5px; }
+      .carnet-back-details { font-size: 7pt; text-align: center; line-height: 1.4; color: #333; }
     }
   </style>
 </head>
@@ -122,11 +125,14 @@
       <h1 style="color:var(--primary); margin-bottom:0.5rem;"><i class="fas fa-building"></i> UADAV V.2026</h1>
       <p style="color:#666; margin-bottom:2rem;">Sistema de Gestión Gremial Integrado</p>
       <form onsubmit="handleLogin(event)">
-        <input type="text" id="loginUser" placeholder="Usuario (admin, finanzas, consulta)" required>
+        <input type="text" id="loginUser" placeholder="Usuario (admin)" required>
         <input type="password" id="loginPass" placeholder="Contraseña (1234)" required>
         <button type="submit" class="btn btn-primary" style="width:100%;">Ingresar</button>
       </form>
-      <p style="margin-top:1rem; font-size:0.8rem; color:#888;">Roles: superadmin, admin_area, consultor</p>
+      <p style="margin-top:1rem; font-size:0.8rem; color:#888;">
+        Roles: superadmin, admin_area, consultor<br>
+        <strong>Default: admin / 1234</strong>
+      </p>
     </div>
   </div>
 
@@ -168,7 +174,7 @@
           </div>
           <div class="card stat-card" style="border-left: 5px solid #198754;">
             <h3>Préstamos Activos</h3>
-            <p style="font-size:2.5rem; font-weight:bold;" id="statPrestamos">$0</p>
+            <p style="font-size:2.5rem; font-weight:bold;" id="statPrestamos">0</p>
           </div>
           <div class="card stat-card" style="border-left: 5px solid var(--accent);">
             <h3>Inspectores Activos</h3>
@@ -218,7 +224,7 @@
       <div id="carnetsModule" class="module-section">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-id-card"></i> Generación de Carnets (Estilo PAMI)</h2>
+            <h2 class="card-title"><i class="fas fa-id-card"></i> Generación de Carnets (Estilo PDF)</h2>
           </div>
           <p style="margin-bottom:1rem; color:#666;">Seleccione un afiliado para generar su credencial profesional de doble faz.</p>
           <div class="table-responsive">
@@ -338,10 +344,12 @@
 
   <script>
     // ==========================================
-    // 1. BASE DE DATOS & INICIALIZACIÓN
+    // 1. BASE DE DATOS & INICIALIZACIÓN CORREGIDA
     // ==========================================
     const DB_KEY = 'uadav_v2026_db';
-    let db = {
+    
+    // Definición por defecto
+    const DEFAULT_DB = {
       afiliados: [],
       prestamos: [],
       inspectores: [],
@@ -352,17 +360,29 @@
       ],
       lastId: 1000
     };
-    let currentUser = null;
+
+    let db = { ...DEFAULT_DB }; // Clon inicial
 
     window.onload = function() {
       loadData();
-      if(!db.inspectores) db.inspectores = [];
-      if(!db.prestamos) db.prestamos = [];
+      checkVersion(); // Verifica integridad
     };
 
     function loadData() {
       const saved = localStorage.getItem(DB_KEY);
-      if(saved) db = JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Merge: Usamos los datos guardados, pero si faltan usuarios, usamos los default
+        db = { ...DEFAULT_DB, ...parsed };
+      }
+    }
+
+    function checkVersion() {
+      // Garantiza que siempre existan usuarios
+      if (!db.usuarios || db.usuarios.length === 0) {
+        db.usuarios = DEFAULT_DB.usuarios;
+        saveData();
+      }
     }
 
     function saveData() {
@@ -377,6 +397,9 @@
       const u = document.getElementById('loginUser').value;
       const p = document.getElementById('loginPass').value;
       
+      // Debug para verificar
+      console.log("Usuarios cargados:", db.usuarios);
+      
       const found = db.usuarios.find(user => user.user === u && user.pass === p);
       if(found) {
         currentUser = found;
@@ -385,16 +408,14 @@
         document.getElementById('mainView').classList.remove('hidden');
         updateDashboard();
       } else {
-        alert('Credenciales incorrectas');
+        alert('Credenciales incorrectas. (Intenta admin / 1234)');
       }
     }
 
     function applyRBAC() {
-      // Ocultar menú de usuarios si no es SuperAdmin
       if(currentUser.role !== 'superadmin') {
         document.getElementById('nav-usuarios').style.display = 'none';
       }
-      // Consultor solo lectura (deshabilitar botones de agregar)
       if(currentUser.role === 'consultor') {
         document.querySelectorAll('.btn-success').forEach(btn => btn.style.display = 'none');
       }
@@ -419,7 +440,6 @@
       if(id === 'inspectores') renderInspectores();
       if(id === 'carnets') renderCarnets();
       
-      // Cerrar menú mobile
       document.getElementById('mainNav').classList.remove('open');
     }
 
@@ -431,7 +451,7 @@
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     // ==========================================
-    // 4. MÓDULO PRÉSTAMOS (FIX & SAVE)
+    // 4. MÓDULO PRÉSTAMOS
     // ==========================================
     function savePrestamo(e) {
       e.preventDefault();
@@ -439,12 +459,9 @@
       const monto = parseFloat(document.getElementById('prMonto').value);
       const cuotas = parseInt(document.getElementById('prCuotas').value);
 
-      // Validación
       const afiliadoExiste = db.afiliados.find(a => a.id === idAf);
       if(!afiliadoExiste) { alert('Error: El ID de afiliado no existe.'); return; }
-      if(isNaN(monto) || monto <= 0) { alert('Error: Monto inválido.'); return; }
-
-      // Estructura JSON
+      
       const nuevoPrestamo = {
         id_prestamo: 'PR-' + Date.now(),
         id_afiliado: idAf,
@@ -456,17 +473,13 @@
         estado: 'activo'
       };
 
-      try {
-        db.prestamos.push(nuevoPrestamo);
-        saveData(); // Persistencia
-        updateDashboard();
-        closeModal('modalPrestamo');
-        e.target.reset();
-        renderPrestamos();
-        alert('✅ Préstamo registrado y guardado correctamente.');
-      } catch(err) {
-        alert('❌ Error al guardar: ' + err.message);
-      }
+      db.prestamos.push(nuevoPrestamo);
+      saveData(); 
+      updateDashboard();
+      closeModal('modalPrestamo');
+      e.target.reset();
+      renderPrestamos();
+      alert('✅ Préstamo registrado correctamente.');
     }
 
     function renderPrestamos() {
@@ -519,7 +532,7 @@
           dni: document.getElementById('afDNI').value,
           categoria: document.getElementById('afCategoria').value,
           foto: fotoBase64,
-          fecha_alta: new Date().toISOString()
+          fecha_alta: new Date().toISOString() // Para el carnet
         });
         saveData();
         closeModal('modalAfiliado');
@@ -558,7 +571,7 @@
     }
 
     // ==========================================
-    // 6. GENERADOR DE CARNETS (ESTILO PAMI)
+    // 6. GENERADOR DE CARNETS (DISEÑO PDF EXACTO)
     // ==========================================
     function imprimirCarnet(id) {
       const af = db.afiliados.find(a => a.id === id);
@@ -566,36 +579,57 @@
 
       const zone = document.getElementById('carnetPrintZone');
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=UADAV-VALIDAR-${af.id}-${af.dni}`;
+      const fechaFormateada = new Date(af.fecha_alta).toLocaleDateString();
 
+      // HTML basado en el PDF proporcionado
       zone.innerHTML = `
         <!-- FRENTE -->
         <div class="carnet-page carnet-front">
-          <div class="carnet-header-print"><span>UADAV</span><span>CREDENCIAL</span></div>
-          <div class="carnet-photo-area">
-            ${af.foto ? `<img src="${af.foto}">` : '<i class="fas fa-user" style="font-size:3rem;color:#ccc;"></i>'}
+          <!-- Header Strip -->
+          <div class="carnet-header-strip">
+            <span>UNION ARGENTINA DE ARTISTAS DE VARIEDADES</span>
+            <span style="font-weight:bold; font-size:10pt;">UADAV ★</span>
           </div>
-          <div class="carnet-data-area">
-            <div class="carnet-name-print">${af.nombre}</div>
-            <div class="carnet-role-print">${af.categoria.toUpperCase()}</div>
-            <div class="carnet-id-print">N° AFILIADO: ${af.id}</div>
-            <div class="carnet-id-print">DNI: ${af.dni}</div>
+          <!-- Title Strip -->
+          <div class="carnet-title-strip">CARNET DE AFILIACION</div>
+          
+          <!-- Body -->
+          <div class="carnet-body-flex">
+            <div class="carnet-photo-box">
+              ${af.foto ? `<img src="${af.foto}">` : '<i class="fas fa-user" style="font-size:3rem;color:#ccc;"></i>'}
+            </div>
+            <div class="carnet-info-box">
+              <div class="carnet-field">
+                <div class="carnet-label">Nombre y Apellido:</div>
+                <div class="carnet-value">${af.nombre}</div>
+              </div>
+              <div class="carnet-field">
+                <div class="carnet-label">Afiliado N°:</div>
+                <div class="carnet-value">${af.id}</div>
+              </div>
+              <div class="carnet-field">
+                <div class="carnet-label">Fecha de Afiliación:</div>
+                <div class="carnet-value">${fechaFormateada}</div>
+              </div>
+            </div>
           </div>
-          <div class="carnet-footer-print">Union Argentina de Artistas de Variedades | Personería Gremial N° 210</div>
+          
+          <!-- Footer Info -->
+          <div class="carnet-footer-info">
+            Union Argentina de Artistas de Variedades | uadavofi@gmail.com | Personería Gremial N° 210 | 11-5375-7711
+          </div>
         </div>
 
         <!-- DORSO -->
         <div class="carnet-page carnet-back">
-          <div class="carnet-back-header">VALIDEZ Y CONTACTO</div>
-          <div class="carnet-qr-area">
-            <div>
-              <img src="${qrUrl}">
-            </div>
-            <div class="carnet-back-info">
-              <p>Escaneá para verificar validez</p>
-              <p>uadavofi@gmail.com</p>
-              <p>11-5375-7711</p>
-              <div class="carnet-barcode"></div>
-            </div>
+          <div class="carnet-back-header">Union Argentina de Artistas de Variedades</div>
+          <img src="${qrUrl}" class="carnet-back-qr" alt="QR">
+          <div class="carnet-back-details">
+            <p>Escaneá para verificar validez</p>
+            <p>uadavofi@gmail.com</p>
+            <p>Personería Gremial N° 210</p>
+            <p>11-5375-7711</p>
+            <div style="height:15px; background:repeating-linear-gradient(90deg, #000 0px, #000 2px, #fff 2px, #fff 4px); width:80%; margin:5px auto;"></div>
           </div>
         </div>
       `;
@@ -617,7 +651,7 @@
     }
 
     // ==========================================
-    // 7. INSPECTORES (TOGGLE)
+    // 7. INSPECTORES
     // ==========================================
     function saveInspector(e) {
       e.preventDefault();
@@ -676,17 +710,12 @@
       
       btnText.innerText = "Sincronizando...";
       icon.style.display = "inline-block";
-
-      // 1. Guardado Local
       saveData();
 
-      // 2. Simulación de Server Update
       setTimeout(() => {
-        // 3. Exportaciones Automáticas (Opcional, o solo aviso)
         if(confirm('Respaldo Local Completado.\n¿Desea generar reporte Excel completo ahora?')) {
           exportarExcel();
         }
-        
         btnText.innerText = "✅ Sincronización Total y Respaldo";
         icon.style.display = "none";
         alert('Sistema Sincronizado y Actualizado.');
@@ -695,31 +724,23 @@
 
     function exportarExcel() {
       const wb = XLSX.utils.book_new();
-      
-      // Hoja 1: Padrón
       const wsPadron = XLSX.utils.json_to_sheet(db.afiliados);
       XLSX.utils.book_append_sheet(wb, wsPadron, "Padrón");
-      
-      // Hoja 2: Préstamos
       const wsPrestamos = XLSX.utils.json_to_sheet(db.prestamos);
       XLSX.utils.book_append_sheet(wb, wsPrestamos, "Prestamos");
-
       XLSX.writeFile(wb, `Reporte_UADAV_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
     function exportarPDFCompleto() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      
       doc.setFontSize(20);
       doc.setTextColor(0, 51, 102);
       doc.text("UADAV - Padrón Gremial Completo", 14, 20);
       doc.setFontSize(10);
       doc.text("Generado: " + new Date().toLocaleString(), 14, 28);
-
       const tableColumn = ["ID", "Nombre", "DNI", "Categoría", "Fecha Alta"];
       const tableRows = db.afiliados.map(a => [a.id, a.nombre, a.dni, a.categoria, new Date(a.fecha_alta).toLocaleDateString()]);
-
       doc.autoTable({
         head: [tableColumn],
         body: tableRows,
@@ -728,13 +749,9 @@
         styles: { fontSize: 8, cellPadding: 2 },
         headStyles: { fillColor: [0, 51, 102] }
       });
-
       doc.save(`Padron_Completo_UADAV_${new Date().toISOString().split('T')[0]}.pdf`);
     }
 
-    // ==========================================
-    // DASHBOARD UPDATER
-    // ==========================================
     function updateDashboard() {
       document.getElementById('statTotal').innerText = db.afiliados.length;
       document.getElementById('statPrestamos').innerText = db.prestamos.filter(p=>p.estado==='activo').length;
