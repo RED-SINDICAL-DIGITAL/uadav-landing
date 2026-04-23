@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Credenciales UADAV</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        h1 {
+            grid-column: 1 / -1;
+            color: #1e7bb4;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        /* Formulario */
+        .form-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1e7bb4;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .file-input-label:hover {
+            border-color: #1e7bb4;
+            color: #1e7bb4;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #1e7bb4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #155a82;
+        }
+
+        .btn-secondary {
+            background: #28a745;
+            margin-top: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #218838;
+        }
+
+        /* Preview área */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Tarjeta Frente */
+        .card {
+            width: 86mm;
+            height: 54mm;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .card-front {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: white;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-text {
+            font-size: 42px;
+            font-weight: 900;
+            color: #1e7bb4;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .logo-star {
+            color: #1e7bb4;
+            font-size: 36px;
+            line-height: 0.5;
+            margin-left: 2px;
+        }
+
+        .org-name {
+            font-size: 9px;
+            color: #1e7bb4;
+            text-transform: lowercase;
+            margin-top: 2px;
+            letter-spacing: 0.3px;
+        }
+
+        .org-number {
+            font-size: 9px;
+            color: #1e7bb4;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .card-front-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1e7bb4;
+            color: white;
+            text-align: center;
+            padding: 6px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Tarjeta Dorso */
+        .card-back {
+            background: white;
+            position: relative;
+        }
+
+        .back-content {
+            display: flex;
+            padding: 12px;
+            height: calc(100% - 28px);
+            gap: 12px;
+        }
+
+        .photo-area {
+            width: 55px;
+            height: 65px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #f0f0f0;
+            flex-shrink: 0;
+            border: 1px solid #ddd;
+        }
+
+        .photo-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .person-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .person-dni {
+            font-size: 10px;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .role-section {
+            text-align: right;
+        }
+
+        .role-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .role-dept {
+            font-size: 9px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-org {
+            font-size: 11px;
+            color: white;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .qr-area {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            width: 55px;
+            height: 55px;
+            background: white;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .qr-area canvas, .qr-area img {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .blue-stripe {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 75px;
+            background: #1e7bb4;
+            z-index: 0;
+        }
+
+        .card-back-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-logo {
+            font-size: 14px;
+            font-weight: 900;
+            color: #1e7bb4;
+        }
+
+        .footer-info {
+            font-size: 7px;
+            color: #666;
+            text-align: right;
+            line-height: 1.3;
+        }
+
+        .footer-info .matricula {
+            color: #1e7bb4;
+            font-weight: 600;
+        }
+
+        .back-main {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            display: flex;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .cards-wrapper, .cards-wrapper * {
+                visibility: visible;
+            }
+            .cards-wrapper {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .form-panel {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Generador de Credenciales UADAV</h1>
+        
+        <div class="form-panel">
+            <div class="form-group">
+                <label>Nombre completo</label>
+                <input type="text" id="nombre" value="Julieta Conde" placeholder="Ej: Julieta Conde">
+            </div>
+            
+            <div class="form-group">
+                <label>DNI</label>
+                <input type="text" id="dni" value="39.120.364" placeholder="Ej: 39.120.364">
+            </div>
+            
+            <div class="form-group">
+                <label>Rol / Cargo</label>
+                <input type="text" id="rol" value="ABOGADA" placeholder="Ej: ABOGADA">
+            </div>
+            
+            <div class="form-group">
+                <label>Departamento</label>
+                <input type="text" id="depto" value="DEPARTAMENTO LEGALES" placeholder="Ej: DEPARTAMENTO LEGALES">
+            </div>
+            
+            <div class="form-group">
+                <label>Matrícula</label>
+                <input type="text" id="matricula" value="T° LIV F° 044" placeholder="Ej: T° LIV F° 044">
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" value="gremiales@uadav.org.ar" placeholder="Ej: gremiales@uadav.org.ar">
+            </div>
+            
+            <div class="form-group">
+                <label>Sitio web</label>
+                <input type="text" id="web" value="www.uadav.org.ar" placeholder="Ej: www.uadav.org.ar">
+            </div>
+            
+            <div class="form-group">
+                <label>Foto del asociado</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="foto" accept="image/*" onchange="loadPhoto(event)">
+                    <label for="foto" class="file-input-label" id="fileLabel">
+                        📷 Haga clic para subir foto
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Contenido del QR</label>
+                <input type="text" id="qrContent" value="https://uadav.org.ar/verificar/39120364" placeholder="URL o texto para el QR">
+            </div>
+
+            <button class="btn" onclick="updateCard()">🔄 Actualizar Vista Previa</button>
+            <button class="btn btn-secondary" onclick="downloadCard()">💾 Descargar Imagen</button>
+            <button class="btn" style="background: #6c757d; margin-top: 8px;" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+
+        <div class="preview-panel">
+            <div class="cards-wrapper" id="cardsContainer">
+                <!-- Frente -->
+                <div class="card card-front" id="cardFront">
+                    <div class="logo-area">
+                        <div class="logo-text">UADAV<span class="logo-star">★</span></div>
+                        <div class="org-name">unión argentina de artistas de variedades</div>
+                        <div class="org-number">Personería Gremial N° 210</div>
+                    </div>
+                    <div class="card-front-footer" id="frontWeb">www.uadav.org.ar</div>
+                </div>
+
+                <!-- Dorso -->
+                <div class="card card-back" id="cardBack">
+                    <div class="blue-stripe"></div>
+                    <div class="back-content">
+                        <div class="back-main">
+                            <div class="photo-area">
+                                <img id="photoPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='55' height='65'%3E%3Crect fill='%23f0f0f0' width='55' height='65'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='10'%3ESin foto%3C/text%3E%3C/svg%3E" alt="Foto">
+                            </div>
+                            <div class="info-area">
+                                <div class="person-name" id="previewNombre">Julieta Conde</div>
+                                <div class="person-dni" id="previewDni">DNI 39.120.364</div>
+                            </div>
+                        </div>
+                        <div class="qr-area" id="qrcode"></div>
+                        <div class="role-section" style="position: absolute; right: 75px; top: 50%; transform: translateY(-50%); z-index: 2;">
+                            <div class="role-title" id="previewRol">ABOGADA</div>
+                            <div class="role-dept" id="previewDepto">DEPARTAMENTO LEGALES</div>
+                            <div class="role-org">UADAV</div>
+                        </div>
+                    </div>
+                    <div class="card-back-footer">
+                        <div>
+                            <span class="footer-logo">UADAV★</span>
+                            <span style="font-size: 7px; color: #666; display: block; margin-top: -2px;">Personería Gremial N° 210</span>
+                        </div>
+                        <div class="footer-info">
+                            <div>Unión Argentina de Artistas de Variedades | Matrícula: <span class="matricula" id="previewMatricula">T° LIV F° 044</span></div>
+                            <div id="previewEmail">gremiales@uadav.org.ar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPhoto = null;
+        let qrCode = null;
+
+        function loadPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentPhoto = e.target.result;
+                    document.getElementById('photoPreview').src = currentPhoto;
+                    document.getElementById('fileLabel').textContent = '✅ ' + file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateCard() {
+            // Actualizar textos
+            document.getElementById('previewNombre').textContent = document.getElementById('nombre').value;
+            document.getElementById('previewDni').textContent = 'DNI ' + document.getElementById('dni').value;
+            document.getElementById('previewRol').textContent = document.getElementById('rol').value;
+            document.getElementById('previewDepto').textContent = document.getElementById('depto').value;
+            document.getElementById('previewMatricula').textContent = document.getElementById('matricula').value;
+            document.getElementById('previewEmail').textContent = document.getElementById('email').value;
+            document.getElementById('frontWeb').textContent = document.getElementById('web').value;
+
+            // Actualizar QR
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            const qrText = document.getElementById('qrContent').value || 'https://uadav.org.ar';
+            
+            qrCode = new QRCode(qrContainer, {
+                text: qrText,
+                width: 51,
+                height: 51,
+                colorDark: "#1e7bb4",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        function downloadCard() {
+            const container = document.getElementById('cardsContainer');
+            
+            html2canvas(container, {
+                scale: 3,
+                backgroundColor: '#f0f2f5',
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'credencial-uadav.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Inicializar
+        window.onload = function() {
+            updateCard();
+        };
+    </script>
+</body>
+</html>
