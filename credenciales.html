@@ -114,6 +114,10 @@
             cursor: pointer;
         }
 
+        input[type="range"] {
+            padding: 0;
+        }
+
         .toggle-row {
             display: flex;
             align-items: center;
@@ -262,7 +266,7 @@
             width: 86mm;
             height: 54mm;
             background: var(--color-card-bg);
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             position: relative;
@@ -351,6 +355,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
 
         /* Franja azul que atraviesa horizontalmente */
@@ -360,7 +365,7 @@
             right: 0;
             top: 50%;
             transform: translateY(-50%);
-            height: 75px;
+            height: 78px;
             background: var(--color-stripe);
             z-index: 1;
         }
@@ -370,9 +375,10 @@
             position: relative;
             z-index: 2;
             display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             padding: 10px 14px 0 14px;
-            gap: 12px;
-            height: calc(100% - 30px);
+            height: calc(100% - 32px);
         }
 
         /* Columna izquierda: FOTO fija → NOMBRE → DNI */
@@ -380,13 +386,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 65px;
+            width: 70px;
             flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .photo-wrapper {
             width: 60px;
-            height: 70px;
+            height: 75px;
             border-radius: 3px;
             overflow: hidden;
             background: #f0f0f0;
@@ -409,7 +416,7 @@
             color: var(--color-text-on-stripe);
             text-align: center;
             line-height: 1.2;
-            max-width: 65px;
+            max-width: 70px;
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
@@ -423,36 +430,44 @@
             margin-top: 2px;
         }
 
-        /* Columna derecha: QR → ABOGADA → DEPARTAMENTO → UADAV */
+        /* Columna derecha: QR → ROL → DEPTO → ORG → WHATSAPP */
         .right-column {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
-            margin-left: auto;
-            width: 65px;
+            gap: 2px;
+            width: 70px;
             flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .qr-wrapper {
-            width: 58px;
-            height: 58px;
+            width: 60px;
+            height: 60px;
             background: white;
             padding: 2px;
             border-radius: 3px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
             margin-bottom: 4px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        .qr-wrapper canvas, .qr-wrapper img {
-            width: 100% !important;
-            height: 100% !important;
+        .qr-wrapper img {
+            width: 56px !important;
+            height: 56px !important;
             display: block;
         }
 
         .role-section {
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
         }
 
         .role-title {
@@ -475,7 +490,7 @@
             font-size: 10px;
             color: var(--color-text-on-stripe);
             font-weight: 700;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         /* WhatsApp */
@@ -487,13 +502,14 @@
         }
 
         .whatsapp-icon {
-            width: 12px;
-            height: 12px;
+            width: 11px;
+            height: 11px;
             fill: #25D366;
+            flex-shrink: 0;
         }
 
         .whatsapp-number {
-            font-size: 8px;
+            font-size: 7px;
             color: var(--color-text-on-stripe);
             font-weight: 500;
         }
@@ -511,7 +527,7 @@
             align-items: center;
             border-top: 1px solid #eee;
             z-index: 3;
-            height: 30px;
+            height: 32px;
         }
 
         .footer-logo-section {
@@ -620,11 +636,12 @@
             }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <div class="container">
         <h1>🎭 Generador de Credenciales UADAV Pro</h1>
-        
+
         <!-- ========== PANEL DE FORMULARIO ========== -->
         <div class="form-panel">
             <!-- Datos del Asociado -->
@@ -811,12 +828,12 @@
                 <!-- DORSO -->
                 <div class="card card-back" id="cardBack">
                     <div class="blue-stripe"></div>
-                    
+
                     <div class="back-upper">
                         <!-- Columna izquierda: FOTO fija → NOMBRE → DNI -->
                         <div class="left-column">
                             <div class="photo-wrapper">
-                                <img id="photoPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='70'%3E%3Crect fill='%23f0f0f0' width='60' height='70'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='9'%3EFoto%3C/text%3E%3C/svg%3E" alt="Foto">
+                                <img id="photoPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='75'%3E%3Crect fill='%23f0f0f0' width='60' height='75'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='9'%3EFoto%3C/text%3E%3C/svg%3E" alt="Foto">
                             </div>
                             <div class="person-name" id="previewNombre">Julieta Conde</div>
                             <div class="person-dni" id="previewDni">DNI 39.120.364</div>
@@ -898,21 +915,13 @@
         }
 
         function updateVisibility() {
-            // DNI
             document.getElementById('previewDni').classList.toggle('hidden', !state.showDni);
-            // QR
             document.getElementById('qrContainer').classList.toggle('hidden', !state.showQr);
-            // Matrícula
             document.getElementById('footerMatricula').classList.toggle('hidden', !state.showMatricula);
-            // Email
             document.getElementById('footerEmail').classList.toggle('hidden', !state.showEmail);
-            // WhatsApp
             document.getElementById('whatsappContainer').classList.toggle('hidden', !state.showWhatsapp);
-            // Web
             document.getElementById('frontWebContainer').classList.toggle('hidden', !state.showWeb);
-            // Personería frente
             document.getElementById('frontPersoneria').classList.toggle('hidden', !state.showPersoneria);
-            // Personería footer
             document.getElementById('footerPersoneria').classList.toggle('hidden', !state.showPersoneria);
         }
 
@@ -975,7 +984,7 @@
             document.getElementById('previewEmail').textContent = document.getElementById('email').value;
             document.getElementById('frontWebContainer').textContent = document.getElementById('web').value;
             document.getElementById('previewWhatsapp').textContent = document.getElementById('whatsapp').value;
-            
+
             // Organización
             document.getElementById('frontOrgName').textContent = document.getElementById('orgName1').value;
             document.getElementById('frontPersoneria').textContent = 'Personería Gremial N° ' + document.getElementById('personeria').value;
@@ -991,19 +1000,32 @@
                 frontBgImg.classList.add('hidden');
             }
 
-            // QR
+            // QR - REPARADO: Usar el color primario actual
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
             if (state.showQr) {
                 const qrText = document.getElementById('qrContent').value || 'https://uadav.org.ar';
+                const primaryColor = document.getElementById('colorPrimary').value;
+
+                // Crear QR con el div interno limpio
                 new QRCode(qrContainer, {
                     text: qrText,
-                    width: 54,
-                    height: 54,
-                    colorDark: document.getElementById('colorPrimary').value,
+                    width: 56,
+                    height: 56,
+                    colorDark: primaryColor,
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.M
                 });
+
+                // Asegurar que la imagen generada tenga el tamaño correcto
+                setTimeout(() => {
+                    const qrImg = qrContainer.querySelector('img');
+                    if (qrImg) {
+                        qrImg.style.width = '56px';
+                        qrImg.style.height = '56px';
+                        qrImg.style.display = 'block';
+                    }
+                }, 100);
             }
 
             updateVisibility();
@@ -1012,7 +1034,7 @@
         // ========== DESCARGAR ==========
         function downloadCard() {
             const container = document.getElementById('cardsContainer');
-            
+
             html2canvas(container, {
                 scale: 4,
                 backgroundColor: '#e8e8e8',
@@ -1030,7 +1052,7 @@
         // ========== VISTA DE IMPRESIÓN ==========
         function openPrintView() {
             const container = document.getElementById('cardsContainer');
-            
+
             html2canvas(container, {
                 scale: 4,
                 backgroundColor: '#e8e8e8',
