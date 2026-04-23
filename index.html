@@ -141,13 +141,14 @@
 
   <!-- ============================================ -->
   <!-- ⚙️ CONFIGURACIÓN: MODO MANTENIMIENTO -->
+  <!-- Cambia a true para mostrar la página de mantenimiento -->
   <!-- ============================================ -->
   <script>
-    const MANTENIMIENTO_ACTIVO = true; // true = mantenimiento | false = landing normal
+    const MANTENIMIENTO_ACTIVO = false; // true = mantenimiento | false = landing normal
   </script>
 
   <!-- ============================================ -->
-  <!-- 🚧 PÁGINA DE MANTENIMIENTO -->
+  <!-- 🚧 PÁGINA DE MANTENIMIENTO (con link a Inspectores) -->
   <!-- ============================================ -->
   <div id="maintenance-page" class="hidden">
     <div class="min-h-screen duotone-gradient flex items-center justify-center px-4">
@@ -201,6 +202,19 @@
             </a>
           </div>
         </div>
+
+        <!-- NUEVO: Inspectores habilitados en modo mantenimiento -->
+        <div class="bg-white/5 rounded-xl p-6 mb-8 border border-white/20">
+          <p class="text-lg mb-4">
+            <i class="fas fa-id-card mr-2"></i>
+            Consultá el listado oficial de inspectores habilitados
+          </p>
+          <a href="https://drive.google.com/file/d/1L2g0h2KKNkOnZPhWFynyW8sERpihRQ-X/view?usp=drive_link" 
+             target="_blank" rel="noopener noreferrer"
+             class="inline-block bg-uadav-sky text-uadav-dark font-bold py-3 px-6 rounded-full hover:bg-white transition text-lg shadow-uadav">
+            <i class="fas fa-external-link-alt mr-2"></i>Ver Inspectores habilitados
+          </a>
+        </div>
         
         <div class="flex justify-center gap-6 mb-8">
           <a href="#" class="text-4xl hover:text-uadav-sky transition transform hover:scale-110">
@@ -223,7 +237,7 @@
   </div>
 
   <!-- ============================================ -->
-  <!-- 🎭 LANDING PAGE NORMAL -->
+  <!-- 🎭 LANDING PAGE NORMAL (con link a Inspectores) -->
   <!-- ============================================ -->
   <div id="landing-page" class="hidden">
     
