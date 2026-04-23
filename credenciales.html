@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Credenciales UADAV</title>
+    <title>Generador de Credenciales UADAV Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -13,64 +13,150 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --color-primary: #1e7bb4;
+            --color-primary-dark: #155a82;
+            --color-bg: #f0f2f5;
+            --color-card-bg: #ffffff;
+            --color-text: #333333;
+            --color-footer-bg: #ffffff;
+            --color-stripe: #1e7bb4;
+            --color-text-on-stripe: #ffffff;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
+            background: var(--color-bg);
             padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: 380px 1fr;
             gap: 30px;
         }
 
         h1 {
             grid-column: 1 / -1;
-            color: #1e7bb4;
+            color: var(--color-primary);
             margin-bottom: 10px;
             font-size: 24px;
         }
 
-        /* Formulario */
+        /* ========== PANEL DE FORMULARIO ========== */
         .form-panel {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             height: fit-content;
             position: sticky;
             top: 20px;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         label {
             display: block;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #555;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         input, select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             transition: border-color 0.2s;
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: #1e7bb4;
+            border-color: var(--color-primary);
+        }
+
+        input[type="color"] {
+            height: 36px;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            color: #444;
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: #ccc;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.active {
+            background: var(--color-primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(18px);
         }
 
         .file-input-wrapper {
@@ -87,50 +173,73 @@
 
         .file-input-label {
             display: block;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: #f8f9fa;
             border: 2px dashed #ddd;
             border-radius: 6px;
             text-align: center;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             color: #666;
             transition: all 0.2s;
         }
 
         .file-input-label:hover {
-            border-color: #1e7bb4;
-            color: #1e7bb4;
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .color-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .color-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .color-group label {
+            font-size: 10px;
         }
 
         .btn {
             width: 100%;
-            padding: 12px;
-            background: #1e7bb4;
+            padding: 10px;
+            background: var(--color-primary);
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .btn:hover {
-            background: #155a82;
+            background: var(--color-primary-dark);
         }
 
         .btn-secondary {
             background: #28a745;
-            margin-top: 8px;
         }
 
         .btn-secondary:hover {
             background: #218838;
         }
 
-        /* Preview área */
+        .btn-gray {
+            background: #6c757d;
+        }
+
+        .btn-gray:hover {
+            background: #5a6268;
+        }
+
+        /* ========== PANEL DE PREVIEW ========== */
         .preview-panel {
             display: flex;
             flex-direction: column;
@@ -143,16 +252,16 @@
             flex-direction: column;
             gap: 20px;
             align-items: center;
-            background: #f0f2f5;
-            padding: 20px;
+            background: #e8e8e8;
+            padding: 30px;
             border-radius: 12px;
         }
 
-        /* Tarjeta Frente */
+        /* ========== TARJETA FRENTE ========== */
         .card {
             width: 86mm;
             height: 54mm;
-            background: white;
+            background: var(--color-card-bg);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -165,7 +274,26 @@
             align-items: center;
             justify-content: center;
             padding: 15px;
-            background: white;
+            background: var(--color-card-bg);
+            height: 100%;
+            position: relative;
+        }
+
+        .front-image-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            object-fit: cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .front-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
         }
 
         .logo-area {
@@ -176,13 +304,13 @@
         .logo-text {
             font-size: 42px;
             font-weight: 900;
-            color: #1e7bb4;
+            color: var(--color-primary);
             letter-spacing: -2px;
             line-height: 1;
         }
 
         .logo-star {
-            color: #1e7bb4;
+            color: var(--color-primary);
             font-size: 36px;
             line-height: 0.5;
             margin-left: 2px;
@@ -190,7 +318,7 @@
 
         .org-name {
             font-size: 9px;
-            color: #1e7bb4;
+            color: var(--color-primary);
             text-transform: lowercase;
             margin-top: 2px;
             letter-spacing: 0.3px;
@@ -198,7 +326,7 @@
 
         .org-number {
             font-size: 9px;
-            color: #1e7bb4;
+            color: var(--color-primary);
             font-weight: 600;
             margin-top: 1px;
         }
@@ -208,17 +336,18 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #1e7bb4;
+            background: var(--color-primary);
             color: white;
             text-align: center;
             padding: 6px;
             font-size: 11px;
             font-weight: 500;
+            z-index: 2;
         }
 
-        /* Tarjeta Dorso - ORDEN EXACTO DEL ORIGINAL */
+        /* ========== TARJETA DORSO ========== */
         .card-back {
-            background: white;
+            background: var(--color-card-bg);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -231,82 +360,95 @@
             right: 0;
             top: 50%;
             transform: translateY(-50%);
-            height: 70px;
-            background: #1e7bb4;
+            height: 75px;
+            background: var(--color-stripe);
             z-index: 1;
         }
 
-        /* Contenido superior: foto + QR + datos */
+        /* Contenido superior */
         .back-upper {
             position: relative;
             z-index: 2;
             display: flex;
-            padding: 12px 15px 0 15px;
-            gap: 15px;
-            height: calc(100% - 28px);
+            padding: 10px 14px 0 14px;
+            gap: 12px;
+            height: calc(100% - 30px);
         }
 
-        /* Columna izquierda: Foto arriba, nombre y DNI debajo */
+        /* Columna izquierda: FOTO fija → NOMBRE → DNI */
         .left-column {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            width: 65px;
+            flex-shrink: 0;
         }
 
-        .photo-area {
+        .photo-wrapper {
             width: 60px;
             height: 70px;
             border-radius: 3px;
             overflow: hidden;
             background: #f0f0f0;
-            flex-shrink: 0;
             border: 2px solid white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            margin-bottom: 6px;
         }
 
-        .photo-area img {
+        .photo-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .person-name {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            color: white;
+            color: var(--color-text-on-stripe);
             text-align: center;
             line-height: 1.2;
+            max-width: 65px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .person-dni {
-            font-size: 10px;
-            color: white;
+            font-size: 9px;
+            color: var(--color-text-on-stripe);
             text-align: center;
             font-weight: 500;
+            margin-top: 2px;
         }
 
-        /* Columna derecha: QR arriba, datos debajo */
+        /* Columna derecha: QR → ABOGADA → DEPARTAMENTO → UADAV */
         .right-column {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             margin-left: auto;
+            width: 65px;
+            flex-shrink: 0;
         }
 
-        .qr-area {
+        .qr-wrapper {
             width: 58px;
             height: 58px;
             background: white;
             padding: 2px;
             border-radius: 3px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            margin-bottom: 4px;
+            flex-shrink: 0;
         }
 
-        .qr-area canvas, .qr-area img {
+        .qr-wrapper canvas, .qr-wrapper img {
             width: 100% !important;
             height: 100% !important;
+            display: block;
         }
 
         .role-section {
@@ -314,16 +456,16 @@
         }
 
         .role-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            color: white;
+            color: var(--color-text-on-stripe);
             text-transform: uppercase;
             line-height: 1.2;
         }
 
         .role-dept {
-            font-size: 8px;
-            color: white;
+            font-size: 7px;
+            color: var(--color-text-on-stripe);
             text-transform: uppercase;
             letter-spacing: 0.3px;
             line-height: 1.2;
@@ -331,9 +473,29 @@
 
         .role-org {
             font-size: 10px;
-            color: white;
+            color: var(--color-text-on-stripe);
             font-weight: 700;
             margin-top: 2px;
+        }
+
+        /* WhatsApp */
+        .whatsapp-section {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 2px;
+        }
+
+        .whatsapp-icon {
+            width: 12px;
+            height: 12px;
+            fill: #25D366;
+        }
+
+        .whatsapp-number {
+            font-size: 8px;
+            color: var(--color-text-on-stripe);
+            font-weight: 500;
         }
 
         /* Footer blanco inferior */
@@ -342,13 +504,14 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
-            padding: 4px 10px;
+            background: var(--color-footer-bg);
+            padding: 5px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-top: 1px solid #eee;
             z-index: 3;
+            height: 30px;
         }
 
         .footer-logo-section {
@@ -357,53 +520,93 @@
         }
 
         .footer-logo {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 900;
-            color: #1e7bb4;
+            color: var(--color-primary);
             line-height: 1;
         }
 
         .footer-org-name {
-            font-size: 7px;
+            font-size: 6px;
             color: #666;
             line-height: 1.2;
         }
 
         .footer-org-number {
-            font-size: 7px;
+            font-size: 6px;
             color: #666;
             line-height: 1.2;
         }
 
         .footer-info {
-            font-size: 7px;
+            font-size: 6px;
             color: #666;
             text-align: right;
             line-height: 1.4;
         }
 
         .footer-info .matricula {
-            color: #1e7bb4;
+            color: var(--color-primary);
             font-weight: 600;
+        }
+
+        /* Ocultar elementos */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========== IMPRESIÓN ========== */
+        .print-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .print-overlay.active {
+            display: flex;
+        }
+
+        .print-image {
+            max-width: 90vw;
+            max-height: 80vh;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .print-controls {
+            display: flex;
+            gap: 10px;
         }
 
         @media print {
             body * {
                 visibility: hidden;
             }
-            .cards-wrapper, .cards-wrapper * {
+            .print-overlay, .print-overlay * {
                 visibility: visible;
             }
-            .cards-wrapper {
+            .print-overlay {
                 position: absolute;
                 left: 0;
                 top: 0;
                 background: white;
             }
-            .card {
+            .print-image {
+                max-width: 100%;
+                max-height: 100%;
                 box-shadow: none;
-                page-break-inside: avoid;
-                margin-bottom: 10px;
+            }
+            .print-controls {
+                display: none;
             }
         }
 
@@ -413,105 +616,227 @@
             }
             .form-panel {
                 position: relative;
+                max-height: none;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎭 Generador de Credenciales UADAV</h1>
+        <h1>🎭 Generador de Credenciales UADAV Pro</h1>
         
+        <!-- ========== PANEL DE FORMULARIO ========== -->
         <div class="form-panel">
-            <div class="form-group">
-                <label>Nombre completo</label>
-                <input type="text" id="nombre" value="Julieta Conde" placeholder="Ej: Julieta Conde">
-            </div>
-            
-            <div class="form-group">
-                <label>DNI</label>
-                <input type="text" id="dni" value="39.120.364" placeholder="Ej: 39.120.364">
-            </div>
-            
-            <div class="form-group">
-                <label>Rol / Cargo</label>
-                <input type="text" id="rol" value="ABOGADA" placeholder="Ej: ABOGADA">
-            </div>
-            
-            <div class="form-group">
-                <label>Departamento</label>
-                <input type="text" id="depto" value="DEPARTAMENTO LEGALES" placeholder="Ej: DEPARTAMENTO LEGALES">
-            </div>
-            
-            <div class="form-group">
-                <label>Matrícula</label>
-                <input type="text" id="matricula" value="T° LIV F° 044" placeholder="Ej: T° LIV F° 044">
-            </div>
-            
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="email" value="gremiales@uadav.org.ar" placeholder="Ej: gremiales@uadav.org.ar">
-            </div>
-            
-            <div class="form-group">
-                <label>Sitio web</label>
-                <input type="text" id="web" value="www.uadav.org.ar" placeholder="Ej: www.uadav.org.ar">
-            </div>
-            
-            <div class="form-group">
-                <label>Foto del asociado</label>
-                <div class="file-input-wrapper">
-                    <input type="file" id="foto" accept="image/*" onchange="loadPhoto(event)">
-                    <label for="foto" class="file-input-label" id="fileLabel">
-                        📷 Haga clic para subir foto
-                    </label>
+            <!-- Datos del Asociado -->
+            <div class="form-section">
+                <div class="section-title">👤 Datos del Asociado</div>
+                <div class="form-group">
+                    <label>Nombre completo</label>
+                    <input type="text" id="nombre" value="Julieta Conde" placeholder="Ej: Julieta Conde">
+                </div>
+                <div class="form-group">
+                    <label>DNI</label>
+                    <input type="text" id="dni" value="39.120.364" placeholder="Ej: 39.120.364">
+                </div>
+                <div class="form-group">
+                    <label>Rol / Cargo</label>
+                    <input type="text" id="rol" value="ABOGADA" placeholder="Ej: ABOGADA">
+                </div>
+                <div class="form-group">
+                    <label>Departamento</label>
+                    <input type="text" id="depto" value="DEPARTAMENTO LEGALES" placeholder="Ej: DEPARTAMENTO LEGALES">
+                </div>
+                <div class="form-group">
+                    <label>Foto del asociado</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="foto" accept="image/*" onchange="loadPhoto(event)">
+                        <label for="foto" class="file-input-label" id="fileLabel">📷 Subir foto</label>
+                    </div>
                 </div>
             </div>
-            
-            <div class="form-group">
-                <label>Contenido del QR</label>
-                <input type="text" id="qrContent" value="https://uadav.org.ar/verificar/39120364" placeholder="URL o texto para el QR">
+
+            <!-- Contacto -->
+            <div class="form-section">
+                <div class="section-title">📞 Contacto</div>
+                <div class="form-group">
+                    <label>WhatsApp (con código de país)</label>
+                    <input type="text" id="whatsapp" value="+54 9 11 1234-5678" placeholder="Ej: +54 9 11 1234-5678">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" value="gremiales@uadav.org.ar" placeholder="Ej: gremiales@uadav.org.ar">
+                </div>
+                <div class="form-group">
+                    <label>Sitio web</label>
+                    <input type="text" id="web" value="www.uadav.org.ar" placeholder="Ej: www.uadav.org.ar">
+                </div>
             </div>
 
+            <!-- Organización -->
+            <div class="form-section">
+                <div class="section-title">🏛️ Organización</div>
+                <div class="form-group">
+                    <label>Matrícula</label>
+                    <input type="text" id="matricula" value="T° LIV F° 044" placeholder="Ej: T° LIV F° 044">
+                </div>
+                <div class="form-group">
+                    <label>Personería Gremial N°</label>
+                    <input type="text" id="personeria" value="210" placeholder="Ej: 210">
+                </div>
+                <div class="form-group">
+                    <label>Nombre org. (línea 1)</label>
+                    <input type="text" id="orgName1" value="unión argentina de artistas de variedades" placeholder="Ej: unión argentina de artistas de variedades">
+                </div>
+                <div class="form-group">
+                    <label>Nombre org. (footer)</label>
+                    <input type="text" id="orgNameFooter" value="Unión Argentina de Artistas de Variedades" placeholder="Ej: Unión Argentina de Artistas de Variedades">
+                </div>
+            </div>
+
+            <!-- QR -->
+            <div class="form-section">
+                <div class="section-title">📱 Código QR</div>
+                <div class="form-group">
+                    <label>Contenido del QR</label>
+                    <input type="text" id="qrContent" value="https://uadav.org.ar/verificar/39120364" placeholder="URL o texto">
+                </div>
+            </div>
+
+            <!-- Visibilidad -->
+            <div class="form-section">
+                <div class="section-title">👁️ Mostrar / Ocultar</div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Mostrar DNI</span>
+                    <div class="toggle-switch active" data-target="showDni" onclick="toggleField(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Mostrar QR</span>
+                    <div class="toggle-switch active" data-target="showQr" onclick="toggleField(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Mostrar Matrícula</span>
+                    <div class="toggle-switch active" data-target="showMatricula" onclick="toggleField(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Mostrar Email</span>
+                    <div class="toggle-switch active" data-target="showEmail" onclick="toggleField(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Mostrar WhatsApp</span>
+                    <div class="toggle-switch active" data-target="showWhatsapp" onclick="toggleField(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Mostrar Web (frente)</span>
+                    <div class="toggle-switch active" data-target="showWeb" onclick="toggleField(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Mostrar Personería</span>
+                    <div class="toggle-switch active" data-target="showPersoneria" onclick="toggleField(this)"></div>
+                </div>
+            </div>
+
+            <!-- Colores -->
+            <div class="form-section">
+                <div class="section-title">🎨 Colores</div>
+                <div class="color-row">
+                    <div class="color-group">
+                        <label>Color principal</label>
+                        <input type="color" id="colorPrimary" value="#1e7bb4" onchange="updateColors()">
+                    </div>
+                    <div class="color-group">
+                        <label>Fondo tarjeta</label>
+                        <input type="color" id="colorCardBg" value="#ffffff" onchange="updateColors()">
+                    </div>
+                    <div class="color-group">
+                        <label>Franja dorsal</label>
+                        <input type="color" id="colorStripe" value="#1e7bb4" onchange="updateColors()">
+                    </div>
+                    <div class="color-group">
+                        <label>Texto en franja</label>
+                        <input type="color" id="colorTextStripe" value="#ffffff" onchange="updateColors()">
+                    </div>
+                    <div class="color-group">
+                        <label>Fondo footer</label>
+                        <input type="color" id="colorFooterBg" value="#ffffff" onchange="updateColors()">
+                    </div>
+                    <div class="color-group">
+                        <label>Fondo general</label>
+                        <input type="color" id="colorBg" value="#f0f2f5" onchange="updateColors()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frente Personalizado -->
+            <div class="form-section">
+                <div class="section-title">🖼️ Frente Personalizado</div>
+                <div class="form-group">
+                    <label>Imagen de fondo (opcional)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="frontBgImage" accept="image/*" onchange="loadFrontImage(event)">
+                        <label for="frontBgImage" class="file-input-label" id="frontBgLabel">📷 Subir imagen de fondo</label>
+                    </div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Usar imagen de fondo</span>
+                    <div class="toggle-switch" data-target="useFrontBg" onclick="toggleField(this)"></div>
+                </div>
+                <div class="form-group" style="margin-top: 8px;">
+                    <label>Opacidad fondo (%)</label>
+                    <input type="range" id="frontBgOpacity" min="0" max="100" value="15" oninput="updateFrontOpacity()">
+                </div>
+            </div>
+
+            <!-- Botones -->
             <button class="btn" onclick="updateCard()">🔄 Actualizar Vista Previa</button>
             <button class="btn btn-secondary" onclick="downloadCard()">💾 Descargar Imagen</button>
-            <button class="btn" style="background: #6c757d; margin-top: 8px;" onclick="window.print()">🖨️ Imprimir</button>
+            <button class="btn btn-gray" onclick="openPrintView()">🖨️ Vista de Impresión</button>
         </div>
 
+        <!-- ========== PANEL DE PREVIEW ========== -->
         <div class="preview-panel">
             <div class="cards-wrapper" id="cardsContainer">
                 <!-- FRENTE -->
                 <div class="card card-front" id="cardFront">
-                    <div class="logo-area">
-                        <div class="logo-text">UADAV<span class="logo-star">★</span></div>
-                        <div class="org-name">unión argentina de artistas de variedades</div>
-                        <div class="org-number">Personería Gremial N° 210</div>
+                    <img id="frontBgImg" class="front-image-bg hidden" src="" alt="">
+                    <div class="front-content">
+                        <div class="logo-area">
+                            <div class="logo-text">UADAV<span class="logo-star">★</span></div>
+                            <div class="org-name" id="frontOrgName">unión argentina de artistas de variedades</div>
+                            <div class="org-number" id="frontPersoneria">Personería Gremial N° 210</div>
+                        </div>
                     </div>
-                    <div class="card-front-footer" id="frontWeb">www.uadav.org.ar</div>
+                    <div class="card-front-footer" id="frontWebContainer">www.uadav.org.ar</div>
                 </div>
 
-                <!-- DORSO - ORDEN EXACTO COMO EN LA IMAGEN ORIGINAL -->
+                <!-- DORSO -->
                 <div class="card card-back" id="cardBack">
-                    <!-- Franja azul horizontal detrás de todo -->
                     <div class="blue-stripe"></div>
                     
-                    <!-- Contenido superior -->
                     <div class="back-upper">
-                        <!-- Columna izquierda: FOTO → NOMBRE → DNI -->
+                        <!-- Columna izquierda: FOTO fija → NOMBRE → DNI -->
                         <div class="left-column">
-                            <div class="photo-area">
-                                <img id="photoPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='70'%3E%3Crect fill='%23f0f0f0' width='60' height='70'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='9'%3ESin foto%3C/text%3E%3C/svg%3E" alt="Foto">
+                            <div class="photo-wrapper">
+                                <img id="photoPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='70'%3E%3Crect fill='%23f0f0f0' width='60' height='70'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='9'%3EFoto%3C/text%3E%3C/svg%3E" alt="Foto">
                             </div>
                             <div class="person-name" id="previewNombre">Julieta Conde</div>
                             <div class="person-dni" id="previewDni">DNI 39.120.364</div>
                         </div>
 
-                        <!-- Columna derecha: QR → ABOGADA → DEPARTAMENTO → UADAV -->
+                        <!-- Columna derecha: QR → ROL → DEPTO → ORG → WHATSAPP -->
                         <div class="right-column">
-                            <div class="qr-area" id="qrcode"></div>
+                            <div class="qr-wrapper" id="qrContainer">
+                                <div id="qrcode"></div>
+                            </div>
                             <div class="role-section">
                                 <div class="role-title" id="previewRol">ABOGADA</div>
                                 <div class="role-dept" id="previewDepto">DEPARTAMENTO LEGALES</div>
                                 <div class="role-org">UADAV</div>
+                                <div class="whatsapp-section" id="whatsappContainer">
+                                    <svg class="whatsapp-icon" viewBox="0 0 24 24">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                                    </svg>
+                                    <span class="whatsapp-number" id="previewWhatsapp">+54 9 11 1234-5678</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -520,12 +845,12 @@
                     <div class="card-back-footer">
                         <div class="footer-logo-section">
                             <span class="footer-logo">UADAV★</span>
-                            <span class="footer-org-name">Unión Argentina de Artistas de Variedades</span>
-                            <span class="footer-org-number">Personería Gremial N° 210</span>
+                            <span class="footer-org-name" id="footerOrgName">Unión Argentina de Artistas de Variedades</span>
+                            <span class="footer-org-number" id="footerPersoneria">Personería Gremial N° 210</span>
                         </div>
                         <div class="footer-info">
-                            <div>Matrícula: <span class="matricula" id="previewMatricula">T° LIV F° 044</span></div>
-                            <div id="previewEmail">gremiales@uadav.org.ar</div>
+                            <div id="footerMatricula">Matrícula: <span class="matricula" id="previewMatricula">T° LIV F° 044</span></div>
+                            <div id="footerEmail">gremiales@uadav.org.ar</div>
                         </div>
                     </div>
                 </div>
@@ -533,55 +858,167 @@
         </div>
     </div>
 
-    <script>
-        let currentPhoto = null;
-        let qrCode = null;
+    <!-- Overlay de impresión -->
+    <div class="print-overlay" id="printOverlay">
+        <img class="print-image" id="printImage" src="" alt="Credencial para imprimir">
+        <div class="print-controls">
+            <button class="btn" onclick="closePrintView()" style="width: auto; padding: 10px 30px;">✖ Cerrar</button>
+            <button class="btn btn-secondary" onclick="window.print()" style="width: auto; padding: 10px 30px;">🖨️ Imprimir</button>
+        </div>
+    </div>
 
+    <script>
+        // ========== ESTADO ==========
+        const state = {
+            showDni: true,
+            showQr: true,
+            showMatricula: true,
+            showEmail: true,
+            showWhatsapp: true,
+            showWeb: true,
+            showPersoneria: true,
+            useFrontBg: false,
+            frontBgOpacity: 15,
+            currentPhoto: null,
+            frontBgImage: null
+        };
+
+        // ========== INICIALIZACIÓN ==========
+        window.onload = function() {
+            updateCard();
+            updateColors();
+        };
+
+        // ========== TOGGLES ==========
+        function toggleField(element) {
+            const target = element.dataset.target;
+            state[target] = !state[target];
+            element.classList.toggle('active', state[target]);
+            updateVisibility();
+        }
+
+        function updateVisibility() {
+            // DNI
+            document.getElementById('previewDni').classList.toggle('hidden', !state.showDni);
+            // QR
+            document.getElementById('qrContainer').classList.toggle('hidden', !state.showQr);
+            // Matrícula
+            document.getElementById('footerMatricula').classList.toggle('hidden', !state.showMatricula);
+            // Email
+            document.getElementById('footerEmail').classList.toggle('hidden', !state.showEmail);
+            // WhatsApp
+            document.getElementById('whatsappContainer').classList.toggle('hidden', !state.showWhatsapp);
+            // Web
+            document.getElementById('frontWebContainer').classList.toggle('hidden', !state.showWeb);
+            // Personería frente
+            document.getElementById('frontPersoneria').classList.toggle('hidden', !state.showPersoneria);
+            // Personería footer
+            document.getElementById('footerPersoneria').classList.toggle('hidden', !state.showPersoneria);
+        }
+
+        // ========== COLORES ==========
+        function updateColors() {
+            const root = document.documentElement;
+            root.style.setProperty('--color-primary', document.getElementById('colorPrimary').value);
+            root.style.setProperty('--color-card-bg', document.getElementById('colorCardBg').value);
+            root.style.setProperty('--color-stripe', document.getElementById('colorStripe').value);
+            root.style.setProperty('--color-text-on-stripe', document.getElementById('colorTextStripe').value);
+            root.style.setProperty('--color-footer-bg', document.getElementById('colorFooterBg').value);
+            root.style.setProperty('--color-bg', document.getElementById('colorBg').value);
+            document.body.style.background = document.getElementById('colorBg').value;
+        }
+
+        // ========== FOTO ==========
         function loadPhoto(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    currentPhoto = e.target.result;
-                    document.getElementById('photoPreview').src = currentPhoto;
+                    state.currentPhoto = e.target.result;
+                    document.getElementById('photoPreview').src = state.currentPhoto;
                     document.getElementById('fileLabel').textContent = '✅ ' + file.name;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
+        // ========== FRENTE PERSONALIZADO ==========
+        function loadFrontImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    state.frontBgImage = e.target.result;
+                    document.getElementById('frontBgImg').src = state.frontBgImage;
+                    document.getElementById('frontBgLabel').textContent = '✅ ' + file.name;
+                    if (state.useFrontBg) {
+                        document.getElementById('frontBgImg').classList.remove('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateFrontOpacity() {
+            state.frontBgOpacity = document.getElementById('frontBgOpacity').value;
+            document.getElementById('frontBgImg').style.opacity = state.frontBgOpacity / 100;
+        }
+
+        // ========== ACTUALIZAR TARJETA ==========
         function updateCard() {
-            // Actualizar textos
+            // Textos
             document.getElementById('previewNombre').textContent = document.getElementById('nombre').value;
             document.getElementById('previewDni').textContent = 'DNI ' + document.getElementById('dni').value;
             document.getElementById('previewRol').textContent = document.getElementById('rol').value;
             document.getElementById('previewDepto').textContent = document.getElementById('depto').value;
             document.getElementById('previewMatricula').textContent = document.getElementById('matricula').value;
             document.getElementById('previewEmail').textContent = document.getElementById('email').value;
-            document.getElementById('frontWeb').textContent = document.getElementById('web').value;
+            document.getElementById('frontWebContainer').textContent = document.getElementById('web').value;
+            document.getElementById('previewWhatsapp').textContent = document.getElementById('whatsapp').value;
+            
+            // Organización
+            document.getElementById('frontOrgName').textContent = document.getElementById('orgName1').value;
+            document.getElementById('frontPersoneria').textContent = 'Personería Gremial N° ' + document.getElementById('personeria').value;
+            document.getElementById('footerOrgName').textContent = document.getElementById('orgNameFooter').value;
+            document.getElementById('footerPersoneria').textContent = 'Personería Gremial N° ' + document.getElementById('personeria').value;
 
-            // Actualizar QR
+            // Frente personalizado
+            const frontBgImg = document.getElementById('frontBgImg');
+            if (state.useFrontBg && state.frontBgImage) {
+                frontBgImg.classList.remove('hidden');
+                frontBgImg.style.opacity = state.frontBgOpacity / 100;
+            } else {
+                frontBgImg.classList.add('hidden');
+            }
+
+            // QR
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
-            const qrText = document.getElementById('qrContent').value || 'https://uadav.org.ar';
-            
-            qrCode = new QRCode(qrContainer, {
-                text: qrText,
-                width: 54,
-                height: 54,
-                colorDark: "#1e7bb4",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
-            });
+            if (state.showQr) {
+                const qrText = document.getElementById('qrContent').value || 'https://uadav.org.ar';
+                new QRCode(qrContainer, {
+                    text: qrText,
+                    width: 54,
+                    height: 54,
+                    colorDark: document.getElementById('colorPrimary').value,
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
+
+            updateVisibility();
         }
 
+        // ========== DESCARGAR ==========
         function downloadCard() {
             const container = document.getElementById('cardsContainer');
             
             html2canvas(container, {
-                scale: 3,
-                backgroundColor: '#f0f2f5',
-                logging: false
+                scale: 4,
+                backgroundColor: '#e8e8e8',
+                logging: false,
+                useCORS: true,
+                allowTaint: true
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'credencial-uadav.png';
@@ -590,10 +1027,33 @@
             });
         }
 
-        // Inicializar
-        window.onload = function() {
-            updateCard();
-        };
+        // ========== VISTA DE IMPRESIÓN ==========
+        function openPrintView() {
+            const container = document.getElementById('cardsContainer');
+            
+            html2canvas(container, {
+                scale: 4,
+                backgroundColor: '#e8e8e8',
+                logging: false,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const printImage = document.getElementById('printImage');
+                printImage.src = canvas.toDataURL('image/png');
+                document.getElementById('printOverlay').classList.add('active');
+            });
+        }
+
+        function closePrintView() {
+            document.getElementById('printOverlay').classList.remove('active');
+        }
+
+        // Cerrar con Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePrintView();
+            }
+        });
     </script>
 </body>
 </html>
