@@ -81,6 +81,9 @@
     .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary), #001a33); }
     .login-box { background: var(--card); padding: 2.5rem; border-radius: var(--radius); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
 
+    /* HIDDEN CLASS */
+    .hidden { display: none !important; }
+
     /* ==========================================
        CARNETS ESTILO PAMI / PDF EXACTO (PRINT CSS)
        ========================================== */
@@ -125,8 +128,8 @@
       <h1 style="color:var(--primary); margin-bottom:0.5rem;"><i class="fas fa-building"></i> UADAV V.2026</h1>
       <p style="color:#666; margin-bottom:2rem;">Sistema de Gestión Gremial Integrado</p>
       <form onsubmit="handleLogin(event)">
-        <input type="text" id="loginUser" placeholder="Usuario (admin)" required>
-        <input type="password" id="loginPass" placeholder="Contraseña (1234)" required>
+        <input type="text" id="loginUser" autocomplete="off" placeholder="Usuario (admin)" required>
+        <input type="password" id="loginPass" autocomplete="off" placeholder="Contraseña (1234)" required>
         <button type="submit" class="btn btn-primary" style="width:100%;">Ingresar</button>
       </form>
       <p style="margin-top:1rem; font-size:0.8rem; color:#888;">
@@ -347,8 +350,9 @@
     // 1. BASE DE DATOS & INICIALIZACIÓN CORREGIDA
     // ==========================================
     const DB_KEY = 'uadav_v2026_db';
+    let currentUser = null; // Declaración global explícita
     
-    // Definición por defecto
+    // Definición por defecto robusta
     const DEFAULT_DB = {
       afiliados: [],
       prestamos: [],
@@ -365,21 +369,30 @@
 
     window.onload = function() {
       loadData();
-      checkVersion(); // Verifica integridad
+      checkVersion(); // Verifica integridad y repara si es necesario
+      console.log("Sistema iniciado. Usuarios disponibles:", db.usuarios.map(u => u.user));
     };
 
     function loadData() {
       const saved = localStorage.getItem(DB_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        // Merge: Usamos los datos guardados, pero si faltan usuarios, usamos los default
-        db = { ...DEFAULT_DB, ...parsed };
+        try {
+          const parsed = JSON.parse(saved);
+          // Merge inteligente: Usa lo guardado, pero si falta algo crítico, usa default
+          db = { ...DEFAULT_DB, ...parsed };
+        } catch (e) {
+          console.error("Error leyendo LocalStorage, reiniciando DB", e);
+          db = { ...DEFAULT_DB };
+        }
       }
     }
 
     function checkVersion() {
-      // Garantiza que siempre existan usuarios
-      if (!db.usuarios || db.usuarios.length === 0) {
+      // Verificación robusta: Si no hay usuarios o el primer usuario no tiene propiedad 'user', reparar
+      const validUsers = db.usuarios && db.usuarios.length > 0 && db.usuarios[0].user;
+      
+      if (!validUsers) {
+        console.log("⚠️ Base de datos corrupta o vacía. Reparando usuarios...");
         db.usuarios = DEFAULT_DB.usuarios;
         saveData();
       }
@@ -390,32 +403,55 @@
     }
 
     // ==========================================
-    // 2. RBAC & AUTH
+    // 2. RBAC & AUTH (CORREGIDO)
     // ==========================================
     function handleLogin(e) {
       e.preventDefault();
-      const u = document.getElementById('loginUser').value;
-      const p = document.getElementById('loginPass').value;
       
-      // Debug para verificar
-      console.log("Usuarios cargados:", db.usuarios);
+      // Obtener valores y limpiar espacios
+      const uRaw = document.getElementById('loginUser').value;
+      const pRaw = document.getElementById('loginPass').value;
       
-      const found = db.usuarios.find(user => user.user === u && user.pass === p);
+      const u = uRaw.trim().toLowerCase(); // Convertir a minúsculas para comparación insensible
+      const p = pRaw.trim();
+      
+      console.log("Intentando login - Usuario ingresado:", u, "- Password:", p);
+      console.log("Usuarios en DB:", db.usuarios);
+      
+      // Búsqueda insensible a mayúsculas/minúsculas para el usuario
+      const found = db.usuarios.find(user => user.user.toLowerCase() === u && user.pass === p);
+      
+      console.log("Resultado de búsqueda:", found);
+      
       if(found) {
         currentUser = found;
+        console.log("✅ Login exitoso. Entrando al sistema como:", currentUser.role);
+        
         applyRBAC();
+        
+        // Transición de pantalla
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('mainView').classList.remove('hidden');
+        
         updateDashboard();
       } else {
-        alert('Credenciales incorrectas. (Intenta admin / 1234)');
+        alert('❌ Credenciales incorrectas.\n\nVerifica que:\n1. Usuario sea "admin"\n2. Contraseña sea "1234"\n3. No haya espacios extra.');
       }
     }
 
     function applyRBAC() {
+      if (!currentUser) return;
+      console.log("Aplicando permisos para:", currentUser.role);
+      
+      // Ocultar menú de usuarios si no es SuperAdmin
+      const navUsuarios = document.getElementById('nav-usuarios');
       if(currentUser.role !== 'superadmin') {
-        document.getElementById('nav-usuarios').style.display = 'none';
+        if(navUsuarios) navUsuarios.style.display = 'none';
+      } else {
+        if(navUsuarios) navUsuarios.style.display = 'inline-block';
       }
+      
+      // Consultor solo lectura (deshabilitar botones de agregar)
       if(currentUser.role === 'consultor') {
         document.querySelectorAll('.btn-success').forEach(btn => btn.style.display = 'none');
       }
