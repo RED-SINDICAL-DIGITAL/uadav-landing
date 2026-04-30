@@ -413,360 +413,1085 @@
 
   <script>
     // ==========================================
-    // DATABASE & INIT
-    // ==========================================
-    const DB_KEY = 'uadav_v2026_local';
-    const BACKUP_KEY = 'uadav_v2026_backup';
-    const DEFAULT_DB = {
-      afiliados: [], pagos: [], prestadores: [], mutuales: [], vinculados: [],
-      ccts: [], actas: [], empresas: { prestadoras:[], productoras:[], salones:[], bares:[], discotecas:[], recitales:[], circos:[] },
-      inspectores: [], lastId: 1000, settings: { theme: 'light' }
-    };
-    let db = null;
-    let currentUser = null;
-    let credPhotoData = null;
+// UADAV ENTERPRISE - JS COMPATIBLE GITHUB PAGES
+// ==========================================
 
-    function initSystem() {
-      try {
-        const saved = localStorage.getItem(DB_KEY);
-        db = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_DB));
-        ['prestadoras','productoras','salones','bares','discotecas','recitales','circos'].forEach(k => { if(!db.empresas[k]) db.empresas[k]=[]; });
-        localStorage.setItem(BACKUP_KEY, JSON.stringify(db));
-        return true;
-      } catch(e) { console.error('Init error:', e); db = JSON.parse(JSON.stringify(DEFAULT_DB)); return false; }
+// Variables globales
+var DB_KEY = 'uadav_v2026_gh';
+var BACKUP_KEY = 'uadav_v2026_backup_gh';
+var db = null;
+var currentUser = null;
+var credPhotoData = null;
+
+// Datos por defecto
+var DEFAULT_DB = {
+  afiliados: [],
+  pagos: [],
+  prestadores: [],
+  mutuales: [],
+  vinculados: [],
+  ccts: [],
+  actas: [],
+  empresas: { prestadoras:[], productoras:[], salones:[], bares:[], discotecas:[], recitales:[], circos:[] },
+  inspectores: [],
+  lastId: 1000,
+  settings: { theme: 'light' }
+};
+
+// ==========================================
+// INICIALIZACIÓN SEGURA
+// ==========================================
+function initSystem() {
+  try {
+    var saved = localStorage.getItem(DB_KEY);
+    if (saved) {
+      db = JSON.parse(saved);
+    } else {
+      // Clonar DEFAULT_DB manualmente (sin spread operator)
+      db = JSON.parse(JSON.stringify(DEFAULT_DB));
     }
+    
+    // Validar estructura
+    if (!db.afiliados) db.afiliados = [];
+    if (!db.inspectores) db.inspectores = [];
+    if (!db.empresas) db.empresas = DEFAULT_DB.empresas;
+    
+    // Backup automático
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(db));
+    
+    console.log('✅ Sistema inicializado');
+    return true;
+  } catch (e) {
+    console.error('❌ Error init:', e);
+    db = JSON.parse(JSON.stringify(DEFAULT_DB));
+    return false;
+  }
+}
 
-    function saveData() { try { localStorage.setItem(DB_KEY, JSON.stringify(db)); localStorage.setItem(BACKUP_KEY, JSON.stringify(db)); updateLastSync(); } catch(e) { console.error('Save error:', e); } }
-    function generateId() { db.lastId = (db.lastId || 1000) + 1; saveData(); return db.lastId; }
-    function updateLastSync() { const el = document.getElementById('lastSync'); if(el) el.textContent = new Date().toLocaleTimeString(); }
+function saveData() {
+  try {
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(db));
+    updateLastSync();
+  } catch (e) {
+    console.error('❌ Error save:', e);
+  }
+}
 
-    // ==========================================
-    // AUTH
-    // ==========================================
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const user = document.getElementById('loginUser').value.trim().toLowerCase();
-      const pass = document.getElementById('loginPass').value.trim();
-      const errorMsg = document.getElementById('errorMsg');
+function generateId() {
+  db.lastId = (db.lastId || 1000) + 1;
+  saveData();
+  return db.lastId;
+}
+
+function updateLastSync() {
+  var el = document.getElementById('lastSync');
+  if (el) {
+    el.textContent = new Date().toLocaleTimeString();
+  }
+}
+
+// ==========================================
+// LOGIN - CORREGIDO PARA GITHUB PAGES
+// ==========================================
+function setupLogin() {
+  var form = document.getElementById('loginForm');
+  if (!form) {
+    console.error('❌ No se encontró #loginForm');
+    return;
+  }
+  
+  form.addEventListener('submit', function(e) {
+    // CRÍTICO: Prevenir recarga PRIMERO
+    e.preventDefault();
+    e.stopPropagation();
+    
+    var user = document.getElementById('loginUser').value.trim().toLowerCase();
+    var pass = document.getElementById('loginPass').value.trim();
+    var errorMsg = document.getElementById('errorMsg');
+    
+    console.log('Login intento:', user, pass ? '***' : 'vacío');
+    
+    if (user === 'admin' && pass === '1234') {
+      currentUser = {
+        username: 'admin',
+        role: 'superadmin',
+        loginTime: new Date().toISOString()
+      };
       
-      if (user === 'admin' && pass === '1234') {
-        currentUser = { username: 'admin', role: 'superadmin', loginTime: new Date().toISOString() };
+      // Guardar sesión
+      try {
         sessionStorage.setItem('uadav_session', JSON.stringify(currentUser));
-        document.getElementById('loginView').style.display = 'none';
-        document.getElementById('mainView').style.display = 'block';
-        updateStats(); renderAll();
-        errorMsg.style.display = 'none';
-      } else {
+      } catch(err) {
+        console.warn('SessionStorage error:', err);
+      }
+      
+      // Mostrar sistema principal
+      var loginView = document.getElementById('loginView');
+      var mainView = document.getElementById('mainView');
+      
+      if (loginView) loginView.style.display = 'none';
+      if (mainView) {
+        mainView.style.display = 'block';
+        updateStats();
+        renderAll();
+      }
+      
+      if (errorMsg) errorMsg.style.display = 'none';
+      
+      console.log('✅ Login exitoso');
+      
+    } else {
+      if (errorMsg) {
         errorMsg.textContent = 'Usuario o contraseña incorrectos';
         errorMsg.style.display = 'block';
       }
+      console.log('❌ Credenciales inválidas');
+    }
+  });
+}
+
+// ==========================================
+// NAVIGACIÓN Y SECCIONES
+// ==========================================
+function showSection(sectionId) {
+  // Ocultar todas las secciones
+  var sections = document.querySelectorAll('section');
+  for (var i = 0; i < sections.length; i++) {
+    sections[i].style.display = 'none';
+  }
+  
+  // Mostrar la seleccionada
+  var target = document.getElementById(sectionId);
+  if (target) {
+    target.style.display = 'block';
+  }
+  
+  // Actualizar nav active
+  var navLinks = document.querySelectorAll('.nav a');
+  for (var j = 0; j < navLinks.length; j++) {
+    navLinks[j].classList.remove('active');
+  }
+  var activeLink = document.querySelector('.nav a[href="#' + sectionId + '"]');
+  if (activeLink) {
+    activeLink.classList.add('active');
+  }
+  
+  // Cargar datos específicos
+  if (sectionId === 'padron') renderPadron();
+  if (sectionId === 'credenciales') { updateCredentialSelect(); loadFirstPersona(); }
+  if (sectionId === 'cobranzas') renderCobranzas();
+  if (sectionId === 'obras-mutuales') renderObras();
+  if (sectionId === 'sindicatos-legales') renderLegales();
+  if (sectionId === 'empresas') renderEmpresas();
+  if (sectionId === 'inspectores') renderInspectores();
+}
+
+function showTab(section, tab) {
+  var parent = document.getElementById(section + '-module') || document;
+  var tabs = parent.querySelectorAll('.tab');
+  var contents = parent.querySelectorAll('.tab-content');
+  
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+  for (var j = 0; j < contents.length; j++) contents[j].classList.remove('active');
+  
+  event.currentTarget.classList.add('active');
+  var target = document.getElementById(section + '-' + tab);
+  if (target) target.classList.add('active');
+}
+
+function openModal(modalId) {
+  var modal = document.getElementById(modalId);
+  if (modal) modal.classList.add('active');
+}
+
+function closeModal(modalId) {
+  var modal = document.getElementById(modalId);
+  if (modal) modal.classList.remove('active');
+}
+
+// ==========================================
+// PADRÓN
+// ==========================================
+function saveAfiliado(e) {
+  e.preventDefault();
+  
+  var fileInput = document.getElementById('afFoto');
+  
+  function processSave(foto) {
+    db.afiliados.push({
+      id: generateId(),
+      nombre: document.getElementById('afNombre').value,
+      dni: document.getElementById('afDNI').value,
+      categoria: document.getElementById('afCategoria').value,
+      foto: foto,
+      fecha: new Date().toISOString()
     });
+    
+    saveData();
+    closeModal('modalAfiliado');
+    e.target.reset();
+    renderPadron();
+    updateStats();
+    updateCredentialSelect();
+  }
+  
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      processSave(ev.target.result);
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  } else {
+    processSave(null);
+  }
+}
 
-    function logout() {
-      sessionStorage.removeItem('uadav_session');
-      currentUser = null;
-      location.reload();
+function renderPadron() {
+  var tbody = document.getElementById('padronTable');
+  if (!tbody) return;
+  
+  var search = (document.getElementById('searchPadron') || {}).value || '';
+  search = search.toLowerCase();
+  
+  var filtered = [];
+  for (var i = 0; i < db.afiliados.length; i++) {
+    var a = db.afiliados[i];
+    var match = a.nombre.toLowerCase().indexOf(search) >= 0 || 
+                a.dni.indexOf(search) >= 0 || 
+                a.id.toString().indexOf(search) >= 0;
+    if (match) filtered.push(a);
+  }
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">Sin registros</td></tr>';
+    return;
+  }
+  
+  var html = '';
+  for (var j = 0; j < filtered.length; j++) {
+    var a = filtered[j];
+    var fotoHtml = a.foto 
+      ? '<img src="' + a.foto + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">'
+      : '<i class="fas fa-user"></i>';
+    
+    html += '<tr>' +
+      '<td>' + fotoHtml + '</td>' +
+      '<td>#' + a.id + '</td>' +
+      '<td>' + a.nombre + '</td>' +
+      '<td>' + a.dni + '</td>' +
+      '<td>' + a.categoria + '</td>' +
+      '<td><button class="btn btn-sm btn-danger" onclick="deleteAfiliado(' + a.id + ')"><i class="fas fa-trash"></i></button></td>' +
+      '</tr>';
+  }
+  
+  tbody.innerHTML = html;
+  updateCredentialSelect();
+}
+
+function deleteAfiliado(id) {
+  if (!confirm('¿Eliminar afiliado?')) return;
+  
+  var newAfiliados = [];
+  for (var i = 0; i < db.afiliados.length; i++) {
+    if (db.afiliados[i].id !== id) {
+      newAfiliados.push(db.afiliados[i]);
     }
+  }
+  db.afiliados = newAfiliados;
+  
+  saveData();
+  renderPadron();
+  updateStats();
+  updateCredentialSelect();
+}
 
-    function showSection(id) {
-      document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-      document.getElementById(id).style.display = 'block';
-      document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-      if(id === 'padron') renderPadron();
-      if(id === 'credenciales') { updateCredentialSelect(); if(db.afiliados[0]) { document.getElementById('credSelectPersona').value = 'afiliado_'+db.afiliados[0].id; loadPersonaData(); } }
-      if(id === 'cobranzas') renderCobranzas();
-      if(id === 'obras-mutuales') renderObras();
-      if(id === 'sindicatos-legales') renderLegales();
-      if(id === 'empresas') renderEmpresas();
-      if(id === 'inspectores') renderInspectores();
+// ==========================================
+// CREDENCIALES - SELECTOR CORREGIDO
+// ==========================================
+function updateCredentialSelect() {
+  var sel = document.getElementById('credSelectPersona');
+  var optAfiliados = document.getElementById('optAfiliados');
+  var optInspectores = document.getElementById('optInspectores');
+  
+  if (!sel || !optAfiliados || !optInspectores) return;
+  
+  // Limpiar opciones
+  optAfiliados.innerHTML = '';
+  optInspectores.innerHTML = '';
+  
+  // Agregar afiliados
+  if (db.afiliados && db.afiliados.length > 0) {
+    for (var i = 0; i < db.afiliados.length; i++) {
+      var a = db.afiliados[i];
+      var opt = document.createElement('option');
+      opt.value = 'afiliado_' + a.id;
+      opt.textContent = a.nombre + ' (ID:' + a.id + ')';
+      optAfiliados.appendChild(opt);
     }
-
-    function showTab(section, tab) {
-      document.querySelectorAll(`#${section} .tab`).forEach(t => t.classList.remove('active'));
-      document.querySelectorAll(`#${section} .tab-content`).forEach(c => c.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-      document.getElementById(`${section}-${tab}`).classList.add('active');
+  } else {
+    var opt = document.createElement('option');
+    opt.disabled = true;
+    opt.textContent = 'Sin afiliados';
+    optAfiliados.appendChild(opt);
+  }
+  
+  // Agregar inspectores
+  if (db.inspectores && db.inspectores.length > 0) {
+    for (var j = 0; j < db.inspectores.length; j++) {
+      var ins = db.inspectores[j];
+      var opt = document.createElement('option');
+      opt.value = 'inspector_' + ins.id;
+      opt.textContent = ins.nombre + ' (Hab:' + (ins.hab || ins.id) + ')';
+      optInspectores.appendChild(opt);
     }
+  } else {
+    var opt = document.createElement('option');
+    opt.disabled = true;
+    opt.textContent = 'Sin inspectores';
+    optInspectores.appendChild(opt);
+  }
+}
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function loadFirstPersona() {
+  var sel = document.getElementById('credSelectPersona');
+  if (!sel) return;
+  
+  // Intentar cargar primer afiliado
+  if (db.afiliados && db.afiliados.length > 0) {
+    sel.value = 'afiliado_' + db.afiliados[0].id;
+    loadPersonaData();
+  } else if (db.inspectores && db.inspectores.length > 0) {
+    sel.value = 'inspector_' + db.inspectores[0].id;
+    loadPersonaData();
+  }
+}
 
-    function showConfirm(message, callback) {
-      document.getElementById('confirmMessage').textContent = message;
-      document.getElementById('confirmBtn').onclick = function() { callback(); closeModal('modalConfirm'); };
-      openModal('modalConfirm');
-    }
-
-    function confirmarLimpieza() {
-      showConfirm('¿Restaurar desde backup?', function() {
-        const backup = localStorage.getItem(BACKUP_KEY);
-        if(backup) { db = JSON.parse(backup); saveData(); renderAll(); alert('✅ Restaurado'); }
-      });
-    }
-
-    // ==========================================
-    // PADRÓN
-    // ==========================================
-    function saveAfiliado(e) {
-      e.preventDefault();
-      const fileInput = document.getElementById('afFoto');
-      const process = (foto) => {
-        db.afiliados.push({ id: generateId(), nombre: document.getElementById('afNombre').value, dni: document.getElementById('afDNI').value, categoria: document.getElementById('afCategoria').value, foto, fecha: new Date().toISOString() });
-        saveData(); closeModal('modalAfiliado'); e.target.reset(); renderPadron(); updateStats(); updateCredentialSelect();
-      };
-      if(fileInput.files?.[0]) { const r = new FileReader(); r.onload = ev => process(ev.target.result); r.readAsDataURL(fileInput.files[0]); }
-      else process(null);
-    }
-
-    function renderPadron() {
-      const search = document.getElementById('searchPadron').value.toLowerCase();
-      const filtered = db.afiliados.filter(a => a.nombre.toLowerCase().includes(search) || a.dni.includes(search) || a.id.toString().includes(search));
-      document.getElementById('padronTable').innerHTML = filtered.map(a => `
-        <tr><td>${a.foto ? `<img src="${a.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<i class="fas fa-user"></i>'}</td>
-        <td>#${a.id}</td><td>${a.nombre}</td><td>${a.dni}</td><td>${a.categoria}</td>
-        <td><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.afiliados = db.afiliados.filter(x=>x.id!==${a.id}); saveData(); renderPadron(); updateStats(); updateCredentialSelect(); })"><i class="fas fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:2rem;">Sin registros</td></tr>';
-      updateCredentialSelect();
-    }
-
-    // ==========================================
-    // CREDENCIALES (CORREGIDO)
-    // ==========================================
-    function updateCredentialSelect() {
-      const sel = document.getElementById('credSelectPersona');
-      const optAfiliados = document.getElementById('optAfiliados');
-      const optInspectores = document.getElementById('optInspectores');
-      if(!sel || !optAfiliados || !optInspectores) return;
-      
-      optAfiliados.innerHTML = db.afiliados.map(a => `<option value="afiliado_${a.id}">${a.nombre} (ID:${a.id})</option>`).join('') || '<option disabled>Sin afiliados</option>';
-      optInspectores.innerHTML = db.inspectores.map(i => `<option value="inspector_${i.id}">${i.nombre} (Hab:${i.hab})</option>`).join('') || '<option disabled>Sin inspectores</option>';
-    }
-
-    function loadPersonaData() {
-      const val = document.getElementById('credSelectPersona').value;
-      if(!val) return;
-      const [tipo, id] = val.split('_');
-      const pid = parseInt(id);
-      
-      if(tipo === 'afiliado') {
-        const af = db.afiliados.find(a => a.id === pid);
-        if(!af) return;
-        document.getElementById('credNombre').value = af.nombre;
-        document.getElementById('credDNI').value = af.dni;
-        document.getElementById('credRol').value = af.categoria;
-        document.getElementById('credDepto').value = 'UADAV';
-        document.getElementById('credAfiliadoNum').value = af.id;
-        document.getElementById('credFechaAfiliacion').value = af.fecha?.split('T')[0] || '';
-        document.getElementById('credEmail').value = 'uadavofi@gmail.com';
-        document.getElementById('credWeb').value = 'www.uadav.org.ar';
-        document.getElementById('credQRContent').value = `UADAV-VALIDAR-${af.id}-${af.dni}`;
-        document.getElementById('credBarcodeContent').value = `UADAV-${af.id}`;
-        if(af.foto) { credPhotoData = af.foto; document.getElementById('credPhotoArea').innerHTML = `<img src="${af.foto}">`; }
-      } else if(tipo === 'inspector') {
-        const ins = db.inspectores.find(i => i.id === pid);
-        if(!ins) return;
-        document.getElementById('credNombre').value = ins.nombre;
-        document.getElementById('credRol').value = 'Inspector';
-        document.getElementById('credDepto').value = ins.zona || 'UADAV';
-        document.getElementById('credAfiliadoNum').value = ins.hab || ins.id;
-        document.getElementById('credEmail').value = ins.email || 'uadavofi@gmail.com';
-        document.getElementById('credQRContent').value = `UADAV-INSPECTOR-${ins.id}-${ins.hab}`;
-        document.getElementById('credBarcodeContent').value = `UADAV-INS-${ins.id}`;
+function loadPersonaData() {
+  var sel = document.getElementById('credSelectPersona');
+  if (!sel || !sel.value) return;
+  
+  var val = sel.value;
+  var parts = val.split('_');
+  if (parts.length !== 2) return;
+  
+  var tipo = parts[0];
+  var pid = parseInt(parts[1]);
+  
+  if (tipo === 'afiliado') {
+    var af = null;
+    for (var i = 0; i < db.afiliados.length; i++) {
+      if (db.afiliados[i].id === pid) {
+        af = db.afiliados[i];
+        break;
       }
-      updateCredential();
     }
-
-    function loadPhoto(input) {
-      if(input.files?.[0]) {
-        const reader = new FileReader();
-        reader.onload = e => { credPhotoData = e.target.result; document.getElementById('credPhotoArea').innerHTML = `<img src="${e.target.result}">`; updateCredential(); };
-        reader.readAsDataURL(input.files[0]);
+    if (!af) return;
+    
+    document.getElementById('credNombre').value = af.nombre || '';
+    document.getElementById('credDNI').value = af.dni || '';
+    document.getElementById('credRol').value = af.categoria || '';
+    document.getElementById('credDepto').value = 'UADAV';
+    document.getElementById('credAfiliadoNum').value = af.id;
+    document.getElementById('credFechaAfiliacion').value = af.fecha ? af.fecha.split('T')[0] : '';
+    document.getElementById('credEmail').value = 'uadavofi@gmail.com';
+    document.getElementById('credWeb').value = 'www.uadav.org.ar';
+    document.getElementById('credQRContent').value = 'UADAV-VALIDAR-' + af.id + '-' + af.dni;
+    document.getElementById('credBarcodeContent').value = 'UADAV-' + af.id;
+    
+    if (af.foto) {
+      credPhotoData = af.foto;
+      var photoArea = document.getElementById('credPhotoArea');
+      if (photoArea) photoArea.innerHTML = '<img src="' + af.foto + '">';
+    }
+    
+  } else if (tipo === 'inspector') {
+    var ins = null;
+    for (var j = 0; j < db.inspectores.length; j++) {
+      if (db.inspectores[j].id === pid) {
+        ins = db.inspectores[j];
+        break;
       }
     }
+    if (!ins) return;
+    
+    document.getElementById('credNombre').value = ins.nombre || '';
+    document.getElementById('credRol').value = 'Inspector';
+    document.getElementById('credDepto').value = ins.zona || 'UADAV';
+    document.getElementById('credAfiliadoNum').value = ins.hab || ins.id;
+    document.getElementById('credEmail').value = ins.email || 'uadavofi@gmail.com';
+    document.getElementById('credQRContent').value = 'UADAV-INSPECTOR-' + ins.id + '-' + (ins.hab || '');
+    document.getElementById('credBarcodeContent').value = 'UADAV-INS-' + ins.id;
+  }
+  
+  updateCredential();
+}
 
-    function updateCredential() {
-      const color = document.getElementById('credColorPrincipal').value;
-      document.documentElement.style.setProperty('--primary', color);
-      document.getElementById('credFront').style.borderTop = `4px solid ${color}`;
-      document.getElementById('credBack').style.borderTop = `4px solid ${color}`;
-      
-      document.getElementById('prevNombre').textContent = document.getElementById('credNombre').value || '-';
-      document.getElementById('prevDNI').textContent = document.getElementById('credDNI').value || '-';
-      document.getElementById('prevRol').textContent = document.getElementById('credRol').value || '-';
-      document.getElementById('prevDepto').textContent = document.getElementById('credDepto').value || '-';
-      document.getElementById('prevAfiliadoNum').textContent = document.getElementById('credAfiliadoNum').value || '-';
-      document.getElementById('prevFechaAfiliacion').textContent = document.getElementById('credFechaAfiliacion').value || '-';
-      
-      ['fieldRol','fieldDepto'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display = document.getElementById(id.replace('field','show')).checked ? '' : 'none'; });
-      document.getElementById('credPhotoArea').style.display = document.getElementById('showFoto').checked ? 'flex' : 'none';
-      
-      const qr = document.getElementById('credQRContent').value || 'UADAV-CREDENCIAL';
-      document.querySelector('#prevQRContainer img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qr)}`;
-      
-      const email = document.getElementById('credEmail').value || 'uadavofi@gmail.com';
-      const phone = document.getElementById('credWhatsApp').value || '11-5375-7711';
-      document.getElementById('prevBackInfo').innerHTML = `<p>Escaneá para verificar validez</p><p>${email}</p><p>Personería Gremial N° 210</p><p>${phone}</p>`;
-      
-      document.getElementById('prevWebFooter').classList.toggle('hidden', !document.getElementById('showWeb').checked);
+function loadPhoto(input) {
+  if (!input || !input.files || !input.files[0]) return;
+  
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    credPhotoData = e.target.result;
+    var photoArea = document.getElementById('credPhotoArea');
+    if (photoArea) {
+      photoArea.innerHTML = '<img src="' + e.target.result + '">';
     }
+    updateCredential();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
 
-    function downloadPNG() {
-      html2canvas(document.getElementById('credentialPrintArea'), {scale:2, backgroundColor:'#ffffff'}).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `UADAV_Credencial_${document.getElementById('credNombre').value||'Preview'}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+function updateCredential() {
+  // Color principal
+  var colorInput = document.getElementById('credColorPrincipal');
+  var color = colorInput ? colorInput.value : '#003366';
+  
+  if (document.documentElement) {
+    document.documentElement.style.setProperty('--primary', color);
+  }
+  
+  var credFront = document.getElementById('credFront');
+  var credBack = document.getElementById('credBack');
+  if (credFront) credFront.style.borderTop = '4px solid ' + color;
+  if (credBack) credBack.style.borderTop = '4px solid ' + color;
+  
+  // Valores de texto
+  var fields = ['credNombre','credDNI','credRol','credDepto','credAfiliadoNum','credFechaAfiliacion'];
+  var prevIds = ['prevNombre','prevDNI','prevRol','prevDepto','prevAfiliadoNum','prevFechaAfiliacion'];
+  
+  for (var i = 0; i < fields.length; i++) {
+    var input = document.getElementById(fields[i]);
+    var prev = document.getElementById(prevIds[i]);
+    if (input && prev) {
+      prev.textContent = input.value || '-';
+    }
+  }
+  
+  // Visibilidad de campos
+  toggleVisibility('fieldRol', document.getElementById('showRol') && document.getElementById('showRol').checked);
+  toggleVisibility('fieldDepto', document.getElementById('showDepto') && document.getElementById('showDepto').checked);
+  
+  // Foto
+  var showFoto = document.getElementById('showFoto') && document.getElementById('showFoto').checked;
+  var photoArea = document.getElementById('credPhotoArea');
+  if (photoArea) {
+    photoArea.style.display = showFoto ? 'flex' : 'none';
+  }
+  
+  // QR
+  var qrInput = document.getElementById('credQRContent');
+  var qrContent = qrInput && qrInput.value ? qrInput.value : 'UADAV-CREDENCIAL';
+  var qrImg = document.querySelector('#prevQRContainer img');
+  if (qrImg) {
+    qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(qrContent);
+  }
+  
+  // Back info
+  var email = (document.getElementById('credEmail') || {}).value || 'uadavofi@gmail.com';
+  var phone = (document.getElementById('credWhatsApp') || {}).value || '11-5375-7711';
+  var backInfo = document.getElementById('prevBackInfo');
+  if (backInfo) {
+    backInfo.innerHTML = '<p>Escaneá para verificar validez</p><p>' + email + '</p><p>Personería Gremial N° 210</p><p>' + phone + '</p>';
+  }
+  
+  // Web footer
+  var webFooter = document.getElementById('prevWebFooter');
+  var showWeb = document.getElementById('showWeb') && document.getElementById('showWeb').checked;
+  if (webFooter) {
+    webFooter.classList.toggle('hidden', !showWeb);
+  }
+}
+
+function toggleVisibility(id, show) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.style.display = show ? '' : 'none';
+  }
+}
+
+function downloadPNG() {
+  if (typeof html2canvas === 'undefined') {
+    alert('Librería html2canvas no cargada. Verificá la conexión.');
+    return;
+  }
+  
+  var area = document.getElementById('credentialPrintArea');
+  if (!area) return;
+  
+  html2canvas(area, { scale: 2, backgroundColor: '#ffffff' }).then(function(canvas) {
+    var link = document.createElement('a');
+    var nombre = (document.getElementById('credNombre') || {}).value || 'Preview';
+    link.download = 'UADAV_Credencial_' + nombre + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(function(err) {
+    console.error('Error PNG:', err);
+    alert('Error al generar PNG: ' + err.message);
+  });
+}
+
+function downloadPDF() {
+  if (typeof window.jspdf === 'undefined') {
+    alert('Librería jsPDF no cargada. Verificá la conexión.');
+    return;
+  }
+  
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [85.6, 53.98 * 2] });
+  
+  var area = document.getElementById('credentialPrintArea');
+  if (!area) return;
+  
+  html2canvas(area, { scale: 2 }).then(function(canvas) {
+    var imgData = canvas.toDataURL('image/png');
+    doc.addImage(imgData, 'PNG', 0, 0, 85.6, 53.98 * 2);
+    var nombre = (document.getElementById('credNombre') || {}).value || 'Preview';
+    doc.save('UADAV_Credencial_' + nombre + '.pdf');
+  }).catch(function(err) {
+    console.error('Error PDF:', err);
+    alert('Error al generar PDF: ' + err.message);
+  });
+}
+
+// ==========================================
+// COBRANZAS
+// ==========================================
+function savePago(e) {
+  e.preventDefault();
+  
+  db.pagos.push({
+    id: Date.now(),
+    afiliadoId: parseInt(document.getElementById('pagoAfiliadoId').value),
+    monto: parseFloat(document.getElementById('pagoMonto').value),
+    mes: document.getElementById('pagoMes').value,
+    fecha: new Date().toISOString()
+  });
+  
+  saveData();
+  closeModal('modalPago');
+  e.target.reset();
+  renderCobranzas();
+}
+
+function renderCobranzas() {
+  var currentMes = new Date().toISOString().slice(0, 7);
+  var pendientes = [];
+  
+  for (var i = 0; i < db.afiliados.length; i++) {
+    var a = db.afiliados[i];
+    var pagado = false;
+    for (var j = 0; j < db.pagos.length; j++) {
+      if (db.pagos[j].afiliadoId === a.id && db.pagos[j].mes === currentMes) {
+        pagado = true;
+        break;
+      }
+    }
+    if (!pagado) pendientes.push(a);
+  }
+  
+  var cuotasList = document.getElementById('cuotasList');
+  if (!cuotasList) return;
+  
+  if (pendientes.length === 0) {
+    cuotasList.innerHTML = '<p style="text-align:center;color:#10b981;">✅ Todos al día</p>';
+    return;
+  }
+  
+  var html = '';
+  for (var k = 0; k < pendientes.length; k++) {
+    var a = pendientes[k];
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;">' +
+      '<div><strong>' + a.nombre + '</strong> <span style="color:#64748b;font-size:0.8rem;">(' + a.dni + ')</span>' +
+      '<div style="font-size:0.85rem;color:#64748b;">Cuota: ' + currentMes + '</div></div>' +
+      '<button class="btn btn-sm btn-success" onclick="document.getElementById(\'pagoAfiliadoId\').value=' + a.id + '; openModal(\'modalPago\')"><i class="fas fa-dollar-sign"></i> Pagar</button>' +
+      '</div>';
+  }
+  cuotasList.innerHTML = html;
+  
+  // Historial
+  var historialList = document.getElementById('historialPagosList');
+  if (historialList) {
+    var histHtml = '';
+    var pagosRev = db.pagos.slice().reverse();
+    for (var l = 0; l < pagosRev.length; l++) {
+      var p = pagosRev[l];
+      var af = null;
+      for (var m = 0; m < db.afiliados.length; m++) {
+        if (db.afiliados[m].id === p.afiliadoId) {
+          af = db.afiliados[m];
+          break;
+        }
+      }
+      histHtml += '<div style="padding:0.5rem;border-bottom:1px solid #eee;">' + 
+        (af ? af.nombre : '?') + ' - $' + p.monto + ' - ' + p.mes + '</div>';
+    }
+    historialList.innerHTML = histHtml || '<p style="text-align:center;color:#64748b;">Sin historial</p>';
+  }
+}
+
+// ==========================================
+// OBRAS / MUTUALES
+// ==========================================
+function savePrestador(e) {
+  e.preventDefault();
+  
+  var item = {
+    id: Date.now(),
+    nombre: document.getElementById('prNombre').value,
+    tipo: document.getElementById('prTipo').value,
+    direccion: document.getElementById('prDir').value,
+    telefono: document.getElementById('prTel').value
+  };
+  
+  if (item.tipo === 'prestador') {
+    db.prestadores.push(item);
+  } else {
+    db.mutuales.push(item);
+  }
+  
+  saveData();
+  closeModal('modalPrestador');
+  e.target.reset();
+  renderObras();
+}
+
+function renderObras() {
+  function renderList(arr, containerId) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (!arr || arr.length === 0) {
+      container.innerHTML = '<p style="text-align:center;color:#64748b;">Sin registros</p>';
+      return;
+    }
+    
+    var html = '';
+    for (var i = 0; i < arr.length; i++) {
+      var p = arr[i];
+      html += '<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;">' +
+        '<div><strong>' + p.nombre + '</strong><div style="font-size:0.85rem;color:#64748b;">' + (p.direccion || '') + ' | ' + (p.telefono || '') + '</div></div>' +
+        '<button class="btn btn-sm btn-danger" onclick="deletePrestador(' + p.id + ')"><i class="fas fa-trash"></i></button>' +
+        '</div>';
+    }
+    container.innerHTML = html;
+  }
+  
+  renderList(db.prestadores, 'prestadoresList');
+  renderList(db.mutuales, 'mutualesList');
+  
+  // Vinculados (placeholder)
+  var vinculadosTable = document.getElementById('vinculadosTable');
+  if (vinculadosTable) {
+    var vHtml = '';
+    for (var j = 0; j < db.afiliados.length; j++) {
+      var a = db.afiliados[j];
+      vHtml += '<tr><td>' + a.nombre + '</td><td><span style="color:#64748b;">Sin asignar</span></td><td>-</td><td><button class="btn btn-sm btn-primary">Asignar</button></td></tr>';
+    }
+    vinculadosTable.innerHTML = vHtml || '<tr><td colspan="4" style="text-align:center;">Sin afiliados</td></tr>';
+  }
+}
+
+function deletePrestador(id) {
+  if (!confirm('¿Eliminar prestador?')) return;
+  
+  var newPrest = [];
+  for (var i = 0; i < db.prestadores.length; i++) {
+    if (db.prestadores[i].id !== id) newPrest.push(db.prestadores[i]);
+  }
+  db.prestadores = newPrest;
+  
+  var newMut = [];
+  for (var j = 0; j < db.mutuales.length; j++) {
+    if (db.mutuales[j].id !== id) newMut.push(db.mutuales[j]);
+  }
+  db.mutuales = newMut;
+  
+  saveData();
+  renderObras();
+}
+
+// ==========================================
+// LEGALES / CCTs
+// ==========================================
+function saveCCT(e) {
+  e.preventDefault();
+  
+  var file = document.getElementById('cctFile').files[0];
+  if (!file) return;
+  
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    db.ccts.push({
+      id: Date.now(),
+      nombre: document.getElementById('cctNombre').value,
+      tipo: document.getElementById('cctTipo').value,
+      fecha: document.getElementById('cctFecha').value,
+      data: ev.target.result
+    });
+    
+    saveData();
+    closeModal('modalCCT');
+    e.target.reset();
+    renderLegales();
+    updateStats();
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveActa(e) {
+  e.preventDefault();
+  
+  db.actas.push({
+    id: Date.now(),
+    titulo: document.getElementById('actaTitulo').value,
+    contenido: document.getElementById('actaContenido').value,
+    fecha: new Date().toISOString()
+  });
+  
+  saveData();
+  closeModal('modalActa');
+  e.target.reset();
+  renderLegales();
+}
+
+function renderLegales() {
+  // CCTs
+  var cctsList = document.getElementById('cctsList');
+  if (cctsList) {
+    if (!db.ccts || db.ccts.length === 0) {
+      cctsList.innerHTML = '<p style="text-align:center;color:#64748b;">Sin CCTs</p>';
+    } else {
+      var html = '';
+      for (var i = 0; i < db.ccts.length; i++) {
+        var c = db.ccts[i];
+        html += '<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">' +
+          '<div><strong>' + c.nombre + '</strong> <span style="background:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:0.75rem;">' + c.tipo + '</span><div style="font-size:0.85rem;color:#64748b;">' + c.fecha + '</div></div>' +
+          '<div style="display:flex;gap:0.5rem;">' +
+          '<a href="' + c.data + '" download="' + c.nombre + '.pdf" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></a>' +
+          '<button class="btn btn-sm btn-danger" onclick="deleteCCT(' + c.id + ')"><i class="fas fa-trash"></i></button>' +
+          '</div></div>';
+      }
+      cctsList.innerHTML = html;
+    }
+  }
+  
+  // Actas
+  var actasList = document.getElementById('actasList');
+  if (actasList) {
+    if (!db.actas || db.actas.length === 0) {
+      actasList.innerHTML = '<p style="text-align:center;color:#64748b;">Sin actas</p>';
+    } else {
+      var html = '';
+      for (var j = 0; j < db.actas.length; j++) {
+        var a = db.actas[j];
+        html += '<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;">' +
+          '<strong>' + a.titulo + '</strong><div style="font-size:0.85rem;color:#64748b;">' + a.fecha.split('T')[0] + '</div></div>';
+      }
+      actasList.innerHTML = html;
+    }
+  }
+}
+
+function deleteCCT(id) {
+  if (!confirm('¿Eliminar CCT?')) return;
+  
+  var newCcts = [];
+  for (var i = 0; i < db.ccts.length; i++) {
+    if (db.ccts[i].id !== id) newCcts.push(db.ccts[i]);
+  }
+  db.ccts = newCcts;
+  
+  saveData();
+  renderLegales();
+  updateStats();
+}
+
+// ==========================================
+// EMPRESAS
+// ==========================================
+function saveEmpresa(e) {
+  e.preventDefault();
+  
+  var tipo = document.getElementById('empTipo').value;
+  db.empresas[tipo].push({
+    id: Date.now(),
+    nombre: document.getElementById('empNombre').value,
+    direccion: document.getElementById('empDir').value,
+    telefono: document.getElementById('empTel').value,
+    cuit: document.getElementById('empCUIT').value
+  });
+  
+  saveData();
+  closeModal('modalEmpresa');
+  e.target.reset();
+  renderEmpresas();
+  updateStats();
+}
+
+function renderEmpresas() {
+  var tipos = ['prestadoras','productoras','salones','bares','discotecas','recitales','circos'];
+  
+  for (var t = 0; t < tipos.length; t++) {
+    var tipo = tipos[t];
+    var containerId = 'emp' + tipo.charAt(0).toUpperCase() + tipo.slice(1) + 'List';
+    var container = document.getElementById(containerId);
+    if (!container) continue;
+    
+    var arr = db.empresas[tipo];
+    if (!arr || arr.length === 0) {
+      container.innerHTML = '<p style="text-align:center;color:#64748b;">Sin registros</p>';
+      continue;
+    }
+    
+    var html = '';
+    for (var i = 0; i < arr.length; i++) {
+      var e = arr[i];
+      html += '<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;">' +
+        '<div><strong>' + e.nombre + '</strong><div style="font-size:0.85rem;color:#64748b;">' + (e.direccion || '') + ' | CUIT: ' + (e.cuit || '-') + '</div></div>' +
+        '<button class="btn btn-sm btn-danger" onclick="deleteEmpresa(\'' + tipo + '\',' + e.id + ')"><i class="fas fa-trash"></i></button>' +
+        '</div>';
+    }
+    container.innerHTML = html;
+  }
+}
+
+function deleteEmpresa(tipo, id) {
+  if (!confirm('¿Eliminar empresa?')) return;
+  
+  var newArr = [];
+  for (var i = 0; i < db.empresas[tipo].length; i++) {
+    if (db.empresas[tipo][i].id !== id) newArr.push(db.empresas[tipo][i]);
+  }
+  db.empresas[tipo] = newArr;
+  
+  saveData();
+  renderEmpresas();
+  updateStats();
+}
+
+// ==========================================
+// INSPECTORES
+// ==========================================
+function saveInspector(e) {
+  e.preventDefault();
+  
+  db.inspectores.push({
+    id: Date.now(),
+    nombre: document.getElementById('insNombre').value,
+    zona: document.getElementById('insZona').value,
+    hab: document.getElementById('insHab').value,
+    email: document.getElementById('insEmail').value,
+    activo: true
+  });
+  
+  saveData();
+  closeModal('modalInspector');
+  e.target.reset();
+  renderInspectores();
+  updateCredentialSelect();
+}
+
+function renderInspectores() {
+  var tbody = document.getElementById('inspectoresTable');
+  if (!tbody) return;
+  
+  if (!db.inspectores || db.inspectores.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;">Sin inspectores</td></tr>';
+    return;
+  }
+  
+  var html = '';
+  for (var i = 0; i < db.inspectores.length; i++) {
+    var ins = db.inspectores[i];
+    html += '<tr>' +
+      '<td>' + ins.nombre + '</td>' +
+      '<td>' + ins.zona + '</td>' +
+      '<td>' + ins.hab + '</td>' +
+      '<td><label class="switch"><input type="checkbox" ' + (ins.activo ? 'checked' : '') + ' onchange="toggleInspector(' + ins.id + ')"><span class="slider"></span></label></td>' +
+      '<td><button class="btn btn-sm btn-danger" onclick="deleteInspector(' + ins.id + ')"><i class="fas fa-trash"></i></button></td>' +
+      '</tr>';
+  }
+  tbody.innerHTML = html;
+}
+
+function toggleInspector(id) {
+  for (var i = 0; i < db.inspectores.length; i++) {
+    if (db.inspectores[i].id === id) {
+      db.inspectores[i].activo = !db.inspectores[i].activo;
+      break;
+    }
+  }
+  saveData();
+  renderInspectores();
+}
+
+function deleteInspector(id) {
+  if (!confirm('¿Eliminar inspector?')) return;
+  
+  var newIns = [];
+  for (var i = 0; i < db.inspectores.length; i++) {
+    if (db.inspectores[i].id !== id) newIns.push(db.inspectores[i]);
+  }
+  db.inspectores = newIns;
+  
+  saveData();
+  renderInspectores();
+  updateCredentialSelect();
+}
+
+// ==========================================
+// UTILIDADES
+// ==========================================
+function updateStats() {
+  var elAf = document.getElementById('statAfiliados');
+  var elEmp = document.getElementById('statEmpresas');
+  var elCCT = document.getElementById('statCCTs');
+  var elIns = document.getElementById('statInspectores');
+  
+  if (elAf) elAf.textContent = db.afiliados ? db.afiliados.length : 0;
+  
+  if (elEmp) {
+    var total = 0;
+    if (db.empresas) {
+      for (var key in db.empresas) {
+        if (db.empresas[key] && db.empresas[key].length) {
+          total += db.empresas[key].length;
+        }
+      }
+    }
+    elEmp.textContent = total;
+  }
+  
+  if (elCCT) elCCT.textContent = db.ccts ? db.ccts.length : 0;
+  if (elIns) elIns.textContent = db.inspectores ? db.inspectores.length : 0;
+}
+
+function renderAll() {
+  renderPadron();
+  renderCobranzas();
+  renderObras();
+  renderLegales();
+  renderEmpresas();
+  renderInspectores();
+  updateCredentialSelect();
+  loadFirstPersona();
+}
+
+function exportarTodoExcel() {
+  if (typeof XLSX === 'undefined') {
+    alert('Librería XLSX no cargada. Verificá la conexión.');
+    return;
+  }
+  
+  var wb = XLSX.utils.book_new();
+  
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.afiliados), "Afiliados");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.pagos), "Pagos");
+  
+  var cctsSimple = [];
+  if (db.ccts) {
+    for (var i = 0; i < db.ccts.length; i++) {
+      cctsSimple.push({
+        nombre: db.ccts[i].nombre,
+        tipo: db.ccts[i].tipo,
+        fecha: db.ccts[i].fecha
       });
     }
+  }
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(cctsSimple), "CCTs");
+  
+  XLSX.writeFile(wb, 'UADAV_Reporte_' + new Date().toISOString().split('T')[0] + '.xlsx');
+}
 
-    function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[85.6, 53.98*2]});
-      html2canvas(document.getElementById('credentialPrintArea'), {scale:2}).then(canvas => {
-        doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 85.6, 53.98*2);
-        doc.save(`UADAV_Credencial_${document.getElementById('credNombre').value||'Preview'}.pdf`);
-      });
+function confirmarLimpieza() {
+  if (!confirm('⚠️ ¿Restaurar desde backup? Se perderán cambios no guardados.')) return;
+  
+  var backup = localStorage.getItem(BACKUP_KEY);
+  if (backup) {
+    try {
+      db = JSON.parse(backup);
+      saveData();
+      renderAll();
+      alert('✅ Sistema restaurado desde backup');
+    } catch (e) {
+      alert('❌ Error al restaurar: ' + e.message);
     }
+  } else {
+    alert('⚠️ No hay backup disponible');
+  }
+}
 
-    // ==========================================
-    // COBRANZAS
-    // ==========================================
-    function savePago(e) {
-      e.preventDefault();
-      db.pagos.push({ id: Date.now(), afiliadoId: parseInt(document.getElementById('pagoAfiliadoId').value), monto: parseFloat(document.getElementById('pagoMonto').value), mes: document.getElementById('pagoMes').value, fecha: new Date().toISOString() });
-      saveData(); closeModal('modalPago'); e.target.reset(); renderCobranzas();
+function logout() {
+  try {
+    sessionStorage.removeItem('uadav_session');
+  } catch(e) {}
+  currentUser = null;
+  location.reload();
+}
+
+// ==========================================
+// INICIALIZACIÓN AL CARGAR
+// ==========================================
+function onDOMContentLoaded() {
+  // Inicializar sistema
+  initSystem();
+  
+  // Configurar login
+  setupLogin();
+  
+  // Verificar sesión activa
+  try {
+    var session = sessionStorage.getItem('uadav_session');
+    if (session) {
+      currentUser = JSON.parse(session);
+      var loginView = document.getElementById('loginView');
+      var mainView = document.getElementById('mainView');
+      if (loginView) loginView.style.display = 'none';
+      if (mainView) {
+        mainView.style.display = 'block';
+        updateStats();
+        renderAll();
+      }
+      return;
     }
+  } catch(e) {
+    console.warn('Error verificando sesión:', e);
+  }
+  
+  // Si no hay sesión, asegurar que login esté visible
+  var mainView = document.getElementById('mainView');
+  if (mainView) mainView.style.display = 'none';
+}
 
-    function renderCobranzas() {
-      const currentMes = new Date().toISOString().slice(0,7);
-      const pendientes = db.afiliados.filter(a => !db.pagos.some(p => p.afiliadoId===a.id && p.mes===currentMes));
-      document.getElementById('cuotasList').innerHTML = pendientes.map(a => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;">
-          <div><strong>${a.nombre}</strong> <span style="color:#64748b;font-size:0.8rem;">(${a.dni})</span><div style="font-size:0.85rem;color:#64748b;">Cuota: ${currentMes}</div></div>
-          <button class="btn btn-sm btn-success" onclick="document.getElementById('pagoAfiliadoId').value=${a.id}; openModal('modalPago')"><i class="fas fa-dollar-sign"></i> Pagar</button>
-        </div>`).join('') || '<p style="text-align:center;color:#10b981;">✅ Todos al día</p>';
-      document.getElementById('historialPagosList').innerHTML = db.pagos.slice().reverse().map(p => {
-        const af = db.afiliados.find(a => a.id===p.afiliadoId);
-        return `<div style="padding:0.5rem;border-bottom:1px solid #eee;">${af?.nombre||'?'} - $${p.monto} - ${p.mes}</div>`;
-      }).join('') || '<p style="text-align:center;color:#64748b;">Sin historial</p>';
+// Event listeners para compatibilidad máxima
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+} else {
+  // Ya cargado
+  onDOMContentLoaded();
+}
+
+// Cerrar modales al click fuera
+window.addEventListener('click', function(e) {
+  var modals = document.querySelectorAll('.modal');
+  for (var i = 0; i < modals.length; i++) {
+    if (e.target === modals[i]) {
+      modals[i].classList.remove('active');
     }
+  }
+});
 
-    // ==========================================
-    // OBRAS / MUTUALES
-    // ==========================================
-    function savePrestador(e) {
-      e.preventDefault();
-      const item = { id: Date.now(), nombre: document.getElementById('prNombre').value, tipo: 'prestador', direccion: document.getElementById('prDir').value, telefono: document.getElementById('prTel').value };
-      db.prestadores.push(item);
-      saveData(); closeModal('modalPrestador'); e.target.reset(); renderObras();
-    }
+// Manejo de errores globales
+window.addEventListener('error', function(e) {
+  console.error('Error global:', e.message, 'en línea', e.lineno);
+});
 
-    function renderObras() {
-      const renderList = (arr, containerId) => {
-        document.getElementById(containerId).innerHTML = arr.map(p => `
-          <div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
-            <div><strong>${p.nombre}</strong><div style="font-size:0.85rem;color:#64748b;">${p.direccion||''} | ${p.telefono||''}</div></div>
-            <button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.prestadores = db.prestadores.filter(x=>x.id!==${p.id}); saveData(); renderObras(); })"><i class="fas fa-trash"></i></button>
-          </div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin registros</p>';
-      };
-      renderList(db.prestadores, 'prestadoresList');
-      document.getElementById('mutualesList').innerHTML = '<p style="text-align:center;color:#64748b;">Módulo de mutuales listo</p>';
-      document.getElementById('vinculadosTable').innerHTML = db.afiliados.map(a => `<tr><td>${a.nombre}</td><td><span style="color:#64748b;">Sin asignar</span></td><td>-</td><td><button class="btn btn-sm btn-primary">Asignar</button></td></tr>`).join('');
-    }
+window.addEventListener('unhandledrejection', function(e) {
+  console.error('Promise rechazada:', e.reason);
+});
 
-    // ==========================================
-    // LEGALES / CCTs
-    // ==========================================
-    function saveCCT(e) {
-      e.preventDefault();
-      const file = document.getElementById('cctFile').files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        db.ccts.push({ id: Date.now(), nombre: document.getElementById('cctNombre').value, tipo: document.getElementById('cctTipo').value, fecha: document.getElementById('cctFecha').value,  ev.target.result });
-        saveData(); closeModal('modalCCT'); e.target.reset(); renderLegales(); updateStats();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function saveActa(e) {
-      e.preventDefault();
-      db.actas.push({ id: Date.now(), titulo: document.getElementById('actaTitulo').value, contenido: document.getElementById('actaContenido').value, fecha: new Date().toISOString() });
-      saveData(); closeModal('modalActa'); e.target.reset(); renderLegales();
-    }
-
-    function renderLegales() {
-      document.getElementById('cctsList').innerHTML = db.ccts.map(c => `
-        <div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">
-          <div><strong>${c.nombre}</strong> <span style="background:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:0.75rem;">${c.tipo}</span><div style="font-size:0.85rem;color:#64748b;">${c.fecha}</div></div>
-          <div style="display:flex;gap:0.5rem;"><a href="${c.data}" download="${c.nombre}.pdf" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></a><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.ccts = db.ccts.filter(x=>x.id!==${c.id}); saveData(); renderLegales(); })"><i class="fas fa-trash"></i></button></div>
-        </div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin CCTs</p>';
-      document.getElementById('actasList').innerHTML = db.actas.map(a => `<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;"><strong>${a.titulo}</strong><div style="font-size:0.85rem;color:#64748b;">${a.fecha.split('T')[0]}</div></div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin actas</p>';
-    }
-
-    // ==========================================
-    // EMPRESAS
-    // ==========================================
-    function saveEmpresa(e) {
-      e.preventDefault();
-      const tipo = document.getElementById('empTipo').value;
-      db.empresas[tipo].push({ id: Date.now(), nombre: document.getElementById('empNombre').value, direccion: document.getElementById('empDir').value, telefono: document.getElementById('empTel').value, cuit: document.getElementById('empCUIT').value });
-      saveData(); closeModal('modalEmpresa'); e.target.reset(); renderEmpresas(); updateStats();
-    }
-
-    function renderEmpresas() {
-      ['prestadoras','productoras','salones','bares','discotecas','recitales','circos'].forEach(tipo => {
-        const container = document.getElementById(`emp${tipo.charAt(0).toUpperCase()+tipo.slice(1)}List`);
-        if(container) container.innerHTML = db.empresas[tipo].map(e => `<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;"><div><strong>${e.nombre}</strong><div style="font-size:0.85rem;color:#64748b;">${e.direccion||''} | CUIT: ${e.cuit||'-'}</div></div><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.empresas['${tipo}'] = db.empresas['${tipo}'].filter(x=>x.id!==${e.id}); saveData(); renderEmpresas(); })"><i class="fas fa-trash"></i></button></div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin registros</p>';
-      });
-    }
-
-    // ==========================================
-    // INSPECTORES
-    // ==========================================
-    function saveInspector(e) {
-      e.preventDefault();
-      db.inspectores.push({ id: Date.now(), nombre: document.getElementById('insNombre').value, zona: document.getElementById('insZona').value, hab: document.getElementById('insHab').value, email: document.getElementById('insEmail').value, activo: true });
-      saveData(); closeModal('modalInspector'); e.target.reset(); renderInspectores(); updateCredentialSelect();
-    }
-
-    function renderInspectores() {
-      document.getElementById('inspectoresTable').innerHTML = db.inspectores.map(i => `
-        <tr><td>${i.nombre}</td><td>${i.zona}</td><td>${i.hab}</td>
-        <td><label class="switch"><input type="checkbox" ${i.activo?'checked':''} onchange="toggleInspector(${i.id})"><span class="slider"></span></label></td>
-        <td><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.inspectores = db.inspectores.filter(x=>x.id!==${i.id}); saveData(); renderInspectores(); updateCredentialSelect(); })"><i class="fas fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;">Sin inspectores</td></tr>';
-    }
-
-    function toggleInspector(id) { const ins = db.inspectores.find(i=>i.id===id); if(ins) { ins.activo = !ins.activo; saveData(); renderInspectores(); } }
-
-    // ==========================================
-    // UTILS
-    // ==========================================
-    function updateStats() {
-      document.getElementById('statAfiliados').textContent = db.afiliados?.length || 0;
-      let totalEmp = 0; Object.values(db.empresas||{}).forEach(arr => totalEmp += arr.length);
-      document.getElementById('statEmpresas').textContent = totalEmp;
-      document.getElementById('statCCTs').textContent = db.ccts?.length || 0;
-      document.getElementById('statInspectores').textContent = db.inspectores?.length || 0;
-    }
-
-    function renderAll() {
-      renderPadron(); renderCobranzas(); renderObras(); renderLegales(); renderEmpresas(); renderInspectores();
-      updateCredentialSelect();
-    }
-
-    function exportarTodoExcel() {
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.afiliados), "Afiliados");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.pagos), "Pagos");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.ccts.map(c=>({nombre:c.nombre,tipo:c.tipo,fecha:c.fecha}))), "CCTs");
-      XLSX.writeFile(wb, `UADAV_Reporte_${new Date().toISOString().split('T')[0]}.xlsx`);
-    }
-
-    window.onclick = e => { if(e.target.classList.contains('modal')) e.target.classList.remove('active'); };
-    window.addEventListener('load', () => { initSystem(); const session = sessionStorage.getItem('uadav_session'); if(session) { currentUser = JSON.parse(session); document.getElementById('mainView').style.display = 'block'; updateStats(); renderAll(); } else { document.getElementById('mainView').style.display = 'none'; } });
-    window.addEventListener('error', e => console.error('Global error:', e.message));
+console.log('✅ UADAV Enterprise JS cargado - GitHub Pages compatible');
   </script>
 </body>
 </html>
