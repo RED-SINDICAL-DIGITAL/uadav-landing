@@ -8,107 +8,109 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
-    :root {
-      --primary: #003366; --secondary: #0056b3; --accent: #e63946;
-      --bg: #f4f6f9; --card: #ffffff; --text: #1e293b; --border: #e2e8f0;
-      --shadow: 0 4px 12px rgba(0,0,0,0.08); --radius: 10px;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); line-height: 1.5; }
+    :root { --primary: #003366; --secondary: #0056b3; --accent: #e63946; --bg: #f4f6f9; --card: #ffffff; --text: #1e293b; --border: #e2e8f0; --shadow: 0 4px 12px rgba(0,0,0,0.08); --radius: 10px; }
+    [data-theme="dark"] { --bg:#0f172a; --card:#1e293b; --text:#e2e8f0; --border:#334152; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+    html { scroll-behavior:smooth; }
+    body { background:var(--bg); color:var(--text); line-height:1.5; transition:0.3s; }
 
-    /* NAV STICKY */
-    .header { background: var(--primary); color: #fff; padding: 0.75rem 1.5rem; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); }
-    .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
-    .logo { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .nav { display: flex; gap: 0.25rem; overflow-x: auto; padding-bottom: 0.25rem; scrollbar-width: none; }
-    .nav::-webkit-scrollbar { display: none; }
-    .nav a { color: #fff; text-decoration: none; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; white-space: nowrap; transition: 0.2s; }
-    .nav a:hover, .nav a.active { background: rgba(255,255,255,0.15); }
-    .nav a.btn-logout { background: var(--accent); }
+    .header { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; padding:0.75rem 1.5rem; position:sticky; top:0; z-index:1000; box-shadow:var(--shadow); }
+    .header-content { max-width:1400px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; }
+    .logo { font-size:1.25rem; font-weight:700; display:flex; align-items:center; gap:0.5rem; }
+    .nav { display:flex; gap:0.25rem; overflow-x:auto; padding-bottom:0.25rem; }
+    .nav::-webkit-scrollbar { display:none; }
+    .nav a { color:#fff; text-decoration:none; padding:0.5rem 0.75rem; border-radius:6px; font-size:0.85rem; font-weight:500; white-space:nowrap; transition:0.2s; cursor:pointer; }
+    .nav a:hover, .nav a.active { background:rgba(255,255,255,0.15); }
+    .nav a.btn-logout { background:var(--accent); }
 
-    /* LAYOUT */
-    .container { max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; }
-    section { scroll-margin-top: 80px; margin-bottom: 3rem; }
-    .card { background: var(--card); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 1.5rem; }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--border); flex-wrap: wrap; gap: 0.5rem; }
-    .card-title { font-size: 1.25rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
+    .container { max-width:1400px; margin:2rem auto; padding:0 1.5rem; }
+    section { scroll-margin-top:80px; margin-bottom:3rem; }
+    .card { background:var(--card); border-radius:var(--radius); padding:1.5rem; box-shadow:var(--shadow); border:1px solid var(--border); margin-bottom:1.5rem; }
+    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:2px solid var(--border); flex-wrap:wrap; gap:0.5rem; }
+    .card-title { font-size:1.25rem; font-weight:700; color:var(--primary); display:flex; align-items:center; gap:0.5rem; }
 
-    /* UI ELEMENTS */
-    .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.9rem; }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-    .btn-primary { background: var(--secondary); color: #fff; }
-    .btn-success { background: #10b981; color: #fff; }
-    .btn-warning { background: #f59e0b; color: #000; }
-    .btn-danger { background: var(--accent); color: #fff; }
-    .btn-info { background: #3b82f6; color: #fff; }
-    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+    .btn { padding:0.6rem 1.2rem; border:none; border-radius:8px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.9rem; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,0.15); }
+    .btn-primary { background:var(--secondary); color:#fff; }
+    .btn-success { background:#10b981; color:#fff; }
+    .btn-warning { background:#f59e0b; color:#000; }
+    .btn-danger { background:var(--accent); color:#fff; }
+    .btn-info { background:#3b82f6; color:#fff; }
+    .btn-sm { padding:0.4rem 0.8rem; font-size:0.8rem; }
 
-    input, select, textarea { width: 100%; padding: 0.7rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); margin-bottom: 0.75rem; }
-    input:focus, select:focus { outline: 2px solid var(--secondary); border-color: transparent; }
+    input, select, textarea { width:100%; padding:0.7rem; border:1px solid var(--border); border-radius:8px; background:#fff; color:var(--text); margin-bottom:0.75rem; }
+    input:focus, select:focus { outline:2px solid var(--secondary); border-color:transparent; }
 
-    /* TABLES */
-    .table-responsive { overflow-x: auto; border-radius: 8px; }
-    table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th, td { padding: 0.85rem; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: var(--primary); color: #fff; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
-    tr:hover { background: #f8fafc; }
+    .table-responsive { overflow-x:auto; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; min-width:600px; }
+    th, td { padding:0.85rem; text-align:left; border-bottom:1px solid var(--border); }
+    th { background:var(--primary); color:#fff; font-weight:600; font-size:0.8rem; text-transform:uppercase; }
+    tr:hover { background:#f8fafc; }
 
-    /* TABS */
-    .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border); margin-bottom: 1rem; overflow-x: auto; }
-    .tab { padding: 0.6rem 1rem; background: none; border: none; cursor: pointer; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; white-space: nowrap; }
-    .tab.active { color: var(--secondary); border-bottom-color: var(--secondary); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.3s; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .tabs { display:flex; gap:0.5rem; border-bottom:2px solid var(--border); margin-bottom:1rem; overflow-x:auto; }
+    .tab { padding:0.6rem 1rem; background:none; border:none; cursor:pointer; font-weight:600; color:#64748b; border-bottom:3px solid transparent; white-space:nowrap; }
+    .tab.active { color:var(--secondary); border-bottom-color:var(--secondary); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; animation:fadeIn 0.3s; }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
 
-    /* TOGGLE SWITCH */
-    .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; transition: .3s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50%; }
-    input:checked + .slider { background: var(--secondary); }
-    input:checked + .slider:before { transform: translateX(22px); }
+    .switch { position:relative; display:inline-block; width:44px; height:22px; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#cbd5e1; transition:.3s; border-radius:34px; }
+    .slider:before { position:absolute; content:""; height:16px; width:16px; left:3px; bottom:3px; background:white; transition:.3s; border-radius:50%; }
+    input:checked+.slider { background:var(--secondary); }
+    input:checked+.slider:before { transform:translateX(22px); }
 
-    /* MODAL */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-    .modal.active { display: flex; }
-    .modal-content { background: var(--card); padding: 2rem; border-radius: var(--radius); width: 92%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; backdrop-filter:blur(4px); }
+    .modal.active { display:flex; }
+    .modal-content { background:var(--card); padding:2rem; border-radius:var(--radius); width:92%; max-width:600px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.2); }
+    .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+    .modal-close { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b; }
 
-    /* LOGIN */
-    .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary), #001a33); }
-    .login-box { background: var(--card); padding: 2.5rem; border-radius: var(--radius); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+    .login-container { display:flex; justify-content:center; align-items:center; min-height:100vh; background:linear-gradient(135deg,var(--primary),#001a33); }
+    .login-box { background:var(--card); padding:2.5rem; border-radius:var(--radius); width:100%; max-width:400px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); }
 
-    /* CARNET PRINT STYLES */
-    .carnet-preview { max-width: 400px; margin: 1rem auto; border: 2px solid #000; background: #fff; page-break-inside: avoid; }
-    .carnet-front { padding: 10px; display: flex; flex-direction: column; }
-    .carnet-header-strip { background: var(--primary); color: #fff; padding: 4px 8px; font-size: 8pt; display: flex; justify-content: space-between; align-items: center; }
-    .carnet-title-strip { background: #e2e8f0; color: #000; text-align: center; padding: 3px; font-weight: bold; font-size: 9pt; border-bottom: 1px solid #000; }
-    .carnet-body-flex { display: flex; gap: 10px; padding: 10px; }
-    .carnet-photo-box { width: 100px; height: 120px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden; }
-    .carnet-photo-box img { width: 100%; height: 100%; object-fit: cover; }
-    .carnet-info-box { flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
-    .carnet-label { font-weight: 600; font-size: 7pt; color: #475569; }
-    .carnet-value { font-weight: 800; font-size: 10pt; color: #0f172a; text-transform: uppercase; }
-    .carnet-footer-info { background: #f1f5f9; border-top: 1px solid #000; font-size: 7pt; padding: 4px; text-align: center; color: #334155; }
-    
+    /* CREDENTIAL CARD STYLES - Basado en tu PDF */
+    .credential-preview-area { display:flex; gap:2rem; flex-wrap:wrap; justify-content:center; }
+    .credential-card { width:360px; background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; position:relative; border:1px solid #e2e8f0; }
+    .credential-card-back { border-top:4px solid var(--primary); }
+    .cred-header { background:var(--primary); color:#fff; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; }
+    .cred-title-bar { background:#f1f5f9; text-align:center; padding:8px; font-weight:700; font-size:0.9rem; color:#334155; border-bottom:2px solid #cbd5e1; }
+    .cred-body { display:flex; padding:16px; gap:16px; }
+    .cred-photo-area { width:100px; height:120px; border:2px solid #cbd5e1; border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#f8fafc; flex-shrink:0; }
+    .cred-photo-area img { width:100%; height:100%; object-fit:cover; }
+    .cred-info-area { flex:1; display:flex; flex-direction:column; gap:6px; }
+    .cred-field { display:flex; flex-direction:column; }
+    .cred-label { font-size:0.7rem; font-weight:600; color:#64748b; text-transform:uppercase; }
+    .cred-value { font-size:0.95rem; font-weight:700; color:#0f172a; }
+    .cred-footer { background:#f8fafc; border-top:2px solid #cbd5e1; padding:10px 16px; text-align:center; font-size:0.75rem; color:#475569; }
+    .cred-back-body { padding:20px; text-align:center; }
+    .cred-back-qr { width:120px; height:120px; margin:0 auto 10px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .cred-back-qr img { width:100%; height:100%; }
+    .cred-back-info { font-size:0.8rem; color:#475569; line-height:1.4; }
+    .cred-barcode { height:30px; background:repeating-linear-gradient(90deg,#1e293b 0px,#1e293b 2px,#fff 2px,#fff 4px); width:80%; margin:10px auto 0; border-radius:4px; }
+
+    .generator-controls { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .gen-section { background:#f8fafc; border-radius:8px; padding:1rem; border:1px solid var(--border); }
+    .gen-section h3 { margin-bottom:0.75rem; color:var(--primary); font-size:1rem; display:flex; align-items:center; gap:0.5rem; }
+    .gen-option { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; font-size:0.9rem; }
+    .gen-option input[type="checkbox"] { width:auto; margin:0; }
+    .gen-option label { margin:0; cursor:pointer; }
+
+    .security-badge { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 0.5rem; margin-bottom: 1rem; font-size: 0.85rem; color: #92400e; display: flex; align-items: center; gap: 0.5rem; }
+    .confirm-dialog { background: #fee2e2; border: 2px solid #dc2626; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    .confirm-dialog h4 { color: #dc2626; margin-bottom: 0.5rem; }
+
     @media print {
-      body * { visibility: hidden; }
-      .carnet-print-zone, .carnet-print-zone * { visibility: visible; }
-      .carnet-print-zone { position: absolute; left: 0; top: 0; width: 100%; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #fff; }
-      .carnet-preview { border: 2px solid #000; box-shadow: none; margin: 0; }
+      body * { visibility:hidden; }
+      .credential-print-area, .credential-print-area * { visibility:visible; }
+      .credential-print-area { position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center; gap:20px; }
+      .credential-card { box-shadow:none; border:2px solid #000; }
     }
-
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .header-content { flex-direction: column; align-items: stretch; }
-      .nav { flex-wrap: nowrap; }
-      .card-header { flex-direction: column; align-items: flex-start; }
-    }
-    .hidden { display: none !important; }
+    @media (max-width:768px) { .generator-controls { grid-template-columns:1fr; } }
+    .hidden { display:none !important; }
   </style>
 </head>
 <body>
@@ -116,31 +118,32 @@
   <!-- LOGIN -->
   <div id="loginView" class="login-container">
     <div class="login-box">
-      <h1 style="color:var(--primary); margin-bottom:0.5rem;"><i class="fas fa-star"></i> UADAV v2026</h1>
-      <p style="color:#64748b; margin-bottom:2rem;">Sistema Integral de Gestión Sindical</p>
-      <form onsubmit="handleLogin(event)">
-        <input type="text" id="loginUser" placeholder="Usuario" required>
-        <input type="password" id="loginPass" placeholder="Contraseña" required>
+      <h1 style="color:var(--primary);margin-bottom:0.5rem;"><i class="fas fa-shield-alt"></i> UADAV Enterprise</h1>
+      <p style="color:#64748b;margin-bottom:2rem;">Sistema de Gestión Sindical + Credenciales</p>
+      <div id="errorMsg" style="background:#fee2e2;color:#dc2626;padding:0.75rem;border-radius:8px;margin-bottom:1rem;display:none;"></div>
+      <form id="loginForm">
+        <input type="text" id="loginUser" placeholder="Usuario" required autocomplete="off">
+        <input type="password" id="loginPass" placeholder="Contraseña" required autocomplete="off">
         <button type="submit" class="btn btn-primary" style="width:100%;">Ingresar</button>
       </form>
-      <p style="margin-top:1rem; font-size:0.8rem; color:#64748b;">admin / 1234</p>
+      <p style="margin-top:1rem;font-size:0.8rem;color:#64748b;">admin / 1234</p>
     </div>
   </div>
 
   <!-- MAIN APP -->
-  <div id="mainView" class="hidden">
+  <div id="mainView" style="display:none;">
     <header class="header">
       <div class="header-content">
         <div class="logo"><i class="fas fa-star"></i> UADAV Enterprise</div>
         <nav class="nav">
-          <a href="#inicio" class="active"><i class="fas fa-home"></i> Inicio</a>
-          <a href="#padron"><i class="fas fa-users"></i> Padrón</a>
-          <a href="#cobranzas"><i class="fas fa-money-bill"></i> Cobranzas</a>
-          <a href="#obras-mutuales"><i class="fas fa-hospital"></i> Obras/Mutuales</a>
-          <a href="#sindicatos-legales"><i class="fas fa-gavel"></i> Sindicatos/Legales</a>
-          <a href="#empresas"><i class="fas fa-building"></i> Empresas</a>
-          <a href="#carnets"><i class="fas fa-id-card"></i> Carnets</a>
-          <a href="#inspectores"><i class="fas fa-user-shield"></i> Inspectores</a>
+          <a href="#inicio" class="active" onclick="showSection('inicio')"><i class="fas fa-home"></i> Inicio</a>
+          <a href="#padron" onclick="showSection('padron')"><i class="fas fa-users"></i> Padrón</a>
+          <a href="#credenciales" onclick="showSection('credenciales')"><i class="fas fa-id-card"></i> Credenciales</a>
+          <a href="#cobranzas" onclick="showSection('cobranzas')"><i class="fas fa-money-bill"></i> Cobranzas</a>
+          <a href="#obras-mutuales" onclick="showSection('obras-mutuales')"><i class="fas fa-hospital"></i> Obras/Mutuales</a>
+          <a href="#sindicatos-legales" onclick="showSection('sindicatos-legales')"><i class="fas fa-gavel"></i> Legales</a>
+          <a href="#empresas" onclick="showSection('empresas')"><i class="fas fa-building"></i> Empresas</a>
+          <a href="#inspectores" onclick="showSection('inspectores')"><i class="fas fa-user-shield"></i> Inspectores</a>
           <a href="#" onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Salir</a>
         </nav>
       </div>
@@ -150,104 +153,203 @@
       
       <!-- INICIO -->
       <section id="inicio">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem;">
-          <div class="card stat-card" style="border-left:5px solid var(--secondary);"><h3>Afiliados</h3><p style="font-size:2rem; font-weight:bold;" id="statAfiliados">0</p></div>
-          <div class="card stat-card" style="border-left:5px solid #10b981;"><h3>Empresas</h3><p style="font-size:2rem; font-weight:bold;" id="statEmpresas">0</p></div>
-          <div class="card stat-card" style="border-left:5px solid var(--accent);"><h3>CCTs</h3><p style="font-size:2rem; font-weight:bold;" id="statCCTs">0</p></div>
-          <div class="card stat-card" style="border-left:5px solid #f59e0b;"><h3>Carnets</h3><p style="font-size:2rem; font-weight:bold;" id="statCarnets">0</p></div>
+        <div class="security-badge">
+          <i class="fas fa-shield-alt"></i> Modo seguro activo | Última sincronización: <span id="lastSync">-</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;">
+          <div class="card stat-card" style="border-left:5px solid var(--secondary);"><h3>Afiliados</h3><p style="font-size:2rem;font-weight:bold;" id="statAfiliados">0</p></div>
+          <div class="card stat-card" style="border-left:5px solid #10b981;"><h3>Empresas</h3><p style="font-size:2rem;font-weight:bold;" id="statEmpresas">0</p></div>
+          <div class="card stat-card" style="border-left:5px solid var(--accent);"><h3>CCTs</h3><p style="font-size:2rem;font-weight:bold;" id="statCCTs">0</p></div>
+          <div class="card stat-card" style="border-left:5px solid #f59e0b;"><h3>Inspectores</h3><p style="font-size:2rem;font-weight:bold;" id="statInspectores">0</p></div>
         </div>
         <div class="card">
           <div class="card-header"><h2 class="card-title"><i class="fas fa-bolt"></i> Accesos Rápidos</h2></div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;">
             <button class="btn btn-success" onclick="openModal('modalAfiliado')"><i class="fas fa-user-plus"></i> Nuevo Afiliado</button>
             <button class="btn btn-primary" onclick="openModal('modalCCT')"><i class="fas fa-file-pdf"></i> Subir CCT</button>
-            <button class="btn btn-info" onclick="document.getElementById('carnets').scrollIntoView({behavior:'smooth'})"><i class="fas fa-id-card"></i> Generar Carnet</button>
+            <button class="btn btn-info" onclick="showSection('credenciales')"><i class="fas fa-id-card"></i> Generar Credencial</button>
             <button class="btn btn-warning" onclick="exportarTodoExcel()"><i class="fas fa-file-excel"></i> Exportar Todo</button>
+            <button class="btn btn-danger" onclick="confirmarLimpieza()"><i class="fas fa-trash-alt"></i> Limpieza Segura</button>
           </div>
         </div>
       </section>
 
       <!-- PADRÓN -->
-      <section id="padron">
+      <section id="padron" style="display:none;">
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-users"></i> Padrón de Afiliados</h2>
-            <button class="btn btn-success" onclick="openModal('modalAfiliado')"><i class="fas fa-plus"></i> Nuevo</button>
-          </div>
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-users"></i> Padrón de Afiliados</h2><button class="btn btn-success" onclick="openModal('modalAfiliado')"><i class="fas fa-plus"></i> Nuevo</button></div>
           <input type="text" id="searchPadron" placeholder="🔍 Buscar por nombre, DNI o ID..." onkeyup="renderPadron()">
           <div class="table-responsive"><table><thead><tr><th>Foto</th><th>ID</th><th>Nombre</th><th>DNI</th><th>Categoría</th><th>Acciones</th></tr></thead><tbody id="padronTable"></tbody></table></div>
         </div>
       </section>
 
-      <!-- COBRANZAS -->
-      <section id="cobranzas">
+      <!-- CREDENCIALES -->
+      <section id="credenciales" style="display:none;">
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-money-bill"></i> Cobranzas y Cuotas</h2>
-            <button class="btn btn-success" onclick="openModal('modalPago')"><i class="fas fa-plus"></i> Registrar Pago</button>
+            <h2 class="card-title"><i class="fas fa-id-card"></i> Generador de Credenciales UADAV</h2>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn btn-info" onclick="downloadPNG()"><i class="fas fa-image"></i> PNG</button>
+              <button class="btn btn-primary" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+              <button class="btn btn-success" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+            </div>
           </div>
+          
+          <div class="generator-controls">
+            <div>
+              <div class="gen-section" style="margin-bottom:1rem;">
+                <h3>🎨 Plantilla</h3>
+                <select id="templateType" onchange="updateCredential()">
+                  <option value="afiliado" selected>🪪 Afiliado</option>
+                  <option value="inspector">🛡️ Inspector</option>
+                  <option value="empleado">💼 Empleado</option>
+                </select>
+              </div>
+
+              <div class="gen-section" style="margin-bottom:1rem;">
+                <h3>📋 Datos del Titular</h3>
+                <div style="margin-bottom:0.75rem;">
+                  <label style="font-size:0.85rem;font-weight:600;">Seleccionar persona:</label>
+                  <select id="credSelectPersona" onchange="loadPersonaData()" style="margin-top:0.25rem;">
+                    <option value="">-- Seleccionar Afiliado o Inspector --</option>
+                    <optgroup label="👥 Afiliados" id="optAfiliados"></optgroup>
+                    <optgroup label="🛡️ Inspectores" id="optInspectores"></optgroup>
+                  </select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                  <input type="text" id="credNombre" placeholder="Nombre completo" oninput="updateCredential()">
+                  <input type="text" id="credDNI" placeholder="DNI" oninput="updateCredential()">
+                  <input type="text" id="credRol" placeholder="Rol / Cargo" oninput="updateCredential()">
+                  <input type="text" id="credDepto" placeholder="Departamento" oninput="updateCredential()">
+                  <input type="text" id="credAfiliadoNum" placeholder="N° (Auto)" readonly>
+                  <input type="date" id="credFechaAfiliacion" oninput="updateCredential()">
+                  <input type="date" id="credVencimiento" oninput="updateCredential()">
+                  <input type="tel" id="credWhatsApp" placeholder="WhatsApp" oninput="updateCredential()">
+                  <input type="email" id="credEmail" placeholder="Email" oninput="updateCredential()">
+                  <input type="text" id="credWeb" placeholder="Sitio web" oninput="updateCredential()">
+                </div>
+                <label style="margin-top:0.5rem;display:block;font-size:0.9rem;">📷 Foto</label>
+                <input type="file" id="credFoto" accept="image/*" onchange="loadPhoto(this)">
+              </div>
+
+              <div class="gen-section" style="margin-bottom:1rem;">
+                <h3>🔲 QR y Código de Barras</h3>
+                <input type="text" id="credQRContent" placeholder="Contenido QR" oninput="updateCredential()">
+                <input type="text" id="credBarcodeContent" placeholder="Contenido Barras" oninput="updateCredential()">
+              </div>
+
+              <div class="gen-section" style="margin-bottom:1rem;">
+                <h3>🎨 Color Principal</h3>
+                <input type="color" id="credColorPrincipal" value="#003366" onchange="updateCredential()" style="height:40px;">
+              </div>
+
+              <div class="gen-section">
+                <h3>👁️ Visibilidad</h3>
+                <div class="gen-option"><input type="checkbox" id="showFoto" checked onchange="updateCredential()"><label for="showFoto">Foto</label></div>
+                <div class="gen-option"><input type="checkbox" id="showQR" checked onchange="updateCredential()"><label for="showQR">QR</label></div>
+                <div class="gen-option"><input type="checkbox" id="showRol" checked onchange="updateCredential()"><label for="showRol">Rol</label></div>
+                <div class="gen-option"><input type="checkbox" id="showDNI" checked onchange="updateCredential()"><label for="showDNI">DNI</label></div>
+                <div class="gen-option"><input type="checkbox" id="showWhatsApp" checked onchange="updateCredential()"><label for="showWhatsApp">WhatsApp</label></div>
+                <div class="gen-option"><input type="checkbox" id="showBarcode" checked onchange="updateCredential()"><label for="showBarcode">Código Barras</label></div>
+              </div>
+            </div>
+
+            <div>
+              <h3 style="margin-bottom:1rem;color:var(--primary);">👁️ Vista Previa:</h3>
+              <div class="credential-print-area" id="credentialPrintArea">
+                <div class="credential-card" id="credFront">
+                  <div class="cred-header">
+                    <span>UNIÓN ARGENTINA DE ARTISTAS DE VARIEDADES</span>
+                    <span style="font-weight:800;font-size:1.1rem;">UADAV ★</span>
+                  </div>
+                  <div class="cred-title-bar">CARNET DE AFILIACIÓN</div>
+                  <div class="cred-body">
+                    <div class="cred-photo-area" id="credPhotoArea"><i class="fas fa-user" style="font-size:2.5rem;color:#94a3b8;"></i></div>
+                    <div class="cred-info-area">
+                      <div class="cred-field"><span class="cred-label">Nombre y Apellido:</span><span class="cred-value" id="prevNombre">-</span></div>
+                      <div class="cred-field"><span class="cred-label">DNI:</span><span class="cred-value" id="prevDNI">-</span></div>
+                      <div class="cred-field" id="fieldRol"><span class="cred-label">Rol / Cargo:</span><span class="cred-value" id="prevRol">-</span></div>
+                      <div class="cred-field" id="fieldDepto"><span class="cred-label">Departamento:</span><span class="cred-value" id="prevDepto">-</span></div>
+                      <div class="cred-field"><span class="cred-label">Afiliado N°:</span><span class="cred-value" id="prevAfiliadoNum">-</span></div>
+                      <div class="cred-field"><span class="cred-label">Fecha de Afiliación:</span><span class="cred-value" id="prevFechaAfiliacion">-</span></div>
+                    </div>
+                  </div>
+                  <div class="cred-footer">
+                    <span>UADAV★</span> Unión Argentina de Artistas de Variedades | Personería Gremial N° 210 | uadavofi@gmail.com | 11-5375-7711
+                    <span id="prevWebFooter" class="hidden"> | www.uadav.org.ar</span>
+                  </div>
+                </div>
+                <div class="credential-card credential-card-back" id="credBack">
+                  <div class="cred-header">
+                    <span>UNIÓN ARGENTINA DE ARTISTAS DE VARIEDADES</span>
+                    <span style="font-weight:800;font-size:1.1rem;">UADAV ★</span>
+                  </div>
+                  <div class="cred-back-body">
+                    <div class="cred-back-qr" id="prevQRContainer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=UADAV-CREDENCIAL" alt="QR"></div>
+                    <div class="cred-back-info" id="prevBackInfo">
+                      <p>Escaneá para verificar validez</p>
+                      <p>uadavofi@gmail.com</p>
+                      <p>Personería Gremial N° 210</p>
+                      <p>11-5375-7711</p>
+                    </div>
+                    <div class="cred-barcode" id="prevBarcode"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COBRANZAS -->
+      <section id="cobranzas" style="display:none;">
+        <div class="card">
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-money-bill"></i> Cobranzas</h2><button class="btn btn-success" onclick="openModal('modalPago')"><i class="fas fa-plus"></i> Registrar Pago</button></div>
           <div class="tabs">
-            <button class="tab active" onclick="showTab('cobranzas','cuotas')">Cuotas Pendientes</button>
-            <button class="tab" onclick="showTab('cobranzas','historial')">Historial de Pagos</button>
+            <button class="tab active" onclick="showTab('cobranzas','cuotas')">Cuotas</button>
+            <button class="tab" onclick="showTab('cobranzas','historial')">Historial</button>
           </div>
           <div id="cobranzas-cuotas" class="tab-content active"><div id="cuotasList"></div></div>
           <div id="cobranzas-historial" class="tab-content"><div id="historialPagosList"></div></div>
         </div>
       </section>
 
-      <!-- OBRAS SOCIALES Y MUTUALES -->
-      <section id="obras-mutuales">
+      <!-- OBRAS / MUTUALES -->
+      <section id="obras-mutuales" style="display:none;">
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-hospital"></i> Obras Sociales y Mutuales</h2>
-            <button class="btn btn-success" onclick="openModal('modalPrestador')"><i class="fas fa-plus"></i> Nuevo Prestador/Mutual</button>
-          </div>
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-hospital"></i> Obras Sociales y Mutuales</h2><button class="btn btn-success" onclick="openModal('modalPrestador')"><i class="fas fa-plus"></i> Nuevo</button></div>
           <div class="tabs">
-            <button class="tab active" onclick="showTab('obras','prestadores')">Prestadores Médicos</button>
+            <button class="tab active" onclick="showTab('obras','prestadores')">Prestadores</button>
             <button class="tab" onclick="showTab('obras','mutuales')">Mutuales</button>
-            <button class="tab" onclick="showTab('obras','vinculados')">Afiliados Vinculados</button>
+            <button class="tab" onclick="showTab('obras','vinculados')">Vinculados</button>
           </div>
           <div id="obras-prestadores" class="tab-content active"><div id="prestadoresList"></div></div>
           <div id="obras-mutuales" class="tab-content"><div id="mutualesList"></div></div>
-          <div id="obras-vinculados" class="tab-content">
-            <p style="color:#64748b; margin-bottom:1rem;">Gestione qué obra social/mutual tiene cada afiliado.</p>
-            <div class="table-responsive"><table><thead><tr><th>Afiliado</th><th>Obra Social / Mutual</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="vinculadosTable"></tbody></table></div>
-          </div>
+          <div id="obras-vinculados" class="tab-content"><div class="table-responsive"><table><thead><tr><th>Afiliado</th><th>Obra Social</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="vinculadosTable"></tbody></table></div></div>
         </div>
       </section>
 
-      <!-- SINDICATOS Y LEGALES -->
-      <section id="sindicatos-legales">
+      <!-- LEGALES / CCTs -->
+      <section id="sindicatos-legales" style="display:none;">
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-gavel"></i> Sindicatos, Legales y CCTs</h2>
-            <div>
-              <button class="btn btn-primary" onclick="openModal('modalCCT')"><i class="fas fa-upload"></i> Subir CCT</button>
-              <button class="btn btn-info" onclick="openModal('modalActa')"><i class="fas fa-file-signature"></i> Nueva Acta/Acuerdo</button>
-            </div>
-          </div>
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-gavel"></i> Legales y CCTs</h2><button class="btn btn-primary" onclick="openModal('modalCCT')"><i class="fas fa-upload"></i> Subir CCT</button></div>
           <div class="tabs">
             <button class="tab active" onclick="showTab('legales','ccts')">Convenios (CCTs)</button>
-            <button class="tab" onclick="showTab('legales','actas')">Actas y Acuerdos</button>
-            <button class="tab" onclick="showTab('legales','expedientes')">Expedientes Legales</button>
+            <button class="tab" onclick="showTab('legales','actas')">Actas</button>
           </div>
           <div id="legales-ccts" class="tab-content active"><div id="cctsList"></div></div>
           <div id="legales-actas" class="tab-content"><div id="actasList"></div></div>
-          <div id="legales-expedientes" class="tab-content"><div id="expedientesList"></div></div>
         </div>
       </section>
 
-      <!-- EMPRESAS / CONTRATISTAS -->
-      <section id="empresas">
+      <!-- EMPRESAS -->
+      <section id="empresas" style="display:none;">
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-building"></i> Empresas y Contratistas</h2>
-            <button class="btn btn-success" onclick="openModal('modalEmpresa')"><i class="fas fa-plus"></i> Registrar Empresa</button>
-          </div>
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-building"></i> Empresas</h2><button class="btn btn-success" onclick="openModal('modalEmpresa')"><i class="fas fa-plus"></i> Registrar</button></div>
           <div class="tabs">
             <button class="tab active" onclick="showTab('empresas','prestadoras')">Prestadoras</button>
             <button class="tab" onclick="showTab('empresas','productoras')">Productoras</button>
-            <button class="tab" onclick="showTab('empresas','salones')">Salones de Eventos</button>
+            <button class="tab" onclick="showTab('empresas','salones')">Salones</button>
             <button class="tab" onclick="showTab('empresas','bares')">Bares</button>
             <button class="tab" onclick="showTab('empresas','discotecas')">Discotecas</button>
             <button class="tab" onclick="showTab('empresas','recitales')">Recitales</button>
@@ -263,40 +365,10 @@
         </div>
       </section>
 
-      <!-- CARNETS -->
-      <section id="carnets">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-id-card"></i> Generador de Carnets Profesionales</h2>
-            <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Imprimir / Guardar PDF</button>
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start;">
-            <div>
-              <label><strong>Seleccionar Afiliado:</strong></label>
-              <select id="carnetSelectAfiliado" onchange="previewCarnet()"><option value="">-- Elegir --</option></select>
-              <div class="form-group" style="margin-top:1rem;">
-                <label><strong>Editar Campos antes de imprimir:</strong></label>
-                <input type="text" id="carnetEditNombre" placeholder="Nombre">
-                <input type="text" id="carnetEditCargo" placeholder="Cargo / Categoría">
-                <input type="text" id="carnetEditVencimiento" placeholder="Vencimiento">
-                <button class="btn btn-info btn-sm" onclick="updatePreview()"><i class="fas fa-sync"></i> Actualizar Vista Previa</button>
-              </div>
-            </div>
-            <div>
-              <h3 style="margin-bottom:0.5rem; color:var(--primary);">Vista Previa:</h3>
-              <div class="carnet-print-zone" id="carnetPreviewZone"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- INSPECTORES -->
-      <section id="inspectores">
+      <section id="inspectores" style="display:none;">
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title"><i class="fas fa-user-shield"></i> Cuerpo de Inspectores</h2>
-            <button class="btn btn-success" onclick="openModal('modalInspector')"><i class="fas fa-plus"></i> Nuevo Inspector</button>
-          </div>
+          <div class="card-header"><h2 class="card-title"><i class="fas fa-user-shield"></i> Inspectores</h2><button class="btn btn-success" onclick="openModal('modalInspector')"><i class="fas fa-plus"></i> Nuevo</button></div>
           <div class="table-responsive"><table><thead><tr><th>Nombre</th><th>Zona</th><th>Habilitación</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="inspectoresTable"></tbody></table></div>
         </div>
       </section>
@@ -304,97 +376,147 @@
     </div>
   </div>
 
-  <!-- MODALES -->
+  <!-- MODALES (simplificados para el ejemplo) -->
   <div id="modalAfiliado" class="modal"><div class="modal-content"><div class="modal-header"><h2>Nuevo Afiliado</h2><button class="modal-close" onclick="closeModal('modalAfiliado')">&times;</button></div>
-    <form onsubmit="saveAfiliado(event)"><input type="text" id="afNombre" placeholder="Nombre y Apellido" required><input type="text" id="afDNI" placeholder="DNI" required><input type="text" id="afCategoria" placeholder="Categoría" required><input type="file" id="afFoto" accept="image/*"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
+    <form onsubmit="saveAfiliado(event)"><input type="text" id="afNombre" placeholder="Nombre" required><input type="text" id="afDNI" placeholder="DNI" required><input type="text" id="afCategoria" placeholder="Categoría" required><input type="file" id="afFoto" accept="image/*"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
 
   <div id="modalPago" class="modal"><div class="modal-content"><div class="modal-header"><h2>Registrar Pago</h2><button class="modal-close" onclick="closeModal('modalPago')">&times;</button></div>
     <form onsubmit="savePago(event)"><input type="number" id="pagoAfiliadoId" placeholder="ID Afiliado" required><input type="number" id="pagoMonto" placeholder="Monto ($)" required><input type="month" id="pagoMes" required><button type="submit" class="btn btn-success" style="width:100%;">Registrar</button></form></div></div>
 
-  <div id="modalPrestador" class="modal"><div class="modal-content"><div class="modal-header"><h2>Nuevo Prestador / Mutual</h2><button class="modal-close" onclick="closeModal('modalPrestador')">&times;</button></div>
-    <form onsubmit="savePrestador(event)"><input type="text" id="prNombre" placeholder="Nombre Institución" required><select id="prTipo"><option value="prestador">Prestador Médico</option><option value="mutual">Mutual</option></select><input type="text" id="prDir" placeholder="Dirección"><input type="tel" id="prTel" placeholder="Teléfono"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
+  <div id="modalPrestador" class="modal"><div class="modal-content"><div class="modal-header"><h2>Nuevo Prestador</h2><button class="modal-close" onclick="closeModal('modalPrestador')">&times;</button></div>
+    <form onsubmit="savePrestador(event)"><input type="text" id="prNombre" placeholder="Nombre" required><input type="text" id="prDir" placeholder="Dirección"><input type="tel" id="prTel" placeholder="Teléfono"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
 
-  <div id="modalCCT" class="modal"><div class="modal-content"><div class="modal-header"><h2>Subir CCT / Documento Legal</h2><button class="modal-close" onclick="closeModal('modalCCT')">&times;</button></div>
-    <form onsubmit="saveCCT(event)"><input type="text" id="cctNombre" placeholder="Nombre del Convenio" required><input type="text" id="cctTipo" placeholder="Tipo (Ej: CCT 258/95)" required><input type="date" id="cctFecha" required><label>Archivo PDF:</label><input type="file" id="cctFile" accept=".pdf" required><button type="submit" class="btn btn-success" style="width:100%;">Subir Documento</button></form></div></div>
+  <div id="modalCCT" class="modal"><div class="modal-content"><div class="modal-header"><h2>Subir CCT</h2><button class="modal-close" onclick="closeModal('modalCCT')">&times;</button></div>
+    <form onsubmit="saveCCT(event)"><input type="text" id="cctNombre" placeholder="Nombre" required><input type="text" id="cctTipo" placeholder="Tipo" required><input type="date" id="cctFecha" required><input type="file" id="cctFile" accept=".pdf" required><button type="submit" class="btn btn-success" style="width:100%;">Subir</button></form></div></div>
 
-  <div id="modalActa" class="modal"><div class="modal-content"><div class="modal-header"><h2>Nueva Acta / Acuerdo</h2><button class="modal-close" onclick="closeModal('modalActa')">&times;</button></div>
-    <form onsubmit="saveActa(event)"><input type="text" id="actaTitulo" placeholder="Título" required><textarea id="actaContenido" rows="4" placeholder="Contenido"></textarea><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
+  <div id="modalActa" class="modal"><div class="modal-content"><div class="modal-header"><h2>Nueva Acta</h2><button class="modal-close" onclick="closeModal('modalActa')">&times;</button></div>
+    <form onsubmit="saveActa(event)"><input type="text" id="actaTitulo" placeholder="Título" required><textarea id="actaContenido" rows="4"></textarea><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
 
   <div id="modalEmpresa" class="modal"><div class="modal-content"><div class="modal-header"><h2>Registrar Empresa</h2><button class="modal-close" onclick="closeModal('modalEmpresa')">&times;</button></div>
-    <form onsubmit="saveEmpresa(event)"><input type="text" id="empNombre" placeholder="Nombre Empresa" required><select id="empTipo"><option value="prestadoras">Prestadora</option><option value="productoras">Productora</option><option value="salones">Salón de Eventos</option><option value="bares">Bar</option><option value="discotecas">Discoteca</option><option value="recitales">Recital</option><option value="circos">Circo</option></select><input type="text" id="empDir" placeholder="Dirección"><input type="tel" id="empTel" placeholder="Teléfono"><input type="text" id="empCUIT" placeholder="CUIT"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
+    <form onsubmit="saveEmpresa(event)"><input type="text" id="empNombre" placeholder="Nombre" required><select id="empTipo"><option value="prestadoras">Prestadora</option><option value="productoras">Productora</option><option value="salones">Salón</option><option value="bares">Bar</option><option value="discotecas">Discoteca</option><option value="recitales">Recital</option><option value="circos">Circo</option></select><input type="text" id="empDir" placeholder="Dirección"><input type="tel" id="empTel" placeholder="Teléfono"><input type="text" id="empCUIT" placeholder="CUIT"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
 
   <div id="modalInspector" class="modal"><div class="modal-content"><div class="modal-header"><h2>Nuevo Inspector</h2><button class="modal-close" onclick="closeModal('modalInspector')">&times;</button></div>
-    <form onsubmit="saveInspector(event)"><input type="text" id="insNombre" placeholder="Nombre Completo" required><input type="text" id="insZona" placeholder="Zona/Seccional" required><input type="text" id="insHab" placeholder="N° Habilitación" required><input type="email" id="insEmail" placeholder="Email"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
+    <form onsubmit="saveInspector(event)"><input type="text" id="insNombre" placeholder="Nombre" required><input type="text" id="insZona" placeholder="Zona" required><input type="text" id="insHab" placeholder="Habilitación" required><input type="email" id="insEmail" placeholder="Email"><button type="submit" class="btn btn-success" style="width:100%;">Guardar</button></form></div></div>
+
+  <div id="modalConfirm" class="modal">
+    <div class="modal-content" style="max-width:400px;">
+      <div class="confirm-dialog">
+        <h4><i class="fas fa-exclamation-triangle"></i> Confirmar</h4>
+        <p id="confirmMessage">¿Está seguro?</p>
+      </div>
+      <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">
+        <button class="btn btn-secondary" onclick="closeModal('modalConfirm')">Cancelar</button>
+        <button class="btn btn-danger" id="confirmBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ==========================================
-    // BASE DE DATOS & INICIALIZACIÓN
+    // DATABASE & INIT
     // ==========================================
-    const DB_KEY = 'uadav_v2026_full';
+    const DB_KEY = 'uadav_v2026_local';
+    const BACKUP_KEY = 'uadav_v2026_backup';
     const DEFAULT_DB = {
-      afiliados: [], prestamos: [], pagos: [],
-      prestadores: [], mutuales: [], vinculados: [],
-      ccts: [], actas: [], expedientes: [],
-      empresas: { prestadoras:[], productoras:[], salones:[], bares:[], discotecas:[], recitales:[], circos:[] },
-      inspectores: [],
-      lastId: 1000
+      afiliados: [], pagos: [], prestadores: [], mutuales: [], vinculados: [],
+      ccts: [], actas: [], empresas: { prestadoras:[], productoras:[], salones:[], bares:[], discotecas:[], recitales:[], circos:[] },
+      inspectores: [], lastId: 1000, settings: { theme: 'light' }
     };
-    let db = { ...DEFAULT_DB };
+    let db = null;
     let currentUser = null;
+    let credPhotoData = null;
 
-    window.onload = function() {
-      const saved = localStorage.getItem(DB_KEY);
-      if (saved) { try { db = JSON.parse(saved); } catch(e) { db = { ...DEFAULT_DB }; } }
-      checkDBIntegrity();
-    };
-
-    function checkDBIntegrity() {
-      if (!db.empresas) db.empresas = DEFAULT_DB.empresas;
-      ['prestadoras','productoras','salones','bares','discotecas','recitales','circos'].forEach(k => { if(!db.empresas[k]) db.empresas[k]=[]; });
-      saveData();
+    function initSystem() {
+      try {
+        const saved = localStorage.getItem(DB_KEY);
+        db = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_DB));
+        ['prestadoras','productoras','salones','bares','discotecas','recitales','circos'].forEach(k => { if(!db.empresas[k]) db.empresas[k]=[]; });
+        localStorage.setItem(BACKUP_KEY, JSON.stringify(db));
+        return true;
+      } catch(e) { console.error('Init error:', e); db = JSON.parse(JSON.stringify(DEFAULT_DB)); return false; }
     }
 
-    function saveData() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-    function generateId() { db.lastId++; saveData(); return db.lastId; }
+    function saveData() { try { localStorage.setItem(DB_KEY, JSON.stringify(db)); localStorage.setItem(BACKUP_KEY, JSON.stringify(db)); updateLastSync(); } catch(e) { console.error('Save error:', e); } }
+    function generateId() { db.lastId = (db.lastId || 1000) + 1; saveData(); return db.lastId; }
+    function updateLastSync() { const el = document.getElementById('lastSync'); if(el) el.textContent = new Date().toLocaleTimeString(); }
 
     // ==========================================
-    // AUTH & NAV
+    // AUTH
     // ==========================================
-    function handleLogin(e) {
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const u = document.getElementById('loginUser').value.trim().toLowerCase();
-      const p = document.getElementById('loginPass').value.trim();
-      if (u === 'admin' && p === '1234') {
-        currentUser = { role: 'superadmin' };
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('mainView').classList.remove('hidden');
-        updateStats();
-        renderAll();
-      } else { alert('Credenciales incorrectas'); }
+      e.stopPropagation();
+      const user = document.getElementById('loginUser').value.trim().toLowerCase();
+      const pass = document.getElementById('loginPass').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      
+      if (user === 'admin' && pass === '1234') {
+        currentUser = { username: 'admin', role: 'superadmin', loginTime: new Date().toISOString() };
+        sessionStorage.setItem('uadav_session', JSON.stringify(currentUser));
+        document.getElementById('loginView').style.display = 'none';
+        document.getElementById('mainView').style.display = 'block';
+        updateStats(); renderAll();
+        errorMsg.style.display = 'none';
+      } else {
+        errorMsg.textContent = 'Usuario o contraseña incorrectos';
+        errorMsg.style.display = 'block';
+      }
+    });
+
+    function logout() {
+      sessionStorage.removeItem('uadav_session');
+      currentUser = null;
+      location.reload();
     }
-    function logout() { location.reload(); }
+
+    function showSection(id) {
+      document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+      document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      if(id === 'padron') renderPadron();
+      if(id === 'credenciales') { updateCredentialSelect(); if(db.afiliados[0]) { document.getElementById('credSelectPersona').value = 'afiliado_'+db.afiliados[0].id; loadPersonaData(); } }
+      if(id === 'cobranzas') renderCobranzas();
+      if(id === 'obras-mutuales') renderObras();
+      if(id === 'sindicatos-legales') renderLegales();
+      if(id === 'empresas') renderEmpresas();
+      if(id === 'inspectores') renderInspectores();
+    }
 
     function showTab(section, tab) {
       document.querySelectorAll(`#${section} .tab`).forEach(t => t.classList.remove('active'));
       document.querySelectorAll(`#${section} .tab-content`).forEach(c => c.classList.remove('active'));
-      event.target.classList.add('active');
+      event.currentTarget.classList.add('active');
       document.getElementById(`${section}-${tab}`).classList.add('active');
     }
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+    function showConfirm(message, callback) {
+      document.getElementById('confirmMessage').textContent = message;
+      document.getElementById('confirmBtn').onclick = function() { callback(); closeModal('modalConfirm'); };
+      openModal('modalConfirm');
+    }
+
+    function confirmarLimpieza() {
+      showConfirm('¿Restaurar desde backup?', function() {
+        const backup = localStorage.getItem(BACKUP_KEY);
+        if(backup) { db = JSON.parse(backup); saveData(); renderAll(); alert('✅ Restaurado'); }
+      });
+    }
+
     // ==========================================
-    // PADRÓN & AFILIADOS
+    // PADRÓN
     // ==========================================
     function saveAfiliado(e) {
       e.preventDefault();
       const fileInput = document.getElementById('afFoto');
       const process = (foto) => {
         db.afiliados.push({ id: generateId(), nombre: document.getElementById('afNombre').value, dni: document.getElementById('afDNI').value, categoria: document.getElementById('afCategoria').value, foto, fecha: new Date().toISOString() });
-        saveData(); closeModal('modalAfiliado'); e.target.reset(); renderPadron(); updateStats();
+        saveData(); closeModal('modalAfiliado'); e.target.reset(); renderPadron(); updateStats(); updateCredentialSelect();
       };
-      if (fileInput.files[0]) { const r = new FileReader(); r.onload = ev => process(ev.target.result); r.readAsDataURL(fileInput.files[0]); }
+      if(fileInput.files?.[0]) { const r = new FileReader(); r.onload = ev => process(ev.target.result); r.readAsDataURL(fileInput.files[0]); }
       else process(null);
     }
 
@@ -402,18 +524,110 @@
       const search = document.getElementById('searchPadron').value.toLowerCase();
       const filtered = db.afiliados.filter(a => a.nombre.toLowerCase().includes(search) || a.dni.includes(search) || a.id.toString().includes(search));
       document.getElementById('padronTable').innerHTML = filtered.map(a => `
-        <tr>
-          <td>${a.foto ? `<img src="${a.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<i class="fas fa-user"></i>'}</td>
-          <td>#${a.id}</td><td>${a.nombre}</td><td>${a.dni}</td><td>${a.categoria}</td>
-          <td><button class="btn btn-sm btn-danger" onclick="deleteAfiliado(${a.id})"><i class="fas fa-trash"></i></button></td>
-        </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:2rem;">Sin registros</td></tr>';
-      
-      // Update Carnet Selector
-      const sel = document.getElementById('carnetSelectAfiliado');
-      sel.innerHTML = '<option value="">-- Elegir --</option>' + db.afiliados.map(a => `<option value="${a.id}">${a.nombre} (ID: ${a.id})</option>`).join('');
+        <tr><td>${a.foto ? `<img src="${a.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<i class="fas fa-user"></i>'}</td>
+        <td>#${a.id}</td><td>${a.nombre}</td><td>${a.dni}</td><td>${a.categoria}</td>
+        <td><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.afiliados = db.afiliados.filter(x=>x.id!==${a.id}); saveData(); renderPadron(); updateStats(); updateCredentialSelect(); })"><i class="fas fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:2rem;">Sin registros</td></tr>';
+      updateCredentialSelect();
     }
 
-    function deleteAfiliado(id) { if(confirm('¿Eliminar?')) { db.afiliados = db.afiliados.filter(a=>a.id!==id); saveData(); renderPadron(); updateStats(); } }
+    // ==========================================
+    // CREDENCIALES (CORREGIDO)
+    // ==========================================
+    function updateCredentialSelect() {
+      const sel = document.getElementById('credSelectPersona');
+      const optAfiliados = document.getElementById('optAfiliados');
+      const optInspectores = document.getElementById('optInspectores');
+      if(!sel || !optAfiliados || !optInspectores) return;
+      
+      optAfiliados.innerHTML = db.afiliados.map(a => `<option value="afiliado_${a.id}">${a.nombre} (ID:${a.id})</option>`).join('') || '<option disabled>Sin afiliados</option>';
+      optInspectores.innerHTML = db.inspectores.map(i => `<option value="inspector_${i.id}">${i.nombre} (Hab:${i.hab})</option>`).join('') || '<option disabled>Sin inspectores</option>';
+    }
+
+    function loadPersonaData() {
+      const val = document.getElementById('credSelectPersona').value;
+      if(!val) return;
+      const [tipo, id] = val.split('_');
+      const pid = parseInt(id);
+      
+      if(tipo === 'afiliado') {
+        const af = db.afiliados.find(a => a.id === pid);
+        if(!af) return;
+        document.getElementById('credNombre').value = af.nombre;
+        document.getElementById('credDNI').value = af.dni;
+        document.getElementById('credRol').value = af.categoria;
+        document.getElementById('credDepto').value = 'UADAV';
+        document.getElementById('credAfiliadoNum').value = af.id;
+        document.getElementById('credFechaAfiliacion').value = af.fecha?.split('T')[0] || '';
+        document.getElementById('credEmail').value = 'uadavofi@gmail.com';
+        document.getElementById('credWeb').value = 'www.uadav.org.ar';
+        document.getElementById('credQRContent').value = `UADAV-VALIDAR-${af.id}-${af.dni}`;
+        document.getElementById('credBarcodeContent').value = `UADAV-${af.id}`;
+        if(af.foto) { credPhotoData = af.foto; document.getElementById('credPhotoArea').innerHTML = `<img src="${af.foto}">`; }
+      } else if(tipo === 'inspector') {
+        const ins = db.inspectores.find(i => i.id === pid);
+        if(!ins) return;
+        document.getElementById('credNombre').value = ins.nombre;
+        document.getElementById('credRol').value = 'Inspector';
+        document.getElementById('credDepto').value = ins.zona || 'UADAV';
+        document.getElementById('credAfiliadoNum').value = ins.hab || ins.id;
+        document.getElementById('credEmail').value = ins.email || 'uadavofi@gmail.com';
+        document.getElementById('credQRContent').value = `UADAV-INSPECTOR-${ins.id}-${ins.hab}`;
+        document.getElementById('credBarcodeContent').value = `UADAV-INS-${ins.id}`;
+      }
+      updateCredential();
+    }
+
+    function loadPhoto(input) {
+      if(input.files?.[0]) {
+        const reader = new FileReader();
+        reader.onload = e => { credPhotoData = e.target.result; document.getElementById('credPhotoArea').innerHTML = `<img src="${e.target.result}">`; updateCredential(); };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function updateCredential() {
+      const color = document.getElementById('credColorPrincipal').value;
+      document.documentElement.style.setProperty('--primary', color);
+      document.getElementById('credFront').style.borderTop = `4px solid ${color}`;
+      document.getElementById('credBack').style.borderTop = `4px solid ${color}`;
+      
+      document.getElementById('prevNombre').textContent = document.getElementById('credNombre').value || '-';
+      document.getElementById('prevDNI').textContent = document.getElementById('credDNI').value || '-';
+      document.getElementById('prevRol').textContent = document.getElementById('credRol').value || '-';
+      document.getElementById('prevDepto').textContent = document.getElementById('credDepto').value || '-';
+      document.getElementById('prevAfiliadoNum').textContent = document.getElementById('credAfiliadoNum').value || '-';
+      document.getElementById('prevFechaAfiliacion').textContent = document.getElementById('credFechaAfiliacion').value || '-';
+      
+      ['fieldRol','fieldDepto'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display = document.getElementById(id.replace('field','show')).checked ? '' : 'none'; });
+      document.getElementById('credPhotoArea').style.display = document.getElementById('showFoto').checked ? 'flex' : 'none';
+      
+      const qr = document.getElementById('credQRContent').value || 'UADAV-CREDENCIAL';
+      document.querySelector('#prevQRContainer img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qr)}`;
+      
+      const email = document.getElementById('credEmail').value || 'uadavofi@gmail.com';
+      const phone = document.getElementById('credWhatsApp').value || '11-5375-7711';
+      document.getElementById('prevBackInfo').innerHTML = `<p>Escaneá para verificar validez</p><p>${email}</p><p>Personería Gremial N° 210</p><p>${phone}</p>`;
+      
+      document.getElementById('prevWebFooter').classList.toggle('hidden', !document.getElementById('showWeb').checked);
+    }
+
+    function downloadPNG() {
+      html2canvas(document.getElementById('credentialPrintArea'), {scale:2, backgroundColor:'#ffffff'}).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `UADAV_Credencial_${document.getElementById('credNombre').value||'Preview'}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[85.6, 53.98*2]});
+      html2canvas(document.getElementById('credentialPrintArea'), {scale:2}).then(canvas => {
+        doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 85.6, 53.98*2);
+        doc.save(`UADAV_Credencial_${document.getElementById('credNombre').value||'Preview'}.pdf`);
+      });
+    }
 
     // ==========================================
     // COBRANZAS
@@ -425,28 +639,26 @@
     }
 
     function renderCobranzas() {
-      const currentMes = new Date().toISOString().slice(0, 7);
-      const pendientes = db.afiliados.filter(a => !db.pagos.some(p => p.afiliadoId === a.id && p.mes === currentMes));
-      
+      const currentMes = new Date().toISOString().slice(0,7);
+      const pendientes = db.afiliados.filter(a => !db.pagos.some(p => p.afiliadoId===a.id && p.mes===currentMes));
       document.getElementById('cuotasList').innerHTML = pendientes.map(a => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;">
           <div><strong>${a.nombre}</strong> <span style="color:#64748b;font-size:0.8rem;">(${a.dni})</span><div style="font-size:0.85rem;color:#64748b;">Cuota: ${currentMes}</div></div>
           <button class="btn btn-sm btn-success" onclick="document.getElementById('pagoAfiliadoId').value=${a.id}; openModal('modalPago')"><i class="fas fa-dollar-sign"></i> Pagar</button>
-        </div>`).join('') || '<p style="text-align:center;color:#10b981;">✅ Todos al día este mes</p>';
-
+        </div>`).join('') || '<p style="text-align:center;color:#10b981;">✅ Todos al día</p>';
       document.getElementById('historialPagosList').innerHTML = db.pagos.slice().reverse().map(p => {
-        const af = db.afiliados.find(a => a.id === p.afiliadoId);
-        return `<div style="padding:0.5rem;border-bottom:1px solid #eee;">${af ? af.nombre : 'Desconocido'} - $${p.monto} - ${p.mes}</div>`;
+        const af = db.afiliados.find(a => a.id===p.afiliadoId);
+        return `<div style="padding:0.5rem;border-bottom:1px solid #eee;">${af?.nombre||'?'} - $${p.monto} - ${p.mes}</div>`;
       }).join('') || '<p style="text-align:center;color:#64748b;">Sin historial</p>';
     }
 
     // ==========================================
-    // OBRAS SOCIALES / MUTUALES / VINCULADOS
+    // OBRAS / MUTUALES
     // ==========================================
     function savePrestador(e) {
       e.preventDefault();
-      const item = { id: Date.now(), nombre: document.getElementById('prNombre').value, tipo: document.getElementById('prTipo').value, direccion: document.getElementById('prDir').value, telefono: document.getElementById('prTel').value };
-      if (item.tipo === 'prestador') db.prestadores.push(item); else db.mutuales.push(item);
+      const item = { id: Date.now(), nombre: document.getElementById('prNombre').value, tipo: 'prestador', direccion: document.getElementById('prDir').value, telefono: document.getElementById('prTel').value };
+      db.prestadores.push(item);
       saveData(); closeModal('modalPrestador'); e.target.reset(); renderObras();
     }
 
@@ -454,53 +666,25 @@
       const renderList = (arr, containerId) => {
         document.getElementById(containerId).innerHTML = arr.map(p => `
           <div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
-            <div><strong>${p.nombre}</strong><div style="font-size:0.85rem;color:#64748b;">${p.direccion || ''} | ${p.telefono || ''}</div></div>
-            <button class="btn btn-sm btn-danger" onclick="deleteItem('${containerId}', ${p.id})"><i class="fas fa-trash"></i></button>
+            <div><strong>${p.nombre}</strong><div style="font-size:0.85rem;color:#64748b;">${p.direccion||''} | ${p.telefono||''}</div></div>
+            <button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.prestadores = db.prestadores.filter(x=>x.id!==${p.id}); saveData(); renderObras(); })"><i class="fas fa-trash"></i></button>
           </div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin registros</p>';
       };
       renderList(db.prestadores, 'prestadoresList');
-      renderList(db.mutuales, 'mutualesList');
-
-      // Vinculados
-      document.getElementById('vinculadosTable').innerHTML = db.afiliados.map(a => {
-        const vinc = db.vinculados.find(v => v.afiliadoId === a.id);
-        return `<tr>
-          <td>${a.nombre}</td>
-          <td>${vinc ? vinc.nombre : '<span style="color:#dc2626;">Sin asignar</span>'}</td>
-          <td>${vinc ? 'Activo' : '-'}</td>
-          <td><button class="btn btn-sm btn-primary" onclick="asignarObra(${a.id})">Asignar</button></td>
-        </tr>`;
-      }).join('');
-    }
-
-    function asignarObra(afId) {
-      const nombre = prompt('Nombre de Obra Social / Mutual:');
-      if (nombre) {
-        db.vinculados = db.vinculados.filter(v => v.afiliadoId !== afId);
-        db.vinculados.push({ afiliadoId: afId, nombre, fecha: new Date().toISOString() });
-        saveData(); renderObras();
-      }
-    }
-
-    function deleteItem(containerId, id) {
-      if(!confirm('¿Eliminar?')) return;
-      const map = { 'prestadoresList': 'prestadores', 'mutualesList': 'mutuales', 'cctsList': 'ccts', 'actasList': 'actas', 'expedientesList': 'expedientes', 'inspectoresTable': 'inspectores' };
-      const key = map[containerId];
-      if (key === 'inspectoresTable') { db.inspectores = db.inspectores.filter(i => i.id !== id); }
-      else { db[key] = db[key].filter(i => i.id !== id); }
-      saveData(); renderObras(); renderLegales(); renderInspectores();
+      document.getElementById('mutualesList').innerHTML = '<p style="text-align:center;color:#64748b;">Módulo de mutuales listo</p>';
+      document.getElementById('vinculadosTable').innerHTML = db.afiliados.map(a => `<tr><td>${a.nombre}</td><td><span style="color:#64748b;">Sin asignar</span></td><td>-</td><td><button class="btn btn-sm btn-primary">Asignar</button></td></tr>`).join('');
     }
 
     // ==========================================
-    // SINDICATOS, LEGALES Y CCTs
+    // LEGALES / CCTs
     // ==========================================
     function saveCCT(e) {
       e.preventDefault();
       const file = document.getElementById('cctFile').files[0];
-      if (!file) return;
+      if(!file) return;
       const reader = new FileReader();
-      reader.onload = function(ev) {
-        db.ccts.push({ id: Date.now(), nombre: document.getElementById('cctNombre').value, tipo: document.getElementById('cctTipo').value, fecha: document.getElementById('cctFecha').value, data: ev.target.result });
+      reader.onload = ev => {
+        db.ccts.push({ id: Date.now(), nombre: document.getElementById('cctNombre').value, tipo: document.getElementById('cctTipo').value, fecha: document.getElementById('cctFecha').value,  ev.target.result });
         saveData(); closeModal('modalCCT'); e.target.reset(); renderLegales(); updateStats();
       };
       reader.readAsDataURL(file);
@@ -515,23 +699,14 @@
     function renderLegales() {
       document.getElementById('cctsList').innerHTML = db.ccts.map(c => `
         <div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;">
-          <div><strong>${c.nombre}</strong> <span style="background:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:0.75rem;">${c.tipo}</span><div style="font-size:0.85rem;color:#64748b;">Fecha: ${c.fecha}</div></div>
-          <div style="display:flex;gap:0.5rem;">
-            <a href="${c.data}" download="${c.nombre}.pdf" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></a>
-            <button class="btn btn-sm btn-danger" onclick="deleteItem('cctsList', ${c.id})"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin CCTs cargados</p>';
-
-      document.getElementById('actasList').innerHTML = db.actas.map(a => `
-        <div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;cursor:pointer;" onclick="alert('${a.contenido.replace(/\n/g, '\\n')}')">
-          <strong>${a.titulo}</strong><div style="font-size:0.85rem;color:#64748b;">${a.fecha.split('T')[0]}</div>
-        </div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin actas</p>';
-      
-      document.getElementById('expedientesList').innerHTML = '<p style="text-align:center;color:#64748b;">Módulo de expedientes listo para implementación.</p>';
+          <div><strong>${c.nombre}</strong> <span style="background:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:0.75rem;">${c.tipo}</span><div style="font-size:0.85rem;color:#64748b;">${c.fecha}</div></div>
+          <div style="display:flex;gap:0.5rem;"><a href="${c.data}" download="${c.nombre}.pdf" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></a><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.ccts = db.ccts.filter(x=>x.id!==${c.id}); saveData(); renderLegales(); })"><i class="fas fa-trash"></i></button></div>
+        </div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin CCTs</p>';
+      document.getElementById('actasList').innerHTML = db.actas.map(a => `<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;"><strong>${a.titulo}</strong><div style="font-size:0.85rem;color:#64748b;">${a.fecha.split('T')[0]}</div></div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin actas</p>';
     }
 
     // ==========================================
-    // EMPRESAS / CONTRATISTAS
+    // EMPRESAS
     // ==========================================
     function saveEmpresa(e) {
       e.preventDefault();
@@ -542,67 +717,9 @@
 
     function renderEmpresas() {
       ['prestadoras','productoras','salones','bares','discotecas','recitales','circos'].forEach(tipo => {
-        const container = document.getElementById(`emp${tipo.charAt(0).toUpperCase() + tipo.slice(1)}List`);
-        if (container) {
-          container.innerHTML = db.empresas[tipo].map(e => `
-            <div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
-              <div><strong>${e.nombre}</strong><div style="font-size:0.85rem;color:#64748b;">${e.direccion || ''} | CUIT: ${e.cuit || '-'}</div></div>
-              <button class="btn btn-sm btn-danger" onclick="deleteEmpresa('${tipo}', ${e.id})"><i class="fas fa-trash"></i></button>
-            </div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin registros</p>';
-        }
+        const container = document.getElementById(`emp${tipo.charAt(0).toUpperCase()+tipo.slice(1)}List`);
+        if(container) container.innerHTML = db.empresas[tipo].map(e => `<div style="padding:0.75rem;background:#f8fafc;border-radius:8px;margin-bottom:0.5rem;display:flex;justify-content:space-between;"><div><strong>${e.nombre}</strong><div style="font-size:0.85rem;color:#64748b;">${e.direccion||''} | CUIT: ${e.cuit||'-'}</div></div><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.empresas['${tipo}'] = db.empresas['${tipo}'].filter(x=>x.id!==${e.id}); saveData(); renderEmpresas(); })"><i class="fas fa-trash"></i></button></div>`).join('') || '<p style="text-align:center;color:#64748b;">Sin registros</p>';
       });
-    }
-
-    function deleteEmpresa(tipo, id) {
-      if(!confirm('¿Eliminar?')) return;
-      db.empresas[tipo] = db.empresas[tipo].filter(e => e.id !== id);
-      saveData(); renderEmpresas(); updateStats();
-    }
-
-    // ==========================================
-    // CARNETS GENERATOR
-    // ==========================================
-    function previewCarnet() {
-      const id = parseInt(document.getElementById('carnetSelectAfiliado').value);
-      if (!id) { document.getElementById('carnetPreviewZone').innerHTML = ''; return; }
-      const af = db.afiliados.find(a => a.id === id);
-      if (!af) return;
-      
-      document.getElementById('carnetEditNombre').value = af.nombre;
-      document.getElementById('carnetEditCargo').value = af.categoria;
-      document.getElementById('carnetEditVencimiento').value = '';
-      
-      renderCarnetPreview(af);
-    }
-
-    function updatePreview() {
-      const id = parseInt(document.getElementById('carnetSelectAfiliado').value);
-      if (!id) return;
-      const af = db.afiliados.find(a => a.id === id);
-      af.nombre = document.getElementById('carnetEditNombre').value;
-      af.categoria = document.getElementById('carnetEditCargo').value;
-      renderCarnetPreview(af);
-    }
-
-    function renderCarnetPreview(af) {
-      const venc = document.getElementById('carnetEditVencimiento').value || '2026-12-31';
-      document.getElementById('carnetPreviewZone').innerHTML = `
-        <div class="carnet-preview">
-          <div class="carnet-front">
-            <div class="carnet-header-strip"><span>UNIÓN ARGENTINA DE ARTISTAS DE VARIEDADES</span><span>UADAV ★</span></div>
-            <div class="carnet-title-strip">CARNET DE AFILIACIÓN</div>
-            <div class="carnet-body-flex">
-              <div class="carnet-photo-box">${af.foto ? `<img src="${af.foto}">` : '<i class="fas fa-user" style="font-size:2.5rem;color:#94a3b8;"></i>'}</div>
-              <div class="carnet-info-box">
-                <div><div class="carnet-label">Nombre y Apellido:</div><div class="carnet-value">${af.nombre}</div></div>
-                <div><div class="carnet-label">Afiliado N°:</div><div class="carnet-value">${af.id}</div></div>
-                <div><div class="carnet-label">Fecha de Afiliación:</div><div class="carnet-value">${new Date(af.fecha).toLocaleDateString()}</div></div>
-              </div>
-            </div>
-            <div class="carnet-footer-info">Unión Argentina de Artistas de Variedades | uadavofi@gmail.com | Personería Gremial N° 210 | 11-5375-7711</div>
-          </div>
-          <div style="text-align:center;padding:10px;font-size:8pt;color:#475569;">Vencimiento: ${venc} | Escanear QR para validar</div>
-        </div>`;
     }
 
     // ==========================================
@@ -611,36 +728,32 @@
     function saveInspector(e) {
       e.preventDefault();
       db.inspectores.push({ id: Date.now(), nombre: document.getElementById('insNombre').value, zona: document.getElementById('insZona').value, hab: document.getElementById('insHab').value, email: document.getElementById('insEmail').value, activo: true });
-      saveData(); closeModal('modalInspector'); e.target.reset(); renderInspectores();
-    }
-
-    function toggleInspector(id) {
-      const ins = db.inspectores.find(i => i.id === id);
-      if (ins) { ins.activo = !ins.activo; saveData(); renderInspectores(); }
+      saveData(); closeModal('modalInspector'); e.target.reset(); renderInspectores(); updateCredentialSelect();
     }
 
     function renderInspectores() {
       document.getElementById('inspectoresTable').innerHTML = db.inspectores.map(i => `
-        <tr>
-          <td>${i.nombre}</td><td>${i.zona}</td><td>${i.hab}</td>
-          <td><label class="switch"><input type="checkbox" ${i.activo?'checked':''} onchange="toggleInspector(${i.id})"><span class="slider"></span></label></td>
-          <td><button class="btn btn-sm btn-danger" onclick="deleteItem('inspectoresTable', ${i.id})"><i class="fas fa-trash"></i></button></td>
-        </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;">Sin inspectores</td></tr>';
+        <tr><td>${i.nombre}</td><td>${i.zona}</td><td>${i.hab}</td>
+        <td><label class="switch"><input type="checkbox" ${i.activo?'checked':''} onchange="toggleInspector(${i.id})"><span class="slider"></span></label></td>
+        <td><button class="btn btn-sm btn-danger" onclick="showConfirm('¿Eliminar?', () => { db.inspectores = db.inspectores.filter(x=>x.id!==${i.id}); saveData(); renderInspectores(); updateCredentialSelect(); })"><i class="fas fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;">Sin inspectores</td></tr>';
     }
 
+    function toggleInspector(id) { const ins = db.inspectores.find(i=>i.id===id); if(ins) { ins.activo = !ins.activo; saveData(); renderInspectores(); } }
+
     // ==========================================
-    // UTILIDADES & EXPORT
+    // UTILS
     // ==========================================
     function updateStats() {
-      document.getElementById('statAfiliados').innerText = db.afiliados.length;
-      let totalEmp = 0; Object.values(db.empresas).forEach(arr => totalEmp += arr.length);
-      document.getElementById('statEmpresas').innerText = totalEmp;
-      document.getElementById('statCCTs').innerText = db.ccts.length;
-      document.getElementById('statCarnets').innerText = db.afiliados.length;
+      document.getElementById('statAfiliados').textContent = db.afiliados?.length || 0;
+      let totalEmp = 0; Object.values(db.empresas||{}).forEach(arr => totalEmp += arr.length);
+      document.getElementById('statEmpresas').textContent = totalEmp;
+      document.getElementById('statCCTs').textContent = db.ccts?.length || 0;
+      document.getElementById('statInspectores').textContent = db.inspectores?.length || 0;
     }
 
     function renderAll() {
       renderPadron(); renderCobranzas(); renderObras(); renderLegales(); renderEmpresas(); renderInspectores();
+      updateCredentialSelect();
     }
 
     function exportarTodoExcel() {
@@ -648,10 +761,12 @@
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.afiliados), "Afiliados");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.pagos), "Pagos");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.ccts.map(c=>({nombre:c.nombre,tipo:c.tipo,fecha:c.fecha}))), "CCTs");
-      XLSX.writeFile(wb, `UADAV_Reporte_Completo_${new Date().toISOString().split('T')[0]}.xlsx`);
+      XLSX.writeFile(wb, `UADAV_Reporte_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
-    window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('active'); };
+    window.onclick = e => { if(e.target.classList.contains('modal')) e.target.classList.remove('active'); };
+    window.addEventListener('load', () => { initSystem(); const session = sessionStorage.getItem('uadav_session'); if(session) { currentUser = JSON.parse(session); document.getElementById('mainView').style.display = 'block'; updateStats(); renderAll(); } else { document.getElementById('mainView').style.display = 'none'; } });
+    window.addEventListener('error', e => console.error('Global error:', e.message));
   </script>
 </body>
 </html>
